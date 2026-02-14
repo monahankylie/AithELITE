@@ -6,6 +6,7 @@ import uvicorn
 from fastapi import FastAPI, BackgroundTasks, HTTPException,Request
 from fastapi.middleware.cors import CORSMiddleware
 
+
 app = FastAPI()
 
 app.add_middleware(
@@ -15,7 +16,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-cred = credentials.Certificate('fbACC.json')
+cred = credentials.Certificate("fbACC.json")  
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
