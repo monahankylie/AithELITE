@@ -1,4 +1,5 @@
 import type { Route } from "./+types/home";
+import { Link } from "react-router";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -31,8 +32,8 @@ export default function Home() {
 
 
           {/* Log In Button (Animated gradient hover) */}
-          <button
-            type="button"
+          <Link
+            to="/login"
             className="
               relative overflow-hidden
               rounded-full px-6 py-2 text-sm font-medium text-white
@@ -42,14 +43,9 @@ export default function Home() {
               hover:bg-right
               shadow-md hover:shadow-lg
               focus:outline-none focus:ring-2 focus:ring-blue-400/40
-            "
-            onClick={() => {
-              // TO DO: wire to auth route/modal
-              console.log("Log In clicked");
-            }}
-          >
+            ">
             Log In
-          </button>
+          </Link>
         </div>
       </header>
 
@@ -72,7 +68,7 @@ export default function Home() {
                 <p className="mt-6 max-w-xl text-base text-black/80">
                    Competitive athlete discovery for collegiate recruiters.
                 </p>
-
+              {/* TO DO: route */}
                 <div className="mt-8">
                   <button
                     type="button"
