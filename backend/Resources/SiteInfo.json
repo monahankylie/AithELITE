@@ -1,0 +1,34 @@
+{
+  "maxpreps": {
+    "CA_DEV":{
+        "team_url_pattern": "https://www.maxpreps.com/ca/basketball/schools/",
+        "title": "California Boys Basketball High School Teams",
+        "header_type": "h1",
+        "ex_roster_info":{
+          "url":"https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/roster/",
+          "ex_player_url" : "/ca/lafayette/acalanes-dons/athletes/preston-hilsabeck/?careerid=hpb7k1kir1dm6"
+        }
+
+    },
+    "teams_title": {
+      "title_pattern": "{state} Boys {sport} High School Teams",
+      "header_type": "h1"
+    },
+    "teams_list_page": {
+      "url_pattern": "https://www.maxpreps.com/{state}/{sport}/schools/"     
+    },
+    "team_page": {
+      "url_pattern": "https://www.maxpreps.com/{state}/{county}/{team_name}/{sport}",
+      "url_shortcut_pattern": "https://www.maxpreps.com/{team_extension}",
+      "next_node_name": "roster"
+    },
+      "roster_page": {
+        "relevant_words": ["roster", "{team_name}"],
+        "Title_pattern": "{team_name} {sport} Roster",
+        "url_pattern": "https://www.maxpreps.com/{state}/{county}/{team_name}/{sport}/roster/"
+      },
+    "player_page": {
+      "url_pattern": "'/{state}/{county}/{team_name}/athletes/{name}/{random_string}',"
+    }
+  }
+}
