@@ -66,10 +66,10 @@ export default function Home() {
                 <p className="mt-6 max-w-xl text-base text-black/80">
                    Competitive athlete discovery for collegiate recruiters.
                 </p>
-              {/* TO DO: route */}
+                
                 <div className="mt-8">
-                  <button
-                    type="button"
+                  <Link
+                    to="/login"
                     className="
                       relative overflow-hidden
                       rounded-full px-8 py-3 text-base font-medium text-white
@@ -82,7 +82,7 @@ export default function Home() {
                     "
                   >
                     Explore Athletes
-                  </button>
+                  </Link>
                 </div>
               </div>
 
