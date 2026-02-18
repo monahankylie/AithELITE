@@ -106,7 +106,7 @@ export default function Home() {
         </section>
         {/* TO DO: add player card carousel */}
         <footer className="border-t border-black/10 bg-white py-6 text-center text-sm text-black/60">
-          &copy; {new Date().getFullYear()} O. Jiang, K. Monahan, M. Levin, K. Cummings.
+          &copy; {new Date().getFullYear()} AithELITE. All rights reserved.
         </footer>
     </div>
   );

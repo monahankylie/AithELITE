@@ -167,7 +167,7 @@ export default function Login() {
       <footer className="border-t border-black/10">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-8 md:flex-row md:items-center md:justify-between">
           <p className="text-xs text-black/50">
-            © {new Date().getFullYear()} Athelite. All rights reserved.
+            © {new Date().getFullYear()} AithELITE. All rights reserved.
           </p>
           <div className="flex gap-5">
             <Link
