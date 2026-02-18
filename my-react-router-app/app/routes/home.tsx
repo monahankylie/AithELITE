@@ -44,7 +44,7 @@ export default function Home() {
               focus:outline-none focus:ring-2 focus:ring-blue-400/40
             "
             onClick={() => {
-              // TODO (production): wire to auth route/modal
+              // TO DO: wire to auth route/modal
               console.log("Log In clicked");
             }}
           >
@@ -110,6 +110,7 @@ export default function Home() {
             </div>
           </div>
         </section>
+        {/* TO DO: add player card carousel */}
     </div>
   );
 }
