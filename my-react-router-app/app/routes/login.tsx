@@ -11,6 +11,10 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
+/**
+ * Log-in Route ("/login")
+ */
+
 export default function Login() {
   return (
     <div className="min-h-screen bg-white">

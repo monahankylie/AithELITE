@@ -10,8 +10,6 @@ export function meta({}: Route.MetaArgs) {
 
 /**
  * Home Route ("/")
- * ---------------
- *
  */
 export default function Home() {
   return (
