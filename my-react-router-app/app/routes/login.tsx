@@ -19,9 +19,10 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-white">
       {/* NAV */}
-      <header className="sticky top-0 z-50 border-b border-black/10 bg-black">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link to="/" className="flex items-center gap-3">
+      <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-black">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
+            
+          <Link to="/" className="flex items-center">
             <img
               src="public/images/logo-aithelite.svg"
               alt="Athelite"
