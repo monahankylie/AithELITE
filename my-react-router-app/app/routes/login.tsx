@@ -28,19 +28,19 @@ export default function Login() {
           <nav className="hidden items-center gap-8 md:flex">
             <Link
               to="/"
-              className="text-sm font-medium text-white/80 transition hover:text-white"
+              className="hidden text-sm font-medium text-white/80 transition hover:text-white"
             >
               Home
             </Link>
             <Link
               to="/recruits"
-              className="text-sm font-medium text-white/80 transition hover:text-white"
+              className="hidden text-sm font-medium text-white/80 transition hover:text-white"
             >
               Recruits
             </Link>
             <Link
               to="/about"
-              className="text-sm font-medium text-white/80 transition hover:text-white"
+              className="hidden text-sm font-medium text-white/80 transition hover:text-white"
             >
               About
             </Link>
