@@ -5,17 +5,22 @@
         "title": "California Boys Basketball High School Teams",
         "header_type": "h1",
         "ex_roster_info":{
-          "url":"https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/roster/",
+          "url":"https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/roster/",          
+          "title": "Acalanes Dons Basketball Roster",
           "ex_player_url" : "/ca/lafayette/acalanes-dons/athletes/preston-hilsabeck/?careerid=hpb7k1kir1dm6"
         }
 
     },
-    "teams_title": {
+    "data_path":{
+      "1": "teams",
+      "2": "team",
+      "3": "roster", 
+      "4": "player"
+    },
+    "teams_page": {
+      "url_pattern": "https://www.maxpreps.com/{state}/{sport}/schools/",
       "title_pattern": "{state} Boys {sport} High School Teams",
       "header_type": "h1"
-    },
-    "teams_list_page": {
-      "url_pattern": "https://www.maxpreps.com/{state}/{sport}/schools/"     
     },
     "team_page": {
       "url_pattern": "https://www.maxpreps.com/{state}/{county}/{team_name}/{sport}",
