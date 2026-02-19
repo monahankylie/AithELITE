@@ -1,13 +1,19 @@
 {
   "maxpreps": {
+    "site_url": "https://www.maxpreps.com",
     "CA_DEV":{
-        "team_url_pattern": "https://www.maxpreps.com/ca/basketball/schools/",
-        "title": "California Boys Basketball High School Teams",
-        "header_type": "h1",
+        "ex_team_info":{
+          "url": "https://www.maxpreps.com/ca/basketball/schools/",
+          "title": "California Boys Basketball High School Teams"
+        },
         "ex_roster_info":{
           "url":"https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/roster/",          
-          "title": "Acalanes Dons Basketball Roster",
-          "ex_player_url" : "/ca/lafayette/acalanes-dons/athletes/preston-hilsabeck/?careerid=hpb7k1kir1dm6"
+          "title": "Acalanes Dons Basketball Roster"
+        },
+        "ex_player_info":{
+          "url" : "/ca/lafayette/acalanes-dons/athletes/preston-hilsabeck/?careerid=hpb7k1kir1dm6",
+          "selector": "script",
+          "selector_name": "__NEXT_DATA__"
         }
 
     },
@@ -15,7 +21,8 @@
       "1": "teams",
       "2": "team",
       "3": "roster", 
-      "4": "player"
+      "4": "player",
+      "5": ["bio","stats"]
     },
     "teams_page": {
       "url_pattern": "https://www.maxpreps.com/{state}/{sport}/schools/",
@@ -33,7 +40,9 @@
         "url_pattern": "https://www.maxpreps.com/{state}/{county}/{team_name}/{sport}/roster/"
       },
     "player_page": {
-      "url_pattern": "'/{state}/{county}/{team_name}/athletes/{name}/{random_string}',"
+      "url_pattern": "https://www.maxpreps.com/{state}/{county}/{team_name}/athletes/{name}/{random_string}",
+      "next_node_name":["bio","stats"],
+      "next_node_regex":"bio|stats"
     }
   }
 }

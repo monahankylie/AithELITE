@@ -1,0 +1,3140 @@
+{
+    "props": {
+        "pageProps": {
+            "canonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/?careerid=6jneeijvodtue",
+            "tracking": {},
+            "requestContext": {
+                "deviceType": "desktop",
+                "appType": 0
+            },
+            "careerContext": {
+                "careerData": {
+                    "shortCareerId": "6jneeijvodtue",
+                    "careerId": "dc928233-77ba-4ead-a4ee-87e52d85d05b",
+                    "firstName": "Landon",
+                    "lastName": "Deily",
+                    "bio": null,
+                    "primarySport": null,
+                    "primaryPosition": "PF",
+                    "jersey": "35",
+                    "heightFeet": 6,
+                    "heightInches": 3,
+                    "weight": 160,
+                    "graduatingClass": 2026,
+                    "classYear": 12,
+                    "facebookProfile": null,
+                    "twitterHandle": null,
+                    "hasProfileImage": true,
+                    "isManuallyManaged": true,
+                    "createdOn": "2022-11-27T03:09:00",
+                    "modifiedOn": "2025-11-16T01:01:38",
+                    "migratedOn": null,
+                    "migratedToCareerId": null,
+                    "excludeFromSearchEngines": false,
+                    "photoVersion": 638988516989677600,
+                    "photoUrl": "https://image.maxpreps.io/careers/d/c/9/dc928233-77ba-4ead-a4ee-87e52d85d05b/thumbnail.jpg?version=638988516989677563",
+                    "mostRecentSchoolId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                    "mostRecentSportSeasonName": "Boys Basketball Winter 25-26",
+                    "mostRecentSportSeasonId": "ee7cf537-7394-4430-88ca-becaabda286c",
+                    "newDataAdded": true,
+                    "isGraduated": false,
+                    "numberOfActiveAthletes": 4,
+                    "numberOfDeletedAthletes": 1,
+                    "wingspanFeet": 6,
+                    "wingspanInches": 4,
+                    "standingReachFeet": 7,
+                    "standingReachInches": 10,
+                    "dominantHand": "right",
+                    "dominantFoot": "left",
+                    "benchPress": null,
+                    "squat": null,
+                    "deadlift": null,
+                    "shuttleRunTime": null,
+                    "fourtyYardDashTime": null,
+                    "verticalJump": null,
+                    "broadJumpFeet": null,
+                    "broadJumpInches": null,
+                    "highSchoolGpa": 3.4,
+                    "satscore": null,
+                    "actscore": null,
+                    "instagram": null,
+                    "snapchat": null,
+                    "tikTok": null,
+                    "hudl": null,
+                    "gameChanger": null
+                },
+                "careerPlayerData": {
+                    "careerId": "dc928233-77ba-4ead-a4ee-87e52d85d05b",
+                    "firstName": "Landon",
+                    "lastName": "Deily",
+                    "schoolName": "Acalanes (Lafayette, CA)",
+                    "schoolCanonicalUrl": "/ca/lafayette/acalanes-dons/",
+                    "photoUrl": "https://image.maxpreps.io/careers/d/c/9/dc928233-77ba-4ead-a4ee-87e52d85d05b/thumbnail.jpg?version=638988516989677563",
+                    "isClaimed": true,
+                    "careerCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/?careerid=6jneeijvodtue",
+                    "careerSports": [
+                        {
+                            "teamId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                            "athleteId": "fd6e6787-3fa2-4028-8299-63f898105723",
+                            "classYear": "Senior",
+                            "gender": "Boys",
+                            "jersey": "35",
+                            "positions": [
+                                "PF",
+                                "SF"
+                            ],
+                            "sport": "Basketball",
+                            "sportSeasonId": "ee7cf537-7394-4430-88ca-becaabda286c",
+                            "teamCanonicalUrl": "/ca/lafayette/acalanes-dons/basketball/",
+                            "teamHomeCanonicalUrl": "/ca/lafayette/acalanes-dons/basketball/",
+                            "teamLevel": "Varsity"
+                        }
+                    ]
+                },
+                "recentSportSeason": {
+                    "sportSeasonId": "ee7cf537-7394-4430-88ca-becaabda286c",
+                    "name": "Boys Basketball Varsity Winter 25-26",
+                    "allSeasonId": "a42c7ea4-0907-491e-b56f-a2d31a45bf19",
+                    "genderId": "e6f737f9-a1fb-469c-a80a-79bed5f3bc7c",
+                    "gender": "Boys",
+                    "sportId": "cfa8c213-4917-11d3-b6f4-005004730205",
+                    "sport": "Basketball",
+                    "levelId": "59a4c93d-374c-42ea-9b7f-87e1e51f1336",
+                    "teamLevelId": "59a4c93d-374c-42ea-9b7f-87e1e51f1336",
+                    "level": "Varsity",
+                    "teamLevel": "Varsity",
+                    "seasonId": "3b7f5061-2185-4d77-9e14-33483ba6bc5f",
+                    "season": "Winter",
+                    "year": "25-26",
+                    "isActive": true,
+                    "isFullyCovered": true,
+                    "isPublished": true,
+                    "isNational": true,
+                    "formattedNameFanPageDefault": null,
+                    "formattedNameAdminDefault": null
+                },
+                "recentSchool": {
+                    "schoolId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                    "isDeleted": false,
+                    "isPseudoSchool": false,
+                    "name": "Acalanes",
+                    "address": "1200 Pleasant Hill Rd",
+                    "city": "Lafayette",
+                    "zip": "94549",
+                    "zipCode": "94549",
+                    "mascot": "Dons",
+                    "color1": "022C66",
+                    "color2": "FFFFFF",
+                    "color3": "      ",
+                    "color4": null,
+                    "colorName1": "Royal Blue",
+                    "colorName2": "White",
+                    "colorName3": null,
+                    "colorName4": null,
+                    "isImported": true,
+                    "searchName": " acalanes",
+                    "gender": "Co-Ed",
+                    "mailingAddress": null,
+                    "mailingAddress2": null,
+                    "mailingAddressNote": null,
+                    "mailingCity": null,
+                    "mailingState": null,
+                    "mailingZip": null,
+                    "phone": "(925) 280-3970",
+                    "type": "Public",
+                    "latitude": 37.903275,
+                    "longitude": -122.09719,
+                    "utcOffset": -28800,
+                    "dstOffset": 3600,
+                    "timeZoneId": "PST",
+                    "athleticDirectorName": "Randy Takahashi",
+                    "isFootballMascotHelmetAvailable": true,
+                    "url": "http://acalanes.acalanes.k12.ca.us/webapps/portal/frameset.jsp?tab_id=_39_1",
+                    "websiteUrl": "http://acalanes.acalanes.k12.ca.us/webapps/portal/frameset.jsp?tab_id=_39_1",
+                    "fullName": "Acalanes",
+                    "additionalInfo": null,
+                    "address2": null,
+                    "addressNote": null,
+                    "enrollment": 1350,
+                    "isHistoricalOnly": false,
+                    "importName": "Acalanes",
+                    "isNameUnique": true,
+                    "mapUrl": null,
+                    "phoneNote": null,
+                    "mascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                    "mascotUploadedOn": "2016-05-11T15:26:00",
+                    "stateId": "e7f4e0d1-5416-4b80-a0d8-49cf9d997e3d",
+                    "state": "CA",
+                    "stateCode": "CA",
+                    "stateName": "California",
+                    "prepSportswearId": null,
+                    "formattedName": "Acalanes (Lafayette, CA)",
+                    "formattedNameWithoutState": "Acalanes (Lafayette)",
+                    "shouldAppendHighSchoolString": true,
+                    "nameAcronym": "AHS",
+                    "canonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/",
+                    "statePlaysIn": null
+                },
+                "partnerInfo": {
+                    "isATicketingPartner": true,
+                    "isAStreamingPartner": false,
+                    "isASitesPartner": false,
+                    "streamingUrl": "https://www.nfhsnetwork.com/",
+                    "ticketingUrl": "https://gofan.co/school/CA22846",
+                    "unityId": null,
+                    "huddleId": null
+                },
+                "followerCount": 3,
+                "dmas": [
+                    {
+                        "dmaId": "f4bb4811-d732-4a99-a58a-12a27e694d43",
+                        "name": "Region: Bay Area",
+                        "code": 0,
+                        "type": "DMA",
+                        "isPublished": false,
+                        "url": "",
+                        "lastSportUpdateOn": null,
+                        "stateCode": null,
+                        "rankingsCanonicalUrl": null,
+                        "scoreboardCanonicalUrl": null
+                    },
+                    {
+                        "dmaId": "dcbb4f6b-844d-49aa-82e4-fcf2287e9bfc",
+                        "name": "Bay Area",
+                        "code": 0,
+                        "type": "Metro",
+                        "isPublished": true,
+                        "url": "san-francisco",
+                        "lastSportUpdateOn": "2014-04-02T22:58:00",
+                        "stateCode": null,
+                        "rankingsCanonicalUrl": null,
+                        "scoreboardCanonicalUrl": null
+                    },
+                    {
+                        "dmaId": "95b6a9cb-6757-48d7-b155-91f9c4bb4ff0",
+                        "name": "San Francisco Metro",
+                        "code": 807,
+                        "type": "DMA",
+                        "isPublished": false,
+                        "url": null,
+                        "lastSportUpdateOn": null,
+                        "stateCode": "CA",
+                        "rankingsCanonicalUrl": null,
+                        "scoreboardCanonicalUrl": null
+                    }
+                ]
+            },
+            "careerMenuData": [
+                {
+                    "text": "Home",
+                    "publicUrl": "/ca/lafayette/acalanes-dons/athletes/landon-deily/?careerid=6jneeijvodtue"
+                },
+                {
+                    "text": "Bio",
+                    "publicUrl": "/ca/lafayette/acalanes-dons/athletes/landon-deily/bio/?careerid=6jneeijvodtue"
+                },
+                {
+                    "text": "Stats",
+                    "publicUrl": "/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                },
+                {
+                    "text": "Photos",
+                    "publicUrl": "/ca/lafayette/acalanes-dons/athletes/landon-deily/media/photos/?careerid=6jneeijvodtue"
+                }
+            ],
+            "breadcrumbListData": {
+                "@context": "https://schema.org",
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "name": "MaxPreps.com",
+                        "item": {
+                            "@type": "Thing",
+                            "@id": "https://www.maxpreps.com/"
+                        },
+                        "position": 1
+                    },
+                    {
+                        "@type": "ListItem",
+                        "name": "CA",
+                        "item": {
+                            "@type": "Thing",
+                            "@id": "https://www.maxpreps.com/ca/"
+                        },
+                        "position": 2
+                    },
+                    {
+                        "@type": "ListItem",
+                        "name": "Acalanes",
+                        "item": {
+                            "@type": "Thing",
+                            "@id": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/"
+                        },
+                        "position": 3
+                    },
+                    {
+                        "@type": "ListItem",
+                        "name": "Landon Deily",
+                        "item": {
+                            "@type": "Thing",
+                            "@id": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/?careerid=6jneeijvodtue"
+                        },
+                        "position": 4
+                    }
+                ]
+            },
+            "siteNavData": {
+                "allSeasonId": "22e2b335-334e-4d4d-9f67-a0f716bb1ccd",
+                "season": "Fall",
+                "sections": [
+                    {
+                        "links": [
+                            {
+                                "url": "https://www.maxpreps.com/football/",
+                                "text": "Football Home"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/football/schools/",
+                                "text": "Teams"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/football/athletes/",
+                                "text": "Players"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/football/#states",
+                                "text": "States"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/list/schedules_scores_redirect.aspx?gendersport=boys,football",
+                                "text": "Scores"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/football/rankings/1/",
+                                "text": "Rankings"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/football/stat-leaders/",
+                                "text": "Stat leaders"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/photography/browse-galleries/?gendersport=boys,football&state=all states",
+                                "text": "Photos"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/football/playoffs/",
+                                "text": "Playoffs"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/video/channel/football/",
+                                "text": "Videos"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/news/1kaTlgLBKUKkzkQPotK9yw/national-high-school-football-record-book.htm",
+                                "text": "Record Book"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/football/game-of-the-week/",
+                                "text": "Game of the Week"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/news/articles_list.aspx?gendersport=boys,football",
+                                "text": "News"
+                            },
+                            {
+                                "url": "https://www.nfhsnetwork.com/sports/football?utm_campaign=sport-menu&utm_medium=referral&utm_source=maxpreps&utm_content=fixed",
+                                "text": "Live Streams"
+                            }
+                        ],
+                        "header": "Football",
+                        "id": "Boys,Football,Fall"
+                    },
+                    {
+                        "links": [
+                            {
+                                "url": "https://www.maxpreps.com/baseball/",
+                                "text": "Baseball Home"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/baseball/schools/",
+                                "text": "Teams"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/baseball/athletes/",
+                                "text": "Players"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/baseball/#states",
+                                "text": "States"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/list/schedules_scores_redirect.aspx?gendersport=boys,baseball",
+                                "text": "Scores"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/baseball/rankings/1/",
+                                "text": "Rankings"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/baseball/stat-leaders/",
+                                "text": "Stat leaders"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/photography/browse-galleries/?gendersport=boys,baseball&state=all states",
+                                "text": "Photos"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/baseball/playoffs/",
+                                "text": "Playoffs"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/news/viAlrzyYJUCPhWbwrqfTXA/national-high-school-baseball-record-book.htm",
+                                "text": "Record Book"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/news/articles_list.aspx?gendersport=boys,baseball",
+                                "text": "News"
+                            },
+                            {
+                                "url": "https://www.nfhsnetwork.com/sports/baseball?utm_campaign=sport-menu&utm_medium=referral&utm_source=maxpreps&utm_content=fixed",
+                                "text": "Live Streams"
+                            }
+                        ],
+                        "header": "Baseball",
+                        "id": "Boys,Baseball,Spring"
+                    },
+                    {
+                        "links": [
+                            {
+                                "url": "https://www.maxpreps.com/basketball/",
+                                "text": "B. Basketball Home"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/basketball/schools/",
+                                "text": "Teams"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/basketball/athletes/",
+                                "text": "Players"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/basketball/#states",
+                                "text": "States"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/list/schedules_scores_redirect.aspx?gendersport=boys,basketball",
+                                "text": "Scores"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/basketball/rankings/1/",
+                                "text": "Rankings"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/basketball/stat-leaders/",
+                                "text": "Stat leaders"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/photography/browse-galleries/?gendersport=boys,basketball&state=all states",
+                                "text": "Photos"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/basketball/playoffs/",
+                                "text": "Playoffs"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/video/channel/basketball/",
+                                "text": "Videos"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/news/NJXu8aL8DUeoU-eSSSAxvg/national-high-school-basketball-record-book.htm",
+                                "text": "Record Book"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/basketball/game-of-the-week/",
+                                "text": "Game of the Week"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/news/articles_list.aspx?gendersport=boys,basketball",
+                                "text": "News"
+                            },
+                            {
+                                "url": "https://www.nfhsnetwork.com/sports/basketball?gender=boys&utm_campaign=sport-menu&utm_medium=referral&utm_source=maxpreps&utm_content=fixed",
+                                "text": "Live Streams"
+                            }
+                        ],
+                        "header": "B. Basketball",
+                        "id": "Boys,Basketball,Winter"
+                    },
+                    {
+                        "links": [
+                            {
+                                "url": "https://www.maxpreps.com/basketball/girls/",
+                                "text": "G. Basketball Home"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/basketball/girls/schools/",
+                                "text": "Teams"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/basketball/girls/athletes/",
+                                "text": "Players"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/basketball/girls/#states",
+                                "text": "States"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/list/schedules_scores_redirect.aspx?gendersport=girls,basketball",
+                                "text": "Scores"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/basketball/girls/rankings/1/",
+                                "text": "Rankings"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/basketball/girls/stat-leaders/",
+                                "text": "Stat leaders"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/photography/browse-galleries/?gendersport=girls,basketball&state=all states",
+                                "text": "Photos"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/basketball/girls/playoffs/",
+                                "text": "Playoffs"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/video/channel/basketball/",
+                                "text": "Videos"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/news/aT5TtNXPJE6gw3znKNhmFw/national-high-school-girls-basketball-record-book.htm",
+                                "text": "Record Book"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/basketball/game-of-the-week/",
+                                "text": "Game of the Week"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/news/articles_list.aspx?gendersport=girls,basketball",
+                                "text": "News"
+                            },
+                            {
+                                "url": "https://www.nfhsnetwork.com/sports/basketball?gender=girls&utm_campaign=sport-menu&utm_medium=referral&utm_source=maxpreps&utm_content=fixed",
+                                "text": "Live Streams"
+                            }
+                        ],
+                        "header": "G. Basketball",
+                        "id": "Girls,Basketball,Winter"
+                    },
+                    {
+                        "links": [
+                            {
+                                "url": "https://www.maxpreps.com/volleyball/",
+                                "text": "G. Volleyball Home"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/volleyball/schools/",
+                                "text": "Teams"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/volleyball/athletes/",
+                                "text": "Players"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/volleyball/#states",
+                                "text": "States"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/list/schedules_scores_redirect.aspx?gendersport=girls,volleyball",
+                                "text": "Scores"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/volleyball/rankings/1/",
+                                "text": "Rankings"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/volleyball/stat-leaders/",
+                                "text": "Stat leaders"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/photography/browse-galleries/?gendersport=girls,volleyball&state=all states",
+                                "text": "Photos"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/volleyball/playoffs/",
+                                "text": "Playoffs"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/news/cIKV6USFeUinmv3U6-AUqA/national-high-school-volleyball-record-book.htm",
+                                "text": "Record Book"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/news/articles_list.aspx?gendersport=girls,volleyball",
+                                "text": "News"
+                            },
+                            {
+                                "url": "https://www.nfhsnetwork.com/sports/volleyball?gender=girls&utm_campaign=sport-menu&utm_medium=referral&utm_source=maxpreps&utm_content=fixed",
+                                "text": "Live Streams"
+                            }
+                        ],
+                        "header": "G. Volleyball",
+                        "id": "Girls,Volleyball,Fall"
+                    },
+                    {
+                        "links": [
+                            {
+                                "url": "https://www.maxpreps.com/sports/",
+                                "text": "All Sports"
+                            }
+                        ],
+                        "header": "All Sports",
+                        "id": "PopularSports-AllSports"
+                    },
+                    {
+                        "links": [
+                            {
+                                "url": "https://www.maxpreps.com/baseball/",
+                                "text": "Baseball"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/basketball/",
+                                "text": "Basketball"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/beach-volleyball/boys/",
+                                "text": "Beach Volleyball"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/cross-country/",
+                                "text": "Cross Country"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/football/",
+                                "text": "Football"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/golf/",
+                                "text": "Golf"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/ice-hockey/",
+                                "text": "Ice Hockey"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/lacrosse/",
+                                "text": "Lacrosse"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/soccer/",
+                                "text": "Soccer"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/swimming/",
+                                "text": "Swimming"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/tennis/",
+                                "text": "Tennis"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/track-field/",
+                                "text": "Track & Field"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/volleyball/boys/",
+                                "text": "Volleyball"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/water-polo/",
+                                "text": "Water Polo"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/wrestling/",
+                                "text": "Wrestling"
+                            }
+                        ],
+                        "header": "Popular Sports - Boys",
+                        "id": "PopularSports-Boys"
+                    },
+                    {
+                        "links": [
+                            {
+                                "url": "https://www.maxpreps.com/basketball/girls/",
+                                "text": "Basketball"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/beach-volleyball/",
+                                "text": "Beach Volleyball"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/cross-country/girls/",
+                                "text": "Cross Country"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/field-hockey/",
+                                "text": "Field Hockey"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/flag-football/girls/",
+                                "text": "Flag Football"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/golf/girls/",
+                                "text": "Golf"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/ice-hockey/girls/",
+                                "text": "Ice Hockey"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/lacrosse/girls/",
+                                "text": "Lacrosse"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/soccer/girls/",
+                                "text": "Soccer"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/softball/",
+                                "text": "Softball"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/swimming/girls/",
+                                "text": "Swimming"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/tennis/girls/",
+                                "text": "Tennis"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/track-field/girls/",
+                                "text": "Track & Field"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/volleyball/",
+                                "text": "Volleyball"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/water-polo/girls/",
+                                "text": "Water Polo"
+                            }
+                        ],
+                        "header": "Popular Sports - Girls",
+                        "id": "PopularSports-Girls"
+                    },
+                    {
+                        "links": [
+                            {
+                                "url": "https://www.maxpreps.com/apps/default.aspx?app=maxapp",
+                                "text": "MaxPreps",
+                                "description": "Follow your favorite high school teams and players",
+                                "thumbnailUrl": "https://asset.maxpreps.io/includes/images/apps/maxapp_icon_v2.png"
+                            },
+                            {
+                                "url": "https://www.maxpreps.com/apps/default.aspx?app=maxstats",
+                                "text": "MP Stats for iPad",
+                                "description": "Stat keeping for basketball teams",
+                                "thumbnailUrl": "https://asset.maxpreps.io/includes/images/apps/maxstats_icon_128x128.png"
+                            }
+                        ],
+                        "header": "Apps",
+                        "id": "Media-Apps"
+                    },
+                    {
+                        "links": [
+                            {
+                                "url": "https://www.maxpreps.com/photography/",
+                                "text": "Photo Galleries",
+                                "description": "Explore and purchase photos of your local teams and players",
+                                "thumbnailUrl": "https://asset.maxpreps.io/includes/react/shared/site-nav-photography-thumbnail.png"
+                            }
+                        ],
+                        "header": "Pro Photography",
+                        "id": "Media-Photography"
+                    },
+                    {
+                        "links": [
+                            {
+                                "url": "https://www.maxpreps.com/video/",
+                                "text": "Video Center",
+                                "description": "See top plays & highlights of the best high school sports",
+                                "thumbnailUrl": "https://asset.maxpreps.io/includes/react/shared/site-nav-video-thumbnail.png"
+                            },
+                            {
+                                "url": "https://www.nfhsnetwork.com/?utm_campaign=media-menu&utm_medium=referral&utm_source=maxpreps&utm_content=fixed",
+                                "text": "Live Streams & Replays",
+                                "description": "Get access to live game streams and full replays for 8000+ schools",
+                                "thumbnailUrl": "https://asset.maxpreps.io/includes/react/shared/site-nav-nfhs.png"
+                            }
+                        ],
+                        "header": "Watch",
+                        "id": "Media-Video"
+                    },
+                    {
+                        "links": [
+                            {
+                                "url": "https://gofan.co/?utm_campaign=media-menu&utm_medium=referral&utm_source=maxpreps&utm_content=fixed",
+                                "text": "Digital Tickets",
+                                "description": "Don't miss the action \u2013 Get Official Tickets",
+                                "thumbnailUrl": "https://asset.maxpreps.io/includes/react/shared/site-nav-gofan.png"
+                            }
+                        ],
+                        "header": "Tickets",
+                        "id": "Tickets"
+                    },
+                    {
+                        "links": [
+                            {
+                                "url": "https://secure.maxpreps.com/utility/member/new_coach.aspx",
+                                "text": "Coaches",
+                                "description": "Set up your high school team",
+                                "thumbnailUrl": "https://asset.maxpreps.io/includes/react/shared/site-nav-whistle.svg"
+                            }
+                        ],
+                        "header": "Content Contributors",
+                        "id": "Content-Contributors"
+                    }
+                ]
+            },
+            "athleteName": "Landon Deily",
+            "careerDataAvailability": {
+                "careerId": "dc928233-77ba-4ead-a4ee-87e52d85d05b",
+                "hasArticles": false,
+                "hasPhotos": true,
+                "hasVideos": false,
+                "hasHudlVideos": false,
+                "hasAwards": false,
+                "hasStats": true,
+                "hasNonCoreStats": false,
+                "hasUnverifiedStats": false
+            },
+            "careerListVariables": {
+                "careerId": "dc928233-77ba-4ead-a4ee-87e52d85d05b",
+                "tracking": "career,career-manually-managed,career-followers,career-basketball,career-claimed-athlete,career-claimed-parent,career-profile-photo,career-claimed,career-measurements,career-resume,career-stats,career-photo-galleries"
+            },
+            "pageTitle": "Landon Deily's Acalanes High School Career Home",
+            "pageDescription": "Check out Landon Deily's high school sports timeline including updates while playing basketball at Acalanes High School (Lafayette, CA).",
+            "pinnedVideo": null,
+            "timelineItems": [
+                {
+                    "type": 5,
+                    "timelineItemType": 5,
+                    "title": "Added to Roster",
+                    "text": "Landon has been added to the Acalanes 2025-26 basketball roster.",
+                    "linksForText": [
+                        {
+                            "text": "Acalanes 2025-26 basketball",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Landon's Roster",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/roster/"
+                        },
+                        {
+                            "text": "Schedule",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/schedule/"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/roster/",
+                    "timeStamp": "2025-11-04T20:24:41",
+                    "data": {
+                        "sportSeasonYear": "2025-26",
+                        "schoolName": "Acalanes",
+                        "schoolMascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                        "schoolColor1": "022C66",
+                        "schoolColor2": "FFFFFF",
+                        "schoolColor3": "",
+                        "schoolColor4": ""
+                    }
+                },
+                {
+                    "type": 4,
+                    "timelineItemType": 4,
+                    "title": "Stats Updated",
+                    "text": "Landon's stats have been entered for the win vs. Concord on Thursday, Feb. 6, 2025.",
+                    "linksForText": [
+                        {
+                            "text": "Landon's",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Concord",
+                            "url": "https://www.maxpreps.com/ca/concord/concord-bears/basketball/"
+                        },
+                        {
+                            "text": "win",
+                            "url": "https://www.maxpreps.com/games/2-6-2025/basketball-24-25/acalanes-vs-concord.htm?c=Tu5qFg4-6E-khqhU6qTpew"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/2-6-2025/basketball-24-25/acalanes-vs-concord.htm?c=Tu5qFg4-6E-khqhU6qTpew"
+                        },
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/2-6-2025/basketball-24-25/acalanes-vs-concord.htm?c=Tu5qFg4-6E-khqhU6qTpew",
+                    "timeStamp": "2025-02-26T08:57:55",
+                    "data": {
+                        "contestId": "166aee4e-3e0e-4fe8-a486-a854eaa4e97b",
+                        "stats": [
+                            {
+                                "name": "Rebounds",
+                                "displayName": "Rebounds",
+                                "header": "Reb",
+                                "value": "2",
+                                "field": "s3"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": 4,
+                    "timelineItemType": 4,
+                    "title": "Stats Updated",
+                    "text": "Landon's stats have been entered for the win vs. Miramonte on Tuesday, Feb. 4, 2025.",
+                    "linksForText": [
+                        {
+                            "text": "Landon's",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Miramonte",
+                            "url": "https://www.maxpreps.com/ca/orinda/miramonte-matadors/basketball/"
+                        },
+                        {
+                            "text": "win",
+                            "url": "https://www.maxpreps.com/games/2-4-2025/basketball-24-25/acalanes-vs-miramonte.htm?c=GM3qxheLEECPHawIM-KwEw"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/2-4-2025/basketball-24-25/acalanes-vs-miramonte.htm?c=GM3qxheLEECPHawIM-KwEw"
+                        },
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/2-4-2025/basketball-24-25/acalanes-vs-miramonte.htm?c=GM3qxheLEECPHawIM-KwEw",
+                    "timeStamp": "2025-02-26T08:54:05",
+                    "data": {
+                        "contestId": "c6eacd18-8b17-4010-8f1d-ac0833e2b013",
+                        "stats": [
+                            {
+                                "name": "Points",
+                                "displayName": "Points",
+                                "header": "Pts",
+                                "value": "2",
+                                "field": "s5"
+                            },
+                            {
+                                "name": "FieldGoalPercentage",
+                                "displayName": "FG %",
+                                "header": "FG%",
+                                "value": "50",
+                                "field": "s15"
+                            },
+                            {
+                                "name": "Rebounds",
+                                "displayName": "Rebounds",
+                                "header": "Reb",
+                                "value": "1",
+                                "field": "s3"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": 4,
+                    "timelineItemType": 4,
+                    "title": "Stats Updated",
+                    "text": "Landon's stats have been entered for the win vs. Mt. Diablo on Tuesday, Jan. 28, 2025.",
+                    "linksForText": [
+                        {
+                            "text": "Landon's",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Mt. Diablo",
+                            "url": "https://www.maxpreps.com/ca/concord/mt-diablo-red-devils/basketball/"
+                        },
+                        {
+                            "text": "win",
+                            "url": "https://www.maxpreps.com/games/1-28-2025/basketball-24-25/acalanes-vs-mt-diablo.htm?c=vQetD6c2xkeAPuvOW-p9-w"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/1-28-2025/basketball-24-25/acalanes-vs-mt-diablo.htm?c=vQetD6c2xkeAPuvOW-p9-w"
+                        },
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/1-28-2025/basketball-24-25/acalanes-vs-mt-diablo.htm?c=vQetD6c2xkeAPuvOW-p9-w",
+                    "timeStamp": "2025-02-25T18:00:13",
+                    "data": {
+                        "contestId": "0fad07bd-36a7-47c6-803e-ebce5bea7dfb",
+                        "stats": [
+                            {
+                                "name": "Points",
+                                "displayName": "Points",
+                                "header": "Pts",
+                                "value": "2",
+                                "field": "s5"
+                            },
+                            {
+                                "name": "FreeThrowPercentage",
+                                "displayName": "FT Per Game",
+                                "header": "FT%",
+                                "value": "50",
+                                "field": "s8"
+                            },
+                            {
+                                "name": "Rebounds",
+                                "displayName": "Rebounds",
+                                "header": "Reb",
+                                "value": "1",
+                                "field": "s3"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": 4,
+                    "timelineItemType": 4,
+                    "title": "Stats Updated",
+                    "text": "Landon's stats have been entered for the win vs. Marin Catholic on Saturday, Jan. 18, 2025.",
+                    "linksForText": [
+                        {
+                            "text": "Landon's",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Marin Catholic",
+                            "url": "https://www.maxpreps.com/ca/kentfield/marin-catholic-wildcats/basketball/"
+                        },
+                        {
+                            "text": "win",
+                            "url": "https://www.maxpreps.com/games/1-18-2025/basketball-24-25/acalanes-vs-marin-catholic.htm?c=I0P_DAqkE0yOSF57HFQJmw"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/1-18-2025/basketball-24-25/acalanes-vs-marin-catholic.htm?c=I0P_DAqkE0yOSF57HFQJmw"
+                        },
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/1-18-2025/basketball-24-25/acalanes-vs-marin-catholic.htm?c=I0P_DAqkE0yOSF57HFQJmw",
+                    "timeStamp": "2025-02-25T17:46:47",
+                    "data": {
+                        "contestId": "0cff4323-a40a-4c13-8e48-5e7b1c54099b",
+                        "stats": [
+                            {
+                                "name": "Rebounds",
+                                "displayName": "Rebounds",
+                                "header": "Reb",
+                                "value": "1",
+                                "field": "s3"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": 4,
+                    "timelineItemType": 4,
+                    "title": "Stats Updated",
+                    "text": "Landon's stats have been entered for the win vs. Northgate on Wednesday, Jan. 15, 2025.",
+                    "linksForText": [
+                        {
+                            "text": "Landon's",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Northgate",
+                            "url": "https://www.maxpreps.com/ca/walnut-creek/northgate-broncos/basketball/"
+                        },
+                        {
+                            "text": "win",
+                            "url": "https://www.maxpreps.com/games/1-15-2025/basketball-24-25/acalanes-vs-northgate.htm?c=eJ9tVkG4PEizVaI0z7IKVg"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/1-15-2025/basketball-24-25/acalanes-vs-northgate.htm?c=eJ9tVkG4PEizVaI0z7IKVg"
+                        },
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/1-15-2025/basketball-24-25/acalanes-vs-northgate.htm?c=eJ9tVkG4PEizVaI0z7IKVg",
+                    "timeStamp": "2025-02-25T17:42:26",
+                    "data": {
+                        "contestId": "566d9f78-b841-483c-b355-a234cfb20a56",
+                        "stats": [
+                            {
+                                "name": "Points",
+                                "displayName": "Points",
+                                "header": "Pts",
+                                "value": "4",
+                                "field": "s5"
+                            },
+                            {
+                                "name": "FieldGoalPercentage",
+                                "displayName": "FG %",
+                                "header": "FG%",
+                                "value": "67",
+                                "field": "s15"
+                            },
+                            {
+                                "name": "Assists",
+                                "displayName": "Assists",
+                                "header": "Ast",
+                                "value": "1",
+                                "field": "s21"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": 4,
+                    "timelineItemType": 4,
+                    "title": "Stats Updated",
+                    "text": "Landon's stats have been entered for the win vs. Berean Christian on Friday, Jan. 10, 2025.",
+                    "linksForText": [
+                        {
+                            "text": "Landon's",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Berean Christian",
+                            "url": "https://www.maxpreps.com/ca/walnut-creek/berean-christian-eagles/basketball/"
+                        },
+                        {
+                            "text": "win",
+                            "url": "https://www.maxpreps.com/games/1-10-2025/basketball-24-25/acalanes-vs-berean-christian.htm?c=eeUfW5kX6EmINS1ENqVpcQ"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/1-10-2025/basketball-24-25/acalanes-vs-berean-christian.htm?c=eeUfW5kX6EmINS1ENqVpcQ"
+                        },
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/1-10-2025/basketball-24-25/acalanes-vs-berean-christian.htm?c=eeUfW5kX6EmINS1ENqVpcQ",
+                    "timeStamp": "2025-02-25T17:32:00",
+                    "data": {
+                        "contestId": "5b1fe579-1799-49e8-8835-2d4436a56971",
+                        "stats": [
+                            {
+                                "name": "Points",
+                                "displayName": "Points",
+                                "header": "Pts",
+                                "value": "2",
+                                "field": "s5"
+                            },
+                            {
+                                "name": "FreeThrowPercentage",
+                                "displayName": "FT Per Game",
+                                "header": "FT%",
+                                "value": "50",
+                                "field": "s8"
+                            },
+                            {
+                                "name": "Rebounds",
+                                "displayName": "Rebounds",
+                                "header": "Reb",
+                                "value": "7",
+                                "field": "s3"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": 4,
+                    "timelineItemType": 4,
+                    "title": "Stats Updated",
+                    "text": "Landon's stats have been entered for the win vs. Vintage on Saturday, Jan. 4, 2025.",
+                    "linksForText": [
+                        {
+                            "text": "Landon's",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Vintage",
+                            "url": "https://www.maxpreps.com/ca/napa/vintage-crushers/basketball/"
+                        },
+                        {
+                            "text": "win",
+                            "url": "https://www.maxpreps.com/games/1-4-2025/basketball-24-25/acalanes-vs-vintage.htm?c=WmAuYhwl5UyQ0Pob1QTNtQ"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/1-4-2025/basketball-24-25/acalanes-vs-vintage.htm?c=WmAuYhwl5UyQ0Pob1QTNtQ"
+                        },
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/1-4-2025/basketball-24-25/acalanes-vs-vintage.htm?c=WmAuYhwl5UyQ0Pob1QTNtQ",
+                    "timeStamp": "2025-02-25T17:08:01",
+                    "data": {
+                        "contestId": "622e605a-251c-4ce5-90d0-fa1bd504cdb5",
+                        "stats": [
+                            {
+                                "name": "Points",
+                                "displayName": "Points",
+                                "header": "Pts",
+                                "value": "10",
+                                "field": "s5"
+                            },
+                            {
+                                "name": "FieldGoalPercentage",
+                                "displayName": "FG %",
+                                "header": "FG%",
+                                "value": "71",
+                                "field": "s15"
+                            },
+                            {
+                                "name": "Assists",
+                                "displayName": "Assists",
+                                "header": "Ast",
+                                "value": "1",
+                                "field": "s21"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": 4,
+                    "timelineItemType": 4,
+                    "title": "Stats Updated",
+                    "text": "Landon's stats have been entered for the win vs. Pinole Valley on Friday, Jan. 3, 2025.",
+                    "linksForText": [
+                        {
+                            "text": "Landon's",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Pinole Valley",
+                            "url": "https://www.maxpreps.com/ca/pinole/pinole-valley-spartans/basketball/"
+                        },
+                        {
+                            "text": "win",
+                            "url": "https://www.maxpreps.com/games/1-3-2025/basketball-24-25/acalanes-vs-pinole-valley.htm?c=1nzue5-2QEKb88LiZVCfIA"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/1-3-2025/basketball-24-25/acalanes-vs-pinole-valley.htm?c=1nzue5-2QEKb88LiZVCfIA"
+                        },
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/1-3-2025/basketball-24-25/acalanes-vs-pinole-valley.htm?c=1nzue5-2QEKb88LiZVCfIA",
+                    "timeStamp": "2025-02-25T17:04:40",
+                    "data": {
+                        "contestId": "7bee7cd6-b69f-4240-9bf3-c2e265509f20",
+                        "stats": [
+                            {
+                                "name": "Points",
+                                "displayName": "Points",
+                                "header": "Pts",
+                                "value": "2",
+                                "field": "s5"
+                            },
+                            {
+                                "name": "FieldGoalPercentage",
+                                "displayName": "FG %",
+                                "header": "FG%",
+                                "value": "33",
+                                "field": "s15"
+                            },
+                            {
+                                "name": "Assists",
+                                "displayName": "Assists",
+                                "header": "Ast",
+                                "value": "1",
+                                "field": "s21"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": 4,
+                    "timelineItemType": 4,
+                    "title": "Stats Updated",
+                    "text": "Landon's stats have been entered for the loss vs. St. John's on Friday, Dec. 27, 2024.",
+                    "linksForText": [
+                        {
+                            "text": "Landon's",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "St. John's",
+                            "url": "https://www.maxpreps.com/tx/houston/st-johns-mavericks/basketball/"
+                        },
+                        {
+                            "text": "loss",
+                            "url": "https://www.maxpreps.com/games/12-27-2024/basketball-24-25/acalanes-vs-st-johns.htm?c=M8oyPTL6VEGJqqZDRarE7g"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/12-27-2024/basketball-24-25/acalanes-vs-st-johns.htm?c=M8oyPTL6VEGJqqZDRarE7g"
+                        },
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/12-27-2024/basketball-24-25/acalanes-vs-st-johns.htm?c=M8oyPTL6VEGJqqZDRarE7g",
+                    "timeStamp": "2025-02-25T16:42:45",
+                    "data": {
+                        "contestId": "3d32ca33-fa32-4154-89aa-a64345aac4ee",
+                        "stats": [
+                            {
+                                "name": "Points",
+                                "displayName": "Points",
+                                "header": "Pts",
+                                "value": "2",
+                                "field": "s5"
+                            },
+                            {
+                                "name": "FieldGoalPercentage",
+                                "displayName": "FG %",
+                                "header": "FG%",
+                                "value": "100",
+                                "field": "s15"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": 4,
+                    "timelineItemType": 4,
+                    "title": "Stats Updated",
+                    "text": "Landon's stats have been entered for the win vs. Stagg on Thursday, Dec. 12, 2024.",
+                    "linksForText": [
+                        {
+                            "text": "Landon's",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Stagg",
+                            "url": "https://www.maxpreps.com/ca/stockton/stagg-delta-kings/basketball/"
+                        },
+                        {
+                            "text": "win",
+                            "url": "https://www.maxpreps.com/games/12-12-2024/basketball-24-25/acalanes-vs-stagg.htm?c=fM547sxESEeCd2RtzqaC3A"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/12-12-2024/basketball-24-25/acalanes-vs-stagg.htm?c=fM547sxESEeCd2RtzqaC3A"
+                        },
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/12-12-2024/basketball-24-25/acalanes-vs-stagg.htm?c=fM547sxESEeCd2RtzqaC3A",
+                    "timeStamp": "2025-02-25T15:48:46",
+                    "data": {
+                        "contestId": "ee78ce7c-44cc-4748-8277-646dcea682dc",
+                        "stats": [
+                            {
+                                "name": "Points",
+                                "displayName": "Points",
+                                "header": "Pts",
+                                "value": "3",
+                                "field": "s5"
+                            },
+                            {
+                                "name": "FreeThrowPercentage",
+                                "displayName": "FT Per Game",
+                                "header": "FT%",
+                                "value": "100",
+                                "field": "s8"
+                            },
+                            {
+                                "name": "FieldGoalPercentage",
+                                "displayName": "FG %",
+                                "header": "FG%",
+                                "value": "33",
+                                "field": "s15"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": 4,
+                    "timelineItemType": 4,
+                    "title": "Stats Updated",
+                    "text": "Landon's stats have been entered for the win vs. Piedmont on Friday, Dec. 6, 2024.",
+                    "linksForText": [
+                        {
+                            "text": "Landon's",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Piedmont",
+                            "url": "https://www.maxpreps.com/ca/piedmont/piedmont-highlanders/basketball/"
+                        },
+                        {
+                            "text": "win",
+                            "url": "https://www.maxpreps.com/games/12-6-2024/basketball-24-25/acalanes-vs-piedmont.htm?c=SHcrmBZmNkWEJsgo4kX2Mw"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/12-6-2024/basketball-24-25/acalanes-vs-piedmont.htm?c=SHcrmBZmNkWEJsgo4kX2Mw"
+                        },
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/12-6-2024/basketball-24-25/acalanes-vs-piedmont.htm?c=SHcrmBZmNkWEJsgo4kX2Mw",
+                    "timeStamp": "2025-02-25T15:40:14",
+                    "data": {
+                        "contestId": "982b7748-6616-4536-8426-c828e245f633",
+                        "stats": [
+                            {
+                                "name": "Points",
+                                "displayName": "Points",
+                                "header": "Pts",
+                                "value": "2",
+                                "field": "s5"
+                            },
+                            {
+                                "name": "FreeThrowPercentage",
+                                "displayName": "FT Per Game",
+                                "header": "FT%",
+                                "value": "100",
+                                "field": "s8"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": 4,
+                    "timelineItemType": 4,
+                    "title": "Stats Updated",
+                    "text": "Landon's stats have been entered for the win vs. Westmoor on Thursday, Dec. 5, 2024.",
+                    "linksForText": [
+                        {
+                            "text": "Landon's",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Westmoor",
+                            "url": "https://www.maxpreps.com/ca/daly-city/westmoor-rams/basketball/"
+                        },
+                        {
+                            "text": "win",
+                            "url": "https://www.maxpreps.com/games/12-5-2024/basketball-24-25/acalanes-vs-westmoor.htm?c=eaWotVrdHkSCzcG-hnyBvQ"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/12-5-2024/basketball-24-25/acalanes-vs-westmoor.htm?c=eaWotVrdHkSCzcG-hnyBvQ"
+                        },
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/12-5-2024/basketball-24-25/acalanes-vs-westmoor.htm?c=eaWotVrdHkSCzcG-hnyBvQ",
+                    "timeStamp": "2025-02-25T15:22:32",
+                    "data": {
+                        "contestId": "b5a8a579-dd5a-441e-82cd-c1be867c81bd",
+                        "stats": [
+                            {
+                                "name": "Points",
+                                "displayName": "Points",
+                                "header": "Pts",
+                                "value": "4",
+                                "field": "s5"
+                            },
+                            {
+                                "name": "FieldGoalPercentage",
+                                "displayName": "FG %",
+                                "header": "FG%",
+                                "value": "67",
+                                "field": "s15"
+                            },
+                            {
+                                "name": "Assists",
+                                "displayName": "Assists",
+                                "header": "Ast",
+                                "value": "2",
+                                "field": "s21"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "type": 9,
+                    "timelineItemType": 9,
+                    "title": "Game Results",
+                    "text": "On Thursday, Feb 6, 2025, the Acalanes Varsity Boys Basketball team won their Senior Night game against Concord High School by a score of 66-50.",
+                    "linksForText": [
+                        {
+                            "text": "Concord",
+                            "url": "https://www.maxpreps.com/ca/concord/concord-bears/basketball/24-25/schedule/"
+                        },
+                        {
+                            "text": "66-50",
+                            "url": "https://www.maxpreps.com/games/2-6-2025/basketball-24-25/acalanes-vs-concord.htm?c=Tu5qFg4-6E-khqhU6qTpew"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/2-6-2025/basketball-24-25/acalanes-vs-concord.htm?c=Tu5qFg4-6E-khqhU6qTpew"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/2-6-2025/basketball-24-25/acalanes-vs-concord.htm?c=Tu5qFg4-6E-khqhU6qTpew",
+                    "timeStamp": "2025-02-06T19:30:00",
+                    "data": {
+                        "contestId": "166aee4e-3e0e-4fe8-a486-a854eaa4e97b",
+                        "hasResult": true,
+                        "canonicalUrl": "https://www.maxpreps.com/games/2-6-2025/basketball-24-25/acalanes-vs-concord.htm?c=Tu5qFg4-6E-khqhU6qTpew",
+                        "timestamp": "2025-02-07T05:15:26",
+                        "sport": "Basketball",
+                        "gender": "Boys",
+                        "season": "Winter",
+                        "year": "24-25",
+                        "homeAwayType": 0,
+                        "contestIsLive": false,
+                        "contestState": 4,
+                        "isTimeTba": false,
+                        "isDateTba": false,
+                        "bracketGameIndex": null,
+                        "teamLevel": "Varsity",
+                        "teams": [
+                            {
+                                "schoolName": "Acalanes",
+                                "schoolNameAcronym": "AHS",
+                                "schoolColor": "022C66",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                                "score": 66,
+                                "result": "W",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            },
+                            {
+                                "schoolName": "Concord",
+                                "schoolNameAcronym": "CHS",
+                                "schoolColor": "00341E",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/4/4/0/440db106-ee2c-4b03-b64c-38385ae221fc.gif?version=638501717400000000&width=1024&height=1024",
+                                "score": 50,
+                                "result": "L",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/concord/concord-bears/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "440db106-ee2c-4b03-b64c-38385ae221fc",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            }
+                        ],
+                        "tournament": {
+                            "tournamentName": null,
+                            "tournamentLogoImageUrl": null,
+                            "bracketName": null,
+                            "bracketLogoImageUrl": null,
+                            "tournamentCanonicalUrl": null
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "timelineItemType": 9,
+                    "title": "Game Results",
+                    "text": "On Tuesday, Feb 4, 2025, the Acalanes Varsity Boys Basketball team won their  game against Miramonte High School by a score of 79-56.",
+                    "linksForText": [
+                        {
+                            "text": "Miramonte",
+                            "url": "https://www.maxpreps.com/ca/orinda/miramonte-matadors/basketball/24-25/schedule/"
+                        },
+                        {
+                            "text": "79-56",
+                            "url": "https://www.maxpreps.com/games/2-4-2025/basketball-24-25/acalanes-vs-miramonte.htm?c=GM3qxheLEECPHawIM-KwEw"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/2-4-2025/basketball-24-25/acalanes-vs-miramonte.htm?c=GM3qxheLEECPHawIM-KwEw"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/2-4-2025/basketball-24-25/acalanes-vs-miramonte.htm?c=GM3qxheLEECPHawIM-KwEw",
+                    "timeStamp": "2025-02-04T19:30:00",
+                    "data": {
+                        "contestId": "c6eacd18-8b17-4010-8f1d-ac0833e2b013",
+                        "hasResult": true,
+                        "canonicalUrl": "https://www.maxpreps.com/games/2-4-2025/basketball-24-25/acalanes-vs-miramonte.htm?c=GM3qxheLEECPHawIM-KwEw",
+                        "timestamp": "2025-02-05T04:49:22",
+                        "sport": "Basketball",
+                        "gender": "Boys",
+                        "season": "Winter",
+                        "year": "24-25",
+                        "homeAwayType": 1,
+                        "contestIsLive": false,
+                        "contestState": 4,
+                        "isTimeTba": false,
+                        "isDateTba": false,
+                        "bracketGameIndex": null,
+                        "teamLevel": "Varsity",
+                        "teams": [
+                            {
+                                "schoolName": "Acalanes",
+                                "schoolNameAcronym": "AHS",
+                                "schoolColor": "022C66",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                                "score": 79,
+                                "result": "W",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            },
+                            {
+                                "schoolName": "Miramonte",
+                                "schoolNameAcronym": "MHS",
+                                "schoolColor": "00341E",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/0/5/d/05de9787-3f9c-4cd2-8026-0b658e736206.gif?version=638013316200000000&width=1024&height=1024",
+                                "score": 56,
+                                "result": "L",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/orinda/miramonte-matadors/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "05de9787-3f9c-4cd2-8026-0b658e736206",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            }
+                        ],
+                        "tournament": {
+                            "tournamentName": null,
+                            "tournamentLogoImageUrl": null,
+                            "bracketName": null,
+                            "bracketLogoImageUrl": null,
+                            "tournamentCanonicalUrl": null
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "timelineItemType": 9,
+                    "title": "Game Results",
+                    "text": "On Tuesday, Jan 28, 2025, the Acalanes Varsity Boys Basketball team won their  game against Mt. Diablo High School by a score of 75-29.",
+                    "linksForText": [
+                        {
+                            "text": "Mt. Diablo",
+                            "url": "https://www.maxpreps.com/ca/concord/mt-diablo-red-devils/basketball/24-25/schedule/"
+                        },
+                        {
+                            "text": "75-29",
+                            "url": "https://www.maxpreps.com/games/1-28-2025/basketball-24-25/acalanes-vs-mt-diablo.htm?c=vQetD6c2xkeAPuvOW-p9-w"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/1-28-2025/basketball-24-25/acalanes-vs-mt-diablo.htm?c=vQetD6c2xkeAPuvOW-p9-w"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/1-28-2025/basketball-24-25/acalanes-vs-mt-diablo.htm?c=vQetD6c2xkeAPuvOW-p9-w",
+                    "timeStamp": "2025-01-28T19:00:00",
+                    "data": {
+                        "contestId": "0fad07bd-36a7-47c6-803e-ebce5bea7dfb",
+                        "hasResult": true,
+                        "canonicalUrl": "https://www.maxpreps.com/games/1-28-2025/basketball-24-25/acalanes-vs-mt-diablo.htm?c=vQetD6c2xkeAPuvOW-p9-w",
+                        "timestamp": "2025-01-29T05:55:06",
+                        "sport": "Basketball",
+                        "gender": "Boys",
+                        "season": "Winter",
+                        "year": "24-25",
+                        "homeAwayType": 1,
+                        "contestIsLive": false,
+                        "contestState": 4,
+                        "isTimeTba": false,
+                        "isDateTba": false,
+                        "bracketGameIndex": null,
+                        "teamLevel": "Varsity",
+                        "teams": [
+                            {
+                                "schoolName": "Acalanes",
+                                "schoolNameAcronym": "AHS",
+                                "schoolColor": "022C66",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                                "score": 75,
+                                "result": "W",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            },
+                            {
+                                "schoolName": "Mt. Diablo",
+                                "schoolNameAcronym": "MDHS",
+                                "schoolColor": "CC0022",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/4/4/f/44f7e741-19a8-4e71-82a0-458196c8cd0f.gif?version=636401257200000000&width=1024&height=1024",
+                                "score": 29,
+                                "result": "L",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/concord/mt-diablo-red-devils/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "44f7e741-19a8-4e71-82a0-458196c8cd0f",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            }
+                        ],
+                        "tournament": {
+                            "tournamentName": null,
+                            "tournamentLogoImageUrl": null,
+                            "bracketName": null,
+                            "bracketLogoImageUrl": null,
+                            "tournamentCanonicalUrl": null
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "timelineItemType": 9,
+                    "title": "Game Results",
+                    "text": "On Friday, Jan 24, 2025, the Acalanes Varsity Boys Basketball team lost their  game against Campolindo High School by a score of 37-57.",
+                    "linksForText": [
+                        {
+                            "text": "Campolindo",
+                            "url": "https://www.maxpreps.com/ca/moraga/campolindo-cougars/basketball/24-25/schedule/"
+                        },
+                        {
+                            "text": "37-57",
+                            "url": "https://www.maxpreps.com/games/1-24-2025/basketball-24-25/acalanes-vs-campolindo.htm?c=We7nhtOEXkaAr28GXr_jPA"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/1-24-2025/basketball-24-25/acalanes-vs-campolindo.htm?c=We7nhtOEXkaAr28GXr_jPA"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/1-24-2025/basketball-24-25/acalanes-vs-campolindo.htm?c=We7nhtOEXkaAr28GXr_jPA",
+                    "timeStamp": "2025-01-24T19:30:00",
+                    "data": {
+                        "contestId": "86e7ee59-84d3-465e-80af-6f065ebfe33c",
+                        "hasResult": true,
+                        "canonicalUrl": "https://www.maxpreps.com/games/1-24-2025/basketball-24-25/acalanes-vs-campolindo.htm?c=We7nhtOEXkaAr28GXr_jPA",
+                        "timestamp": "2025-01-25T04:46:55",
+                        "sport": "Basketball",
+                        "gender": "Boys",
+                        "season": "Winter",
+                        "year": "24-25",
+                        "homeAwayType": 0,
+                        "contestIsLive": false,
+                        "contestState": 4,
+                        "isTimeTba": false,
+                        "isDateTba": false,
+                        "bracketGameIndex": null,
+                        "teamLevel": "Varsity",
+                        "teams": [
+                            {
+                                "schoolName": "Acalanes",
+                                "schoolNameAcronym": "AHS",
+                                "schoolColor": "022C66",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                                "score": 37,
+                                "result": "L",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            },
+                            {
+                                "schoolName": "Campolindo",
+                                "schoolNameAcronym": "CHS",
+                                "schoolColor": "022C66",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/b/6/b/b6b1981a-7182-44bd-9b84-e4db9df44256.gif?version=635477902800000000&width=1024&height=1024",
+                                "score": 57,
+                                "result": "W",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/moraga/campolindo-cougars/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "b6b1981a-7182-44bd-9b84-e4db9df44256",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            }
+                        ],
+                        "tournament": {
+                            "tournamentName": null,
+                            "tournamentLogoImageUrl": null,
+                            "bracketName": null,
+                            "bracketLogoImageUrl": null,
+                            "tournamentCanonicalUrl": null
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "timelineItemType": 9,
+                    "title": "Game Results",
+                    "text": "On Saturday, Jan 18, 2025, the Acalanes Varsity Boys Basketball team won their MLK-John Lewis Memorial at San Marin HS game against Marin Catholic High School by a score of 56-42.",
+                    "linksForText": [
+                        {
+                            "text": "Marin Catholic",
+                            "url": "https://www.maxpreps.com/ca/kentfield/marin-catholic-wildcats/basketball/24-25/schedule/"
+                        },
+                        {
+                            "text": "56-42",
+                            "url": "https://www.maxpreps.com/games/1-18-2025/basketball-24-25/acalanes-vs-marin-catholic.htm?c=I0P_DAqkE0yOSF57HFQJmw"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/1-18-2025/basketball-24-25/acalanes-vs-marin-catholic.htm?c=I0P_DAqkE0yOSF57HFQJmw"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/1-18-2025/basketball-24-25/acalanes-vs-marin-catholic.htm?c=I0P_DAqkE0yOSF57HFQJmw",
+                    "timeStamp": "2025-01-18T18:30:00",
+                    "data": {
+                        "contestId": "0cff4323-a40a-4c13-8e48-5e7b1c54099b",
+                        "hasResult": true,
+                        "canonicalUrl": "https://www.maxpreps.com/games/1-18-2025/basketball-24-25/acalanes-vs-marin-catholic.htm?c=I0P_DAqkE0yOSF57HFQJmw",
+                        "timestamp": "2025-01-19T04:55:02",
+                        "sport": "Basketball",
+                        "gender": "Boys",
+                        "season": "Winter",
+                        "year": "24-25",
+                        "homeAwayType": 2,
+                        "contestIsLive": false,
+                        "contestState": 4,
+                        "isTimeTba": false,
+                        "isDateTba": false,
+                        "bracketGameIndex": null,
+                        "teamLevel": "Varsity",
+                        "teams": [
+                            {
+                                "schoolName": "Acalanes",
+                                "schoolNameAcronym": "AHS",
+                                "schoolColor": "022C66",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                                "score": 56,
+                                "result": "W",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            },
+                            {
+                                "schoolName": "Marin Catholic",
+                                "schoolNameAcronym": "MCHS",
+                                "schoolColor": "022C66",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/6/9/e/69e24861-fa93-42a2-acb5-be60e01ee555.gif?version=634901619600000000&width=1024&height=1024",
+                                "score": 42,
+                                "result": "L",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/kentfield/marin-catholic-wildcats/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "69e24861-fa93-42a2-acb5-be60e01ee555",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            }
+                        ],
+                        "tournament": {
+                            "tournamentName": null,
+                            "tournamentLogoImageUrl": null,
+                            "bracketName": null,
+                            "bracketLogoImageUrl": null,
+                            "tournamentCanonicalUrl": null
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "timelineItemType": 9,
+                    "title": "Game Results",
+                    "text": "On Wednesday, Jan 15, 2025, the Acalanes Varsity Boys Basketball team won their  game against Northgate High School by a score of 60-40.",
+                    "linksForText": [
+                        {
+                            "text": "Northgate",
+                            "url": "https://www.maxpreps.com/ca/walnut-creek/northgate-broncos/basketball/24-25/schedule/"
+                        },
+                        {
+                            "text": "60-40",
+                            "url": "https://www.maxpreps.com/games/1-15-2025/basketball-24-25/acalanes-vs-northgate.htm?c=eJ9tVkG4PEizVaI0z7IKVg"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/1-15-2025/basketball-24-25/acalanes-vs-northgate.htm?c=eJ9tVkG4PEizVaI0z7IKVg"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/1-15-2025/basketball-24-25/acalanes-vs-northgate.htm?c=eJ9tVkG4PEizVaI0z7IKVg",
+                    "timeStamp": "2025-01-15T19:30:00",
+                    "data": {
+                        "contestId": "566d9f78-b841-483c-b355-a234cfb20a56",
+                        "hasResult": true,
+                        "canonicalUrl": "https://www.maxpreps.com/games/1-15-2025/basketball-24-25/acalanes-vs-northgate.htm?c=eJ9tVkG4PEizVaI0z7IKVg",
+                        "timestamp": "2025-01-16T04:46:50",
+                        "sport": "Basketball",
+                        "gender": "Boys",
+                        "season": "Winter",
+                        "year": "24-25",
+                        "homeAwayType": 0,
+                        "contestIsLive": false,
+                        "contestState": 4,
+                        "isTimeTba": false,
+                        "isDateTba": false,
+                        "bracketGameIndex": null,
+                        "teamLevel": "Varsity",
+                        "teams": [
+                            {
+                                "schoolName": "Acalanes",
+                                "schoolNameAcronym": "AHS",
+                                "schoolColor": "022C66",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                                "score": 60,
+                                "result": "W",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            },
+                            {
+                                "schoolName": "Northgate",
+                                "schoolNameAcronym": "NHS",
+                                "schoolColor": "8F0018",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/1/c/1/1c17eb45-514a-4595-acac-36f7eff4fd57.gif?version=636235238400000000&width=1024&height=1024",
+                                "score": 40,
+                                "result": "L",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/walnut-creek/northgate-broncos/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "1c17eb45-514a-4595-acac-36f7eff4fd57",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            }
+                        ],
+                        "tournament": {
+                            "tournamentName": null,
+                            "tournamentLogoImageUrl": null,
+                            "bracketName": null,
+                            "bracketLogoImageUrl": null,
+                            "tournamentCanonicalUrl": null
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "timelineItemType": 9,
+                    "title": "Game Results",
+                    "text": "On Friday, Jan 10, 2025, the Acalanes Varsity Boys Basketball team won their  game against Berean Christian High School by a score of 69-26.",
+                    "linksForText": [
+                        {
+                            "text": "Berean Christian",
+                            "url": "https://www.maxpreps.com/ca/walnut-creek/berean-christian-eagles/basketball/24-25/schedule/"
+                        },
+                        {
+                            "text": "69-26",
+                            "url": "https://www.maxpreps.com/games/1-10-2025/basketball-24-25/acalanes-vs-berean-christian.htm?c=eeUfW5kX6EmINS1ENqVpcQ"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/1-10-2025/basketball-24-25/acalanes-vs-berean-christian.htm?c=eeUfW5kX6EmINS1ENqVpcQ"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/1-10-2025/basketball-24-25/acalanes-vs-berean-christian.htm?c=eeUfW5kX6EmINS1ENqVpcQ",
+                    "timeStamp": "2025-01-10T19:30:00",
+                    "data": {
+                        "contestId": "5b1fe579-1799-49e8-8835-2d4436a56971",
+                        "hasResult": true,
+                        "canonicalUrl": "https://www.maxpreps.com/games/1-10-2025/basketball-24-25/acalanes-vs-berean-christian.htm?c=eeUfW5kX6EmINS1ENqVpcQ",
+                        "timestamp": "2025-01-11T05:25:04",
+                        "sport": "Basketball",
+                        "gender": "Boys",
+                        "season": "Winter",
+                        "year": "24-25",
+                        "homeAwayType": 1,
+                        "contestIsLive": false,
+                        "contestState": 4,
+                        "isTimeTba": false,
+                        "isDateTba": false,
+                        "bracketGameIndex": null,
+                        "teamLevel": "Varsity",
+                        "teams": [
+                            {
+                                "schoolName": "Acalanes",
+                                "schoolNameAcronym": "AHS",
+                                "schoolColor": "022C66",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                                "score": 69,
+                                "result": "W",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            },
+                            {
+                                "schoolName": "Berean Christian",
+                                "schoolNameAcronym": "BCHS",
+                                "schoolColor": "022C66",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/7/3/b/73b24221-653b-4cb6-8978-2ea262117983.gif?version=637008760800000000&width=1024&height=1024",
+                                "score": 26,
+                                "result": "L",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/walnut-creek/berean-christian-eagles/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "73b24221-653b-4cb6-8978-2ea262117983",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            }
+                        ],
+                        "tournament": {
+                            "tournamentName": null,
+                            "tournamentLogoImageUrl": null,
+                            "bracketName": null,
+                            "bracketLogoImageUrl": null,
+                            "tournamentCanonicalUrl": null
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "timelineItemType": 9,
+                    "title": "Game Results",
+                    "text": "On Saturday, Jan 4, 2025, the Acalanes Varsity Boys Basketball team won their  game against Vintage High School by a score of 65-34.",
+                    "linksForText": [
+                        {
+                            "text": "Vintage",
+                            "url": "https://www.maxpreps.com/ca/napa/vintage-crushers/basketball/24-25/schedule/"
+                        },
+                        {
+                            "text": "65-34",
+                            "url": "https://www.maxpreps.com/games/1-4-2025/basketball-24-25/acalanes-vs-vintage.htm?c=WmAuYhwl5UyQ0Pob1QTNtQ"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/1-4-2025/basketball-24-25/acalanes-vs-vintage.htm?c=WmAuYhwl5UyQ0Pob1QTNtQ"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/1-4-2025/basketball-24-25/acalanes-vs-vintage.htm?c=WmAuYhwl5UyQ0Pob1QTNtQ",
+                    "timeStamp": "2025-01-04T16:00:00",
+                    "data": {
+                        "contestId": "622e605a-251c-4ce5-90d0-fa1bd504cdb5",
+                        "hasResult": true,
+                        "canonicalUrl": "https://www.maxpreps.com/games/1-4-2025/basketball-24-25/acalanes-vs-vintage.htm?c=WmAuYhwl5UyQ0Pob1QTNtQ",
+                        "timestamp": "2025-01-05T05:55:02",
+                        "sport": "Basketball",
+                        "gender": "Boys",
+                        "season": "Winter",
+                        "year": "24-25",
+                        "homeAwayType": 1,
+                        "contestIsLive": false,
+                        "contestState": 4,
+                        "isTimeTba": false,
+                        "isDateTba": false,
+                        "bracketGameIndex": null,
+                        "teamLevel": "Varsity",
+                        "teams": [
+                            {
+                                "schoolName": "Acalanes",
+                                "schoolNameAcronym": "AHS",
+                                "schoolColor": "022C66",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                                "score": 65,
+                                "result": "W",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            },
+                            {
+                                "schoolName": "Vintage",
+                                "schoolNameAcronym": "VHS",
+                                "schoolColor": "52000E",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/4/c/7/4c76a5e2-5fdb-42db-9297-6a97fa4b2027.gif?version=637720648800000000&width=1024&height=1024",
+                                "score": 34,
+                                "result": "L",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/napa/vintage-crushers/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "4c76a5e2-5fdb-42db-9297-6a97fa4b2027",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            }
+                        ],
+                        "tournament": {
+                            "tournamentName": null,
+                            "tournamentLogoImageUrl": null,
+                            "bracketName": null,
+                            "bracketLogoImageUrl": null,
+                            "tournamentCanonicalUrl": null
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "timelineItemType": 9,
+                    "title": "Game Results",
+                    "text": "On Friday, Jan 3, 2025, the Acalanes Varsity Boys Basketball team won their  game against Pinole Valley High School by a score of 80-44.",
+                    "linksForText": [
+                        {
+                            "text": "Pinole Valley",
+                            "url": "https://www.maxpreps.com/ca/pinole/pinole-valley-spartans/basketball/24-25/schedule/"
+                        },
+                        {
+                            "text": "80-44",
+                            "url": "https://www.maxpreps.com/games/1-3-2025/basketball-24-25/acalanes-vs-pinole-valley.htm?c=1nzue5-2QEKb88LiZVCfIA"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/1-3-2025/basketball-24-25/acalanes-vs-pinole-valley.htm?c=1nzue5-2QEKb88LiZVCfIA"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/1-3-2025/basketball-24-25/acalanes-vs-pinole-valley.htm?c=1nzue5-2QEKb88LiZVCfIA",
+                    "timeStamp": "2025-01-03T19:00:00",
+                    "data": {
+                        "contestId": "7bee7cd6-b69f-4240-9bf3-c2e265509f20",
+                        "hasResult": true,
+                        "canonicalUrl": "https://www.maxpreps.com/games/1-3-2025/basketball-24-25/acalanes-vs-pinole-valley.htm?c=1nzue5-2QEKb88LiZVCfIA",
+                        "timestamp": "2025-01-04T07:20:17",
+                        "sport": "Basketball",
+                        "gender": "Boys",
+                        "season": "Winter",
+                        "year": "24-25",
+                        "homeAwayType": 0,
+                        "contestIsLive": false,
+                        "contestState": 4,
+                        "isTimeTba": false,
+                        "isDateTba": false,
+                        "bracketGameIndex": null,
+                        "teamLevel": "Varsity",
+                        "teams": [
+                            {
+                                "schoolName": "Acalanes",
+                                "schoolNameAcronym": "AHS",
+                                "schoolColor": "022C66",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                                "score": 80,
+                                "result": "W",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            },
+                            {
+                                "schoolName": "Pinole Valley",
+                                "schoolNameAcronym": "PVHS",
+                                "schoolColor": "022C66",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/5/e/c/5ec5da26-eb5d-4ce8-823b-ba8ca8ac90e6.gif?version=636753862800000000&width=1024&height=1024",
+                                "score": 44,
+                                "result": "L",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/pinole/pinole-valley-spartans/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "5ec5da26-eb5d-4ce8-823b-ba8ca8ac90e6",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            }
+                        ],
+                        "tournament": {
+                            "tournamentName": null,
+                            "tournamentLogoImageUrl": null,
+                            "bracketName": null,
+                            "bracketLogoImageUrl": null,
+                            "tournamentCanonicalUrl": null
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "timelineItemType": 9,
+                    "title": "Game Results",
+                    "text": "On Thursday, Jan 2, 2025, the Acalanes Varsity Boys Basketball team lost their  game against Junipero Serra High School by a score of 53-70.",
+                    "linksForText": [
+                        {
+                            "text": "Junipero Serra",
+                            "url": "https://www.maxpreps.com/ca/san-mateo/junipero-serra-padres/basketball/24-25/schedule/"
+                        },
+                        {
+                            "text": "53-70",
+                            "url": "https://www.maxpreps.com/games/1-2-2025/basketball-24-25/acalanes-vs-junipero-serra.htm?c=7eI9Ab14v0m3Tqp0pziizg"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/1-2-2025/basketball-24-25/acalanes-vs-junipero-serra.htm?c=7eI9Ab14v0m3Tqp0pziizg"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/1-2-2025/basketball-24-25/acalanes-vs-junipero-serra.htm?c=7eI9Ab14v0m3Tqp0pziizg",
+                    "timeStamp": "2025-01-02T19:00:00",
+                    "data": {
+                        "contestId": "013de2ed-78bd-49bf-b74e-aa74a738a2ce",
+                        "hasResult": true,
+                        "canonicalUrl": "https://www.maxpreps.com/games/1-2-2025/basketball-24-25/acalanes-vs-junipero-serra.htm?c=7eI9Ab14v0m3Tqp0pziizg",
+                        "timestamp": "2025-01-03T04:32:11",
+                        "sport": "Basketball",
+                        "gender": "Boys",
+                        "season": "Winter",
+                        "year": "24-25",
+                        "homeAwayType": 1,
+                        "contestIsLive": false,
+                        "contestState": 4,
+                        "isTimeTba": false,
+                        "isDateTba": false,
+                        "bracketGameIndex": null,
+                        "teamLevel": "Varsity",
+                        "teams": [
+                            {
+                                "schoolName": "Acalanes",
+                                "schoolNameAcronym": "AHS",
+                                "schoolColor": "022C66",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                                "score": 53,
+                                "result": "L",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            },
+                            {
+                                "schoolName": "Junipero Serra",
+                                "schoolNameAcronym": "JSHS",
+                                "schoolColor": "034CB2",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/1/6/e/16e16363-66d8-45af-b777-7820b3256850.gif?version=636559221600000000&width=1024&height=1024",
+                                "score": 70,
+                                "result": "W",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/san-mateo/junipero-serra-padres/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "16e16363-66d8-45af-b777-7820b3256850",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            }
+                        ],
+                        "tournament": {
+                            "tournamentName": null,
+                            "tournamentLogoImageUrl": null,
+                            "bracketName": null,
+                            "bracketLogoImageUrl": null,
+                            "tournamentCanonicalUrl": null
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "timelineItemType": 9,
+                    "title": "Game Results",
+                    "text": "On Friday, Dec 27, 2024, the Acalanes Varsity Boys Basketball team lost their Surf N' Slam, San Diego game against St. John's High School by a score of 54-81.",
+                    "linksForText": [
+                        {
+                            "text": "St. John's",
+                            "url": "https://www.maxpreps.com/tx/houston/st-johns-mavericks/basketball/24-25/schedule/"
+                        },
+                        {
+                            "text": "54-81",
+                            "url": "https://www.maxpreps.com/games/12-27-2024/basketball-24-25/acalanes-vs-st-johns.htm?c=M8oyPTL6VEGJqqZDRarE7g"
+                        }
+                    ],
+                    "links": [
+                        {
+                            "text": "Landon's Full Stats",
+                            "url": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/basketball/stats/?careerid=6jneeijvodtue"
+                        },
+                        {
+                            "text": "Box Score",
+                            "url": "https://www.maxpreps.com/games/12-27-2024/basketball-24-25/acalanes-vs-st-johns.htm?c=M8oyPTL6VEGJqqZDRarE7g"
+                        }
+                    ],
+                    "shareLink": "https://www.maxpreps.com/games/12-27-2024/basketball-24-25/acalanes-vs-st-johns.htm?c=M8oyPTL6VEGJqqZDRarE7g",
+                    "timeStamp": "2024-12-27T15:00:00",
+                    "data": {
+                        "contestId": "3d32ca33-fa32-4154-89aa-a64345aac4ee",
+                        "hasResult": true,
+                        "canonicalUrl": "https://www.maxpreps.com/games/12-27-2024/basketball-24-25/acalanes-vs-st-johns.htm?c=M8oyPTL6VEGJqqZDRarE7g",
+                        "timestamp": "2024-12-28T00:38:12",
+                        "sport": "Basketball",
+                        "gender": "Boys",
+                        "season": "Winter",
+                        "year": "24-25",
+                        "homeAwayType": 2,
+                        "contestIsLive": false,
+                        "contestState": 4,
+                        "isTimeTba": false,
+                        "isDateTba": false,
+                        "bracketGameIndex": null,
+                        "teamLevel": "Varsity",
+                        "teams": [
+                            {
+                                "schoolName": "Acalanes",
+                                "schoolNameAcronym": "AHS",
+                                "schoolColor": "022C66",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                                "score": 54,
+                                "result": "L",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            },
+                            {
+                                "schoolName": "St. John's",
+                                "schoolNameAcronym": "SJHS",
+                                "schoolColor": "CC0022",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/f/0/f/f0f64269-b76f-4b44-b892-5f49260ba2ce.gif?version=635398998000000000&width=1024&height=1024",
+                                "score": 81,
+                                "result": "W",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/tx/houston/st-johns-mavericks/basketball/24-25/schedule/",
+                                "record": null,
+                                "teamId": "f0f64269-b76f-4b44-b892-5f49260ba2ce",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            }
+                        ],
+                        "tournament": {
+                            "tournamentName": null,
+                            "tournamentLogoImageUrl": null,
+                            "bracketName": null,
+                            "bracketLogoImageUrl": null,
+                            "tournamentCanonicalUrl": null
+                        }
+                    }
+                }
+            ],
+            "careerHomeCards": {
+                "careerId": "dc928233-77ba-4ead-a4ee-87e52d85d05b",
+                "quickStats": [],
+                "teamMates": [
+                    {
+                        "allSeasonId": "a42c7ea4-0907-491e-b56f-a2d31a45bf19",
+                        "schoolName": "Acalanes",
+                        "schoolCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/",
+                        "mascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                        "rosterUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/roster/",
+                        "latestSeason": "25-26",
+                        "sport": "Basketball",
+                        "roasterTotal": 13,
+                        "roster": [
+                            {
+                                "linkedAthlete": null,
+                                "linkedParents": null,
+                                "hudlParticipantCount": 0,
+                                "hudlParticipantHighlightCount": 0,
+                                "canStartChat": false,
+                                "accountInformation": null,
+                                "athleteId": "05bbd69e-a525-4fc9-a760-4de2055c95d0",
+                                "firstName": "Sam",
+                                "lastName": "Phillips",
+                                "classYear": 11,
+                                "jersey": "5",
+                                "heightInches": 10,
+                                "heightFeet": 5,
+                                "weight": 140,
+                                "position1": "",
+                                "position2": "",
+                                "position3": "",
+                                "hasStats": false,
+                                "isCaptain": false,
+                                "isDeleted": false,
+                                "photoUrl": null,
+                                "secondaryPhotoUrl": null,
+                                "weightClass": null,
+                                "isPlayerOfTheGame": null,
+                                "isFemale": false,
+                                "bio": "",
+                                "hasPhoto": false,
+                                "rosterId": "0ef54a3b-bb26-455e-ab38-38a8a4e8b0af",
+                                "schoolId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "sportSeasonId": "ee7cf537-7394-4430-88ca-becaabda286c",
+                                "sportSeasonName": null,
+                                "careerProfileId": "38569f40-71ee-4219-92d3-9d4548ee5d8c",
+                                "createdOn": "2025-11-04T20:07:22",
+                                "canonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/sam-phillips/?careerid=qd4gfkvejm577"
+                            },
+                            {
+                                "linkedAthlete": null,
+                                "linkedParents": null,
+                                "hudlParticipantCount": 0,
+                                "hudlParticipantHighlightCount": 0,
+                                "canStartChat": false,
+                                "accountInformation": null,
+                                "athleteId": "26405f01-79ef-4c07-8775-e7b0be150b52",
+                                "firstName": "Evan",
+                                "lastName": "Palmer",
+                                "classYear": 11,
+                                "jersey": "15",
+                                "heightInches": 9,
+                                "heightFeet": 5,
+                                "weight": 125,
+                                "position1": "",
+                                "position2": "",
+                                "position3": "",
+                                "hasStats": false,
+                                "isCaptain": false,
+                                "isDeleted": false,
+                                "photoUrl": null,
+                                "secondaryPhotoUrl": null,
+                                "weightClass": null,
+                                "isPlayerOfTheGame": null,
+                                "isFemale": false,
+                                "bio": "",
+                                "hasPhoto": false,
+                                "rosterId": "ff7b867b-fb06-40ea-b35a-136ce3503c0e",
+                                "schoolId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "sportSeasonId": "ee7cf537-7394-4430-88ca-becaabda286c",
+                                "sportSeasonName": null,
+                                "careerProfileId": "aa66e582-ebf8-45cc-a7d8-7e94ab117fde",
+                                "createdOn": "2025-11-04T21:04:26",
+                                "canonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/evan-palmer/?careerid=e40dlmenhoaaa"
+                            },
+                            {
+                                "linkedAthlete": null,
+                                "linkedParents": null,
+                                "hudlParticipantCount": 0,
+                                "hudlParticipantHighlightCount": 0,
+                                "canStartChat": false,
+                                "accountInformation": null,
+                                "athleteId": "b207e15e-2299-4612-85e4-681d561e980b",
+                                "firstName": "Justice",
+                                "lastName": "Hembrador",
+                                "classYear": 11,
+                                "jersey": "3",
+                                "heightInches": 4,
+                                "heightFeet": 5,
+                                "weight": 110,
+                                "position1": "",
+                                "position2": "",
+                                "position3": "",
+                                "hasStats": false,
+                                "isCaptain": false,
+                                "isDeleted": false,
+                                "photoUrl": null,
+                                "secondaryPhotoUrl": null,
+                                "weightClass": null,
+                                "isPlayerOfTheGame": null,
+                                "isFemale": false,
+                                "bio": "",
+                                "hasPhoto": false,
+                                "rosterId": "9cc644bc-150d-4585-9e93-ef9b25f1d994",
+                                "schoolId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "sportSeasonId": "ee7cf537-7394-4430-88ca-becaabda286c",
+                                "sportSeasonName": null,
+                                "careerProfileId": "a2aa1ffd-b273-425c-a8cd-9ba990491612",
+                                "createdOn": "2025-11-04T20:17:13",
+                                "canonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/justice-hembrador/?careerid=2kfkn0i2o19bb"
+                            },
+                            {
+                                "linkedAthlete": null,
+                                "linkedParents": null,
+                                "hudlParticipantCount": 0,
+                                "hudlParticipantHighlightCount": 0,
+                                "canStartChat": false,
+                                "accountInformation": null,
+                                "athleteId": "d5b6bdce-2ad7-42cd-8daa-bdbde48543c3",
+                                "firstName": "Aakash",
+                                "lastName": "Agarwal",
+                                "classYear": 11,
+                                "jersey": "34",
+                                "heightInches": null,
+                                "heightFeet": null,
+                                "weight": null,
+                                "position1": "SF",
+                                "position2": "",
+                                "position3": "",
+                                "hasStats": false,
+                                "isCaptain": false,
+                                "isDeleted": false,
+                                "photoUrl": null,
+                                "secondaryPhotoUrl": null,
+                                "weightClass": null,
+                                "isPlayerOfTheGame": null,
+                                "isFemale": false,
+                                "bio": "",
+                                "hasPhoto": false,
+                                "rosterId": "33f70971-fe49-43af-ac69-a21a0795cade",
+                                "schoolId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "sportSeasonId": "ee7cf537-7394-4430-88ca-becaabda286c",
+                                "sportSeasonName": null,
+                                "careerProfileId": "b6f0dd9e-d838-479d-ac2a-a5d0acaac7a3",
+                                "createdOn": "2025-11-04T20:03:10",
+                                "canonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/aakash-agarwal/?careerid=9u5jbbjt91tm6"
+                            },
+                            {
+                                "linkedAthlete": null,
+                                "linkedParents": null,
+                                "hudlParticipantCount": 0,
+                                "hudlParticipantHighlightCount": 0,
+                                "canStartChat": false,
+                                "accountInformation": null,
+                                "athleteId": "87f8d455-29f2-4378-87d6-f7b9a43ada71",
+                                "firstName": "A.j.",
+                                "lastName": "Hastings",
+                                "classYear": 11,
+                                "jersey": "12",
+                                "heightInches": 3,
+                                "heightFeet": 6,
+                                "weight": 190,
+                                "position1": "PG",
+                                "position2": "SG",
+                                "position3": "",
+                                "hasStats": false,
+                                "isCaptain": false,
+                                "isDeleted": false,
+                                "photoUrl": null,
+                                "secondaryPhotoUrl": null,
+                                "weightClass": null,
+                                "isPlayerOfTheGame": null,
+                                "isFemale": false,
+                                "bio": "",
+                                "hasPhoto": false,
+                                "rosterId": "77b1c34d-583b-4714-b534-07ceb103d8af",
+                                "schoolId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "sportSeasonId": "ee7cf537-7394-4430-88ca-becaabda286c",
+                                "sportSeasonName": null,
+                                "careerProfileId": "c7d74aca-5bdb-47ba-a4d8-1d9f1e29b06d",
+                                "createdOn": "2025-11-04T20:51:36",
+                                "canonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/aj-hastings/?careerid=5s34l10a9ftee"
+                            },
+                            {
+                                "linkedAthlete": null,
+                                "linkedParents": null,
+                                "hudlParticipantCount": 0,
+                                "hudlParticipantHighlightCount": 0,
+                                "canStartChat": false,
+                                "accountInformation": null,
+                                "athleteId": "61a3a2d9-1b04-4bb9-adbd-c60cea80dbb7",
+                                "firstName": "Gavin",
+                                "lastName": "Dodge",
+                                "classYear": 12,
+                                "jersey": "24",
+                                "heightInches": 5,
+                                "heightFeet": 6,
+                                "weight": 190,
+                                "position1": "PG",
+                                "position2": "SG",
+                                "position3": "",
+                                "hasStats": false,
+                                "isCaptain": false,
+                                "isDeleted": false,
+                                "photoUrl": null,
+                                "secondaryPhotoUrl": null,
+                                "weightClass": null,
+                                "isPlayerOfTheGame": null,
+                                "isFemale": false,
+                                "bio": "",
+                                "hasPhoto": false,
+                                "rosterId": "f5b2eb47-e639-4573-95a3-bb23ef5109ad",
+                                "schoolId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "sportSeasonId": "ee7cf537-7394-4430-88ca-becaabda286c",
+                                "sportSeasonName": null,
+                                "careerProfileId": "454ca4e5-9f4c-47b4-9572-36bb9b9821b4",
+                                "createdOn": "2025-11-04T20:31:10",
+                                "canonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/gavin-dodge/?careerid=2eorqhnhgcb44"
+                            }
+                        ]
+                    }
+                ],
+                "recentGames": null,
+                "recentContestResults": {
+                    "athleteId": "fd6e6787-3fa2-4028-8299-63f898105723",
+                    "lastGame": {
+                        "contestId": "3f584125-05aa-44ad-8a54-aa3767d16cc2",
+                        "hasResult": true,
+                        "canonicalUrl": "https://www.maxpreps.com/games/02-21-2025/basketball-24-25/acalanes-vs-redwood.htm?c=JUFYP6oFrUSKVKo3Z9Fswg",
+                        "timestamp": "2025-02-21T19:00:00",
+                        "sport": "Basketball",
+                        "gender": "Boys",
+                        "season": "Winter",
+                        "year": "24-25",
+                        "homeAwayType": 0,
+                        "contestIsLive": false,
+                        "contestState": 4,
+                        "isTimeTba": false,
+                        "isDateTba": false,
+                        "bracketGameIndex": 0,
+                        "teamLevel": "Varsity",
+                        "teams": [
+                            {
+                                "schoolName": "Acalanes",
+                                "schoolNameAcronym": "AHS",
+                                "schoolColor": "022C66",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                                "score": 52,
+                                "result": "L",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/24-25/schedule/",
+                                "record": "22-7",
+                                "teamId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            },
+                            {
+                                "schoolName": "Redwood",
+                                "schoolNameAcronym": "RHS",
+                                "schoolColor": "CC0022",
+                                "mascotUrl": "https://image.maxpreps.io/school-mascot/1/2/6/12616b84-157c-48d3-b353-434576d9df8d.gif?version=636093507600000000&width=1024&height=1024",
+                                "score": 62,
+                                "result": "W",
+                                "teamCanonicalUrl": "https://www.maxpreps.com/ca/larkspur/redwood-giants/basketball/24-25/schedule/",
+                                "record": "22-8",
+                                "teamId": "12616b84-157c-48d3-b353-434576d9df8d",
+                                "isForfeit": false,
+                                "isTeamTBA": false,
+                                "sportSeasonId": "20ea215d-54ce-4502-8305-748bdc872d49"
+                            }
+                        ],
+                        "tournament": null
+                    },
+                    "nextGame": null
+                },
+                "teamInfo": [
+                    {
+                        "teamId": "e6042da9-e5ce-4f18-a841-ae5e6cf48015",
+                        "sportSeasonId": "ee7cf537-7394-4430-88ca-becaabda286c",
+                        "sport": "Basketball",
+                        "schoolName": "Acalanes",
+                        "scheduleCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/schedule/",
+                        "seasonYear": "2025-26",
+                        "standingsCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/standings/",
+                        "rankingsCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/rankings/",
+                        "teamStandings": {
+                            "overallRecord": "18-11-0",
+                            "overallWinPercentage": 0.621,
+                            "leagueRecord": "8-2",
+                            "leagueRanking": "2nd",
+                            "leagueName": "Diablo",
+                            "leagueAlias": "League",
+                            "leagueCanonicalUrl": "https://www.maxpreps.com/ca/basketball/25-26/league/diablo/?leagueid=c454378a-7ab5-428b-8898-31ef624bfb18"
+                        },
+                        "leagueStandings": [
+                            {
+                                "rank": 1,
+                                "schoolName": "Clayton Valley Charter",
+                                "schoolMascotUrl": "https://image.maxpreps.io/school-mascot/b/9/d/b9d6983f-f628-43e1-90c0-f7ee32f9eb09.gif?version=637534317000000000&width=1024&height=1024",
+                                "schoolCanonicalUrl": "https://www.maxpreps.com/ca/concord/clayton-valley-charter-ugly-eagles/basketball/",
+                                "record": "12-0"
+                            },
+                            {
+                                "rank": 2,
+                                "schoolName": "Acalanes",
+                                "schoolMascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                                "schoolCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/",
+                                "record": "8-2"
+                            },
+                            {
+                                "rank": 3,
+                                "schoolName": "Campolindo",
+                                "schoolMascotUrl": "https://image.maxpreps.io/school-mascot/b/6/b/b6b1981a-7182-44bd-9b84-e4db9df44256.gif?version=635477902800000000&width=1024&height=1024",
+                                "schoolCanonicalUrl": "https://www.maxpreps.com/ca/moraga/campolindo-cougars/basketball/",
+                                "record": "7-3"
+                            }
+                        ],
+                        "rankings": [
+                            {
+                                "rank": 3,
+                                "rankingContextName": "North Coast Section Division 3",
+                                "rankingContextCanonicalUrl": "https://www.maxpreps.com/ca/north-coast-section/basketball/25-26/division/division-3/rankings/1/?sectiondivisionid=10735531-cd87-47b5-acb4-63c022d8d8fe"
+                            },
+                            {
+                                "rank": 21,
+                                "rankingContextName": "North Coast Section",
+                                "rankingContextCanonicalUrl": "https://www.maxpreps.com/ca/north-coast-section/basketball/rankings/1/"
+                            },
+                            {
+                                "rank": 28,
+                                "rankingContextName": "San Francisco Metro",
+                                "rankingContextCanonicalUrl": "https://www.maxpreps.com/ca/dma/san-francisco-metro/basketball/rankings/1/?dmaid=95b6a9cb-6757-48d7-b155-91f9c4bb4ff0"
+                            }
+                        ]
+                    }
+                ],
+                "topPerformers": []
+            },
+            "careerProspectReport": null,
+            "careerHistoryData": [
+                {
+                    "seasonPhotos": [],
+                    "schoolName": "Acalanes",
+                    "formattedCityState": "Acalanes (Lafayette, CA)",
+                    "schoolMascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                    "teamHomeCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/freshman/22-23/schedule/",
+                    "rosterPhotoUrl": null,
+                    "classYear": 9,
+                    "heightFeet": 0,
+                    "heightInches": 0,
+                    "weight": 0,
+                    "positions": [],
+                    "overallRecord": null,
+                    "leagueRecord": null,
+                    "leagueAlias": "League",
+                    "leagueStandingsRank": 0,
+                    "leagueCanonicalUrl": null,
+                    "ssid": "bfe5ae97-90d0-4b30-a13b-ee70937deec8",
+                    "sport": "Basketball",
+                    "jersey": "25",
+                    "isCaptain": false,
+                    "teamLevel": "Freshman",
+                    "teamScheduleCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/freshman/22-23/schedule/",
+                    "year": "22-23",
+                    "leagueName": null,
+                    "hasVerifiedStats": true,
+                    "athleteRankings": [],
+                    "stats": [
+                        {
+                            "nationalValue": "10",
+                            "name": "GamesPlayed",
+                            "displayName": "Games Played",
+                            "header": "GP",
+                            "value": "21",
+                            "field": "GamesPlayed"
+                        },
+                        {
+                            "nationalValue": "4.3",
+                            "name": "PointsPerGame",
+                            "displayName": "Points Per Game",
+                            "header": "P/G",
+                            "value": "3.2",
+                            "field": "s23"
+                        },
+                        {
+                            "nationalValue": "0.8",
+                            "name": "AssistsPerGame",
+                            "displayName": "Assists Per Game",
+                            "header": "Ast/G",
+                            "value": "0.3",
+                            "field": "s27"
+                        },
+                        {
+                            "nationalValue": "2.3",
+                            "name": "ReboundsPerGame",
+                            "displayName": "Rebounds Per Game",
+                            "header": "Reb/G",
+                            "value": "2.9",
+                            "field": "s25"
+                        },
+                        {
+                            "nationalValue": "1.0",
+                            "name": "StealsPerGame",
+                            "displayName": "Steals Per Game",
+                            "header": "Stl/G",
+                            "value": "0.2",
+                            "field": "s26"
+                        },
+                        {
+                            "nationalValue": "0.4",
+                            "name": "BlocksPerGame",
+                            "displayName": "Blocks Per Game",
+                            "header": "Blk/G",
+                            "value": "0.1",
+                            "field": "s28"
+                        }
+                    ],
+                    "awards": []
+                },
+                {
+                    "seasonPhotos": [
+                        {
+                            "sportSeasonId": "c0be1ce9-e50e-40c5-8fed-36cfde832c2a",
+                            "year": 2023,
+                            "photogalleryImageId": "6af127ea-4612-4ef5-a363-37b8d9430254",
+                            "sourceCanonicalUrl": "https://image.maxpreps.io/Gallery/sz1yp4YBcUqIdsysK4vIqQ/6ifxahJG9U6jYze42UMCVA/1,660,520/vintage_acalanes_boys_basketball_image.jpg",
+                            "imageTitle": "",
+                            "imageCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/media/photos/full-size/?careerid=6jneeijvodtue&photoid=6af127ea-4612-4ef5-a363-37b8d9430254",
+                            "imageHeight": 3000,
+                            "imageWidth": 2216,
+                            "purchasable": true,
+                            "photogalleryId": "a7723db3-0186-4a71-8876-ccac2b8bc8a9",
+                            "galleryTitle": null,
+                            "galleryCanonicalUrl": null,
+                            "photographerName": null,
+                            "photographerMugShotUrl": null,
+                            "photographerCanonicalUrl": null,
+                            "photographerGalleryCount": 0,
+                            "publishedDate": "2023-11-26T19:21:00"
+                        },
+                        {
+                            "sportSeasonId": "c0be1ce9-e50e-40c5-8fed-36cfde832c2a",
+                            "year": 2023,
+                            "photogalleryImageId": "c6b7a447-ff29-4d21-8b6e-4761d454ae8f",
+                            "sourceCanonicalUrl": "https://image.maxpreps.io/Gallery/sz1yp4YBcUqIdsysK4vIqQ/R6S3xin_IU2Lbkdh1FSujw/1,660,520/vintage_acalanes_boys_basketball_image.jpg",
+                            "imageTitle": "",
+                            "imageCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/media/photos/full-size/?careerid=6jneeijvodtue&photoid=c6b7a447-ff29-4d21-8b6e-4761d454ae8f",
+                            "imageHeight": 3000,
+                            "imageWidth": 2216,
+                            "purchasable": true,
+                            "photogalleryId": "a7723db3-0186-4a71-8876-ccac2b8bc8a9",
+                            "galleryTitle": null,
+                            "galleryCanonicalUrl": null,
+                            "photographerName": null,
+                            "photographerMugShotUrl": null,
+                            "photographerCanonicalUrl": null,
+                            "photographerGalleryCount": 0,
+                            "publishedDate": "2023-11-26T19:21:00"
+                        },
+                        {
+                            "sportSeasonId": "c0be1ce9-e50e-40c5-8fed-36cfde832c2a",
+                            "year": 2023,
+                            "photogalleryImageId": "c8ea41e8-46d4-4d93-87d8-a07b744d56b6",
+                            "sourceCanonicalUrl": "https://image.maxpreps.io/Gallery/sz1yp4YBcUqIdsysK4vIqQ/6EHqyNRGk02H2KB7dE1Wtg/1,660,520/vintage_acalanes_boys_basketball_image.jpg",
+                            "imageTitle": "",
+                            "imageCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/athletes/landon-deily/media/photos/full-size/?careerid=6jneeijvodtue&photoid=c8ea41e8-46d4-4d93-87d8-a07b744d56b6",
+                            "imageHeight": 3000,
+                            "imageWidth": 2216,
+                            "purchasable": true,
+                            "photogalleryId": "a7723db3-0186-4a71-8876-ccac2b8bc8a9",
+                            "galleryTitle": null,
+                            "galleryCanonicalUrl": null,
+                            "photographerName": null,
+                            "photographerMugShotUrl": null,
+                            "photographerCanonicalUrl": null,
+                            "photographerGalleryCount": 0,
+                            "publishedDate": "2023-11-26T19:18:00"
+                        }
+                    ],
+                    "schoolName": "Acalanes",
+                    "formattedCityState": "Acalanes (Lafayette, CA)",
+                    "schoolMascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                    "teamHomeCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/jv/23-24/schedule/",
+                    "rosterPhotoUrl": null,
+                    "classYear": 10,
+                    "heightFeet": 0,
+                    "heightInches": 0,
+                    "weight": 0,
+                    "positions": [],
+                    "overallRecord": null,
+                    "leagueRecord": null,
+                    "leagueAlias": "League",
+                    "leagueStandingsRank": 0,
+                    "leagueCanonicalUrl": null,
+                    "ssid": "c0be1ce9-e50e-40c5-8fed-36cfde832c2a",
+                    "sport": "Basketball",
+                    "jersey": "35",
+                    "isCaptain": false,
+                    "teamLevel": "JV",
+                    "teamScheduleCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/jv/23-24/schedule/",
+                    "year": "23-24",
+                    "leagueName": null,
+                    "hasVerifiedStats": true,
+                    "athleteRankings": [],
+                    "stats": [
+                        {
+                            "nationalValue": "11",
+                            "name": "GamesPlayed",
+                            "displayName": "Games Played",
+                            "header": "GP",
+                            "value": "16",
+                            "field": "GamesPlayed"
+                        },
+                        {
+                            "nationalValue": "4.5",
+                            "name": "PointsPerGame",
+                            "displayName": "Points Per Game",
+                            "header": "P/G",
+                            "value": "3.6",
+                            "field": "s23"
+                        },
+                        {
+                            "nationalValue": "0.9",
+                            "name": "AssistsPerGame",
+                            "displayName": "Assists Per Game",
+                            "header": "Ast/G",
+                            "value": "0.7",
+                            "field": "s27"
+                        },
+                        {
+                            "nationalValue": "2.5",
+                            "name": "ReboundsPerGame",
+                            "displayName": "Rebounds Per Game",
+                            "header": "Reb/G",
+                            "value": "2.9",
+                            "field": "s25"
+                        },
+                        {
+                            "nationalValue": "1.0",
+                            "name": "StealsPerGame",
+                            "displayName": "Steals Per Game",
+                            "header": "Stl/G",
+                            "value": "0.4",
+                            "field": "s26"
+                        },
+                        {
+                            "nationalValue": "0.3",
+                            "name": "BlocksPerGame",
+                            "displayName": "Blocks Per Game",
+                            "header": "Blk/G",
+                            "value": "0.1",
+                            "field": "s28"
+                        }
+                    ],
+                    "awards": []
+                },
+                {
+                    "seasonPhotos": [],
+                    "schoolName": "Acalanes",
+                    "formattedCityState": "Acalanes (Lafayette, CA)",
+                    "schoolMascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                    "teamHomeCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/24-25/schedule/",
+                    "rosterPhotoUrl": null,
+                    "classYear": 11,
+                    "heightFeet": 6,
+                    "heightInches": 4,
+                    "weight": 180,
+                    "positions": [
+                        "PF"
+                    ],
+                    "overallRecord": "22-7",
+                    "leagueRecord": "11-1",
+                    "leagueAlias": "League",
+                    "leagueStandingsRank": 1,
+                    "leagueCanonicalUrl": "https://www.maxpreps.com/ca/basketball/24-25/league/diablo/?leagueid=67055375-c281-4b13-b6bc-284fa9dd6945",
+                    "ssid": "20ea215d-54ce-4502-8305-748bdc872d49",
+                    "sport": "Basketball",
+                    "jersey": "35",
+                    "isCaptain": false,
+                    "teamLevel": "Varsity",
+                    "teamScheduleCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/24-25/schedule/",
+                    "year": "24-25",
+                    "leagueName": "Diablo",
+                    "hasVerifiedStats": true,
+                    "athleteRankings": [
+                        {
+                            "rankingContextType": 1,
+                            "rankingContextName": "State",
+                            "ranking": 144,
+                            "rankingCanonicalUrl": "https://www.maxpreps.com/ca/basketball/24-25/rankings/1/"
+                        },
+                        {
+                            "rankingContextType": 2,
+                            "rankingContextName": "North Coast Section",
+                            "ranking": 18,
+                            "rankingCanonicalUrl": "https://www.maxpreps.com/ca/north-coast-section/basketball/24-25/rankings/1/"
+                        }
+                    ],
+                    "stats": [
+                        {
+                            "nationalValue": "15",
+                            "name": "GamesPlayed",
+                            "displayName": "Games Played",
+                            "header": "GP",
+                            "value": "16",
+                            "field": "GamesPlayed"
+                        },
+                        {
+                            "nationalValue": "4.9",
+                            "name": "PointsPerGame",
+                            "displayName": "Points Per Game",
+                            "header": "P/G",
+                            "value": "2.1",
+                            "field": "s23"
+                        },
+                        {
+                            "nationalValue": "1.0",
+                            "name": "AssistsPerGame",
+                            "displayName": "Assists Per Game",
+                            "header": "Ast/G",
+                            "value": "0.3",
+                            "field": "s27"
+                        },
+                        {
+                            "nationalValue": "2.6",
+                            "name": "ReboundsPerGame",
+                            "displayName": "Rebounds Per Game",
+                            "header": "Reb/G",
+                            "value": "1.8",
+                            "field": "s25"
+                        },
+                        {
+                            "nationalValue": "0.8",
+                            "name": "StealsPerGame",
+                            "displayName": "Steals Per Game",
+                            "header": "Stl/G",
+                            "value": "0.2",
+                            "field": "s26"
+                        },
+                        {
+                            "nationalValue": "0.2",
+                            "name": "BlocksPerGame",
+                            "displayName": "Blocks Per Game",
+                            "header": "Blk/G",
+                            "value": "0.1",
+                            "field": "s28"
+                        }
+                    ],
+                    "awards": []
+                },
+                {
+                    "seasonPhotos": [],
+                    "schoolName": "Acalanes",
+                    "formattedCityState": "Acalanes (Lafayette, CA)",
+                    "schoolMascotUrl": "https://image.maxpreps.io/school-mascot/e/6/0/e6042da9-e5ce-4f18-a841-ae5e6cf48015.gif?version=635985771600000000&width=1024&height=1024",
+                    "teamHomeCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/",
+                    "rosterPhotoUrl": null,
+                    "classYear": 12,
+                    "heightFeet": 6,
+                    "heightInches": 4,
+                    "weight": 180,
+                    "positions": [
+                        "PF",
+                        "SF"
+                    ],
+                    "overallRecord": "18-11",
+                    "leagueRecord": "8-2",
+                    "leagueAlias": "League",
+                    "leagueStandingsRank": 2,
+                    "leagueCanonicalUrl": "https://www.maxpreps.com/ca/basketball/25-26/league/diablo/?leagueid=c454378a-7ab5-428b-8898-31ef624bfb18",
+                    "ssid": "ee7cf537-7394-4430-88ca-becaabda286c",
+                    "sport": "Basketball",
+                    "jersey": "35",
+                    "isCaptain": false,
+                    "teamLevel": "Varsity",
+                    "teamScheduleCanonicalUrl": "https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/schedule/",
+                    "year": "25-26",
+                    "leagueName": "Diablo",
+                    "hasVerifiedStats": false,
+                    "athleteRankings": [
+                        {
+                            "rankingContextType": 1,
+                            "rankingContextName": "State",
+                            "ranking": 142,
+                            "rankingCanonicalUrl": "https://www.maxpreps.com/ca/basketball/rankings/1/"
+                        },
+                        {
+                            "rankingContextType": 2,
+                            "rankingContextName": "North Coast Section",
+                            "ranking": 21,
+                            "rankingCanonicalUrl": "https://www.maxpreps.com/ca/north-coast-section/basketball/rankings/1/"
+                        }
+                    ],
+                    "stats": [],
+                    "awards": []
+                }
+            ],
+            "careerClubTeamsData": []
+        },
+        "__N_SSP": true
+    },
+    "page": "/careerprofile/home",
+    "query": {
+        "careerid": "dc928233-77ba-4ead-a4ee-87e52d85d05b",
+        "url": "/local/career/default.aspx?careerid=dc928233-77ba-4ead-a4ee-87e52d85d05b",
+        "currentContext": "CareerV2Home"
+    },
+    "buildId": "1771446045\n",
+    "assetPrefix": "https://asset.maxpreps.io",
+    "isFallback": false,
+    "isExperimentalCompile": false,
+    "dynamicIds": [
+        76053,
+        64849,
+        61791
+    ],
+    "gssp": true,
+    "scriptLoader": []
+}
