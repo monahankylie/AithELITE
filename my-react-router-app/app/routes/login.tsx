@@ -158,6 +158,15 @@ export default function Login() {
                   </Link>
                   .
                 </p>
+                <p className="pt-1 text-center text-xs text-black/60">
+                  Don’t have recruiter credentials?{" "}
+                  <Link
+                    to="/signup"
+                    className="font-semibold text-black/70 underline decoration-black/20 underline-offset-4 transition hover:text-black hover:decoration-black/40"
+                  >
+                    Sign up
+                  </Link>
+                </p>
               </Form>
             </div>
           </section>
