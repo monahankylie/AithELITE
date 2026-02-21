@@ -1,5 +1,6 @@
 import type { Route } from "./+types/home";
 import { Link } from "react-router";
+import PlayerCard from "~/components/playercard";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -104,7 +105,61 @@ export default function Home() {
             </div>
           </div>
         </section>
-        {/* TO DO: add player card carousel */}
+        {/* PLAYER CARD CAROUSEL */}
+<section className="bg-white py-16">
+  <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <div className="flex items-end justify-between gap-6">
+      <div>
+        <h2 className="text-3xl font-extrabold tracking-tight text-black sm:text-4xl">
+          Featured Athletes
+        </h2>
+        <p className="mt-2 text-sm text-black/70">
+          A quick glance at rising talent in your pipeline.
+        </p>
+      </div>
+
+      <Link
+        to="/login"
+        className="hidden rounded-full border border-black/15 px-5 py-2 text-sm font-semibold text-black/80 transition hover:border-black/25 hover:text-black sm:inline-flex"
+      >
+        View all
+      </Link>
+    </div>
+
+    {/* Horizontal scroll on mobile, grid on larger screens */}
+    <div className="mt-10 -mx-4 flex gap-6 overflow-x-auto px-4 pb-3 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-3">
+      <PlayerCard
+        name="John Doe"
+        sportPosition="Sport / Position"
+        school="High School"
+        classYear="Class of 2026"
+      />
+      <PlayerCard
+        name="Jane Doe"
+        sportPosition="Sport / Position"
+        school="High School"
+        classYear="Class of 2027"
+      />
+      <PlayerCard
+        name="Name"
+        sportPosition="Sport / Position"
+        school="High School"
+        classYear="Class of 2026"
+      />
+    </div>
+
+    <div className="mt-6 sm:hidden">
+      <Link
+        to="/login"
+        className="inline-flex rounded-full border border-black/15 px-5 py-2 text-sm font-semibold text-black/80 transition hover:border-black/25 hover:text-black"
+      >
+        View all
+      </Link>
+    </div>
+  </div>
+</section>
+
+        
         <footer className="border-t border-black/10 bg-white py-6 text-center text-sm text-black/60">
           &copy; {new Date().getFullYear()} AithELITE. All rights reserved.
         </footer>

@@ -15,13 +15,13 @@ export default function Signup() {
       <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-black">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           {/* AithELITE-Logo area */}
-          <div className="flex items-center">
+          <Link to="/" className="flex items-center">
             <img
               src="/images/logo-aithelite.svg"
               alt="Athelite Logo"
               className="h-8 w-auto"
             />
-          </div>
+          </Link>
 
           {/* Login Button */}
           <Link
@@ -182,8 +182,7 @@ export default function Signup() {
 
       {/* FOOTER */}
       <footer className="border-t border-black/10 bg-white py-6 text-center text-sm text-black/60">
-        &copy; {new Date().getFullYear()} O. Jiang, K. Monahan, M. Levin, K.
-        Cummings.
+        &copy; {new Date().getFullYear()}AithELITE. All rights reserved.
       </footer>
     </div>
   );
