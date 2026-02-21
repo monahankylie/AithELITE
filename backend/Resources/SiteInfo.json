@@ -3,42 +3,51 @@
     "maxpreps": {
       "site_url": "https://www.maxpreps.com",
       "scraping": {
-        "steps": [{
+        "steps": [
+          {
             "description": "State-level directory of teams",
             "scrape_method":["entry"],
-            "href_pattern": "/{state}/{sport}/schools/"
+            "pattern": "/{state}/{sport}/schools/"
           },
           {
             "description": "Main landing page for a specific team",
             "scrape_method": ["match","access_each"],
-            "href_pattern": "/{state}/{county}/{team_name}/{sport}"
+            "match": {
+              "pattern": "/{state}/{county}/{team_name}/{sport}",
+              "tag": "a",
+              "attr": "href"
+            },
+            "match_type":"href"
           },
           {
             "description": "Roster page listing all athletes",
-            "scrape_method": ["match","access_each"],
-            "href_pattern": "/{state}/{county}/{team_name}/{sport}/roster/"
+            "scrape_method": ["attach","access_each"],
+            "match": {
+              "pattern": "/{state}/{county}/{team_name}/{sport}/roster/",
+              "tag": "a",
+              "attr": "href"
+            }
           },
           {
             "description": "Individual athlete profile page",
             "scrape_method": ["match","access_each"],
-            "href_pattern": "/{state}/{county}/{team_name}/athletes/{name}/{random_string}"
-          },
-          {
-            "description": "Individual athlete profile page",
-            "scrape_method": ["match","access_each"],
-            "href_pattern": "/{state}/{county}/{team_name}/athletes/{name}/{random_string}"
+            "match": {
+              "regex_pattern": "careerid=[a-z0-9]+",
+              "pattern": "/{state}/{county}/{team_name}/athletes/{name}/{random_string}",
+              "tag": "a",
+              "attr": "href"
+            }
           },
           {
             "description": "Athlete Data Scraping: Targeting embedded JSON blob containing bio, stats, and timeline data",
             "scrape_method": ["target","store"],
-            "href_pattern": "/{state}/{county}/{team_name}/athletes/{name}/{random_string}",
             "target": {
               "element": "id",
               "id": "__NEXT_DATA__"
             }
           }
         ]
-        }},
+        },
       "parsing": {
         "bio_parsing": {
           "description": "Targeting static bio information from ex_player_bio.json",
@@ -84,6 +93,7 @@
       }
     }
   }
+}
 
 
 
