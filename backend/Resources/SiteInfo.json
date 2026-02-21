@@ -3,28 +3,32 @@
     "maxpreps": {
       "site_url": "https://www.maxpreps.com",
       "scraping": {
-        "steps": {
-          "1": {
+        "steps": [{
             "description": "State-level directory of teams",
-            "scrape_method":["seed","get_html"],
+            "scrape_method":["entry"],
             "href_pattern": "/{state}/{sport}/schools/"
           },
-          "2": {
+          {
             "description": "Main landing page for a specific team",
             "scrape_method": ["match","access_each"],
             "href_pattern": "/{state}/{county}/{team_name}/{sport}"
           },
-          "3": {
+          {
             "description": "Roster page listing all athletes",
             "scrape_method": ["match","access_each"],
             "href_pattern": "/{state}/{county}/{team_name}/{sport}/roster/"
           },
-          "4": {
+          {
             "description": "Individual athlete profile page",
             "scrape_method": ["match","access_each"],
             "href_pattern": "/{state}/{county}/{team_name}/athletes/{name}/{random_string}"
           },
-          "5":{
+          {
+            "description": "Individual athlete profile page",
+            "scrape_method": ["match","access_each"],
+            "href_pattern": "/{state}/{county}/{team_name}/athletes/{name}/{random_string}"
+          },
+          {
             "description": "Athlete Data Scraping: Targeting embedded JSON blob containing bio, stats, and timeline data",
             "scrape_method": ["target","store"],
             "href_pattern": "/{state}/{county}/{team_name}/athletes/{name}/{random_string}",
@@ -33,7 +37,8 @@
               "id": "__NEXT_DATA__"
             }
           }
-        },
+        ]
+        }},
       "parsing": {
         "bio_parsing": {
           "description": "Targeting static bio information from ex_player_bio.json",
@@ -79,7 +84,7 @@
       }
     }
   }
-}
-}
+
+
 
 
