@@ -1,56 +1,85 @@
 {
-  "maxpreps": {
-    "site_url": "https://www.maxpreps.com",
-    "CA_DEV":{
-        "ex_team_info":{
-          "url": "https://www.maxpreps.com/ca/basketball/schools/",
-          "title": "California Boys Basketball High School Teams"
+  "site_keys":{
+    "maxpreps": {
+      "site_url": "https://www.maxpreps.com",
+      "scraping": {
+        "steps": {
+          "1": {
+            "description": "State-level directory of teams",
+            "scrape_method":["seed","get_html"],
+            "href_pattern": "/{state}/{sport}/schools/"
+          },
+          "2": {
+            "description": "Main landing page for a specific team",
+            "scrape_method": ["match","access_each"],
+            "href_pattern": "/{state}/{county}/{team_name}/{sport}"
+          },
+          "3": {
+            "description": "Roster page listing all athletes",
+            "scrape_method": ["match","access_each"],
+            "href_pattern": "/{state}/{county}/{team_name}/{sport}/roster/"
+          },
+          "4": {
+            "description": "Individual athlete profile page",
+            "scrape_method": ["match","access_each"],
+            "href_pattern": "/{state}/{county}/{team_name}/athletes/{name}/{random_string}"
+          },
+          "5":{
+            "description": "Athlete Data Scraping: Targeting embedded JSON blob containing bio, stats, and timeline data",
+            "scrape_method": ["target","store"],
+            "href_pattern": "/{state}/{county}/{team_name}/athletes/{name}/{random_string}",
+            "target": {
+              "element": "id",
+              "id": "__NEXT_DATA__"
+            }
+          }
         },
-        "ex_roster_info":{
-          "url":"https://www.maxpreps.com/ca/lafayette/acalanes-dons/basketball/roster/",          
-          "title": "Acalanes Dons Basketball Roster"
+      "parsing": {
+        "bio_parsing": {
+          "description": "Targeting static bio information from ex_player_bio.json",
+          "access_path": [
+            "props",
+            "pageProps",
+            "careerContext"
+          ],
+          "target_nodes": [
+            "careerData",
+            "careerPlayerData",
+            "recentSchool",
+            "recentSportSeason"
+          ]
         },
-        "ex_player_info":{
-          "url" : "/ca/lafayette/acalanes-dons/athletes/preston-hilsabeck/?careerid=hpb7k1kir1dm6",
-          "selector": "script",
-          "selector_name": "__NEXT_DATA__"
+        "stats_parsing": {
+          "description": "Targeting statistical groups from ex_player_stats.json",
+          "access_path": [
+            "props",
+            "pageProps",
+            "statsCardProps",
+            "careerRollup",
+            "groups"
+          ],
+          "target_groups": [
+            "Game Stats",
+            "Shooting",
+            "Totals",
+            "Misc Totals",
+            "Per 32"
+          ]
+        },
+        "timeline_parsing": {
+          "description": "Targeting timeline/feed data from ex_player_info.json",
+          "access_path": [
+            "props",
+            "pageProps"
+          ],
+          "target_nodes": [
+            "timelineItems"
+          ]
         }
-
-    },
-    "data_path":{
-      "1": "teams",
-      "2": "team",
-      "3": "roster", 
-      "4": "player"
-    },
-    "teams_page": {
-      "url_pattern": "https://www.maxpreps.com/{state}/{sport}/schools/",
-      "title_pattern": "{state} Boys {sport} High School Teams",
-      "header_type": "h1"
-    },
-    "team_page": {
-      "url_pattern": "https://www.maxpreps.com/{state}/{county}/{team_name}/{sport}",
-      "url_shortcut_pattern": "https://www.maxpreps.com/{team_extension}",
-      "next_node_name": "roster"
-    },
-      "roster_page": {
-        "relevant_words": ["roster", "{team_name}"],
-        "Title_pattern": "{team_name} {sport} Roster",
-        "url_pattern": "https://www.maxpreps.com/{state}/{county}/{team_name}/{sport}/roster/"
-      },
-    "player_page": {
-      "url_pattern": "https://www.maxpreps.com/{state}/{county}/{team_name}/athletes/{name}/{random_string}",
-      "next_node":{
-        "type": "script",
-        "id":"__NEXT_DATA__"
-      }
-    },
-    "data_structure":{
-      "key_to_key_maps":{
-        "general_stats": ["props","pageProps","careerContext"],
-        "timeline_stats": ["props","pageProps","timelineItems"], 
-        "past_info": ["props","pageProps","careerHistoryData"]
       }
     }
   }
 }
+}
+
+
