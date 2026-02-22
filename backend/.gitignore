@@ -1,3 +1,5 @@
 fbACC.json
 .DS_Store
 .ipynb_checkpoints
+.pyc
+__pycache__/
