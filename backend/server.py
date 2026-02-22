@@ -1,13 +1,13 @@
 import requests
-from bs4 import BeautifulSoup
+from data_structures.Scraper import Scraper_Task
 import firebase_admin
 from firebase_admin import credentials, firestore, auth
 import uvicorn  
 from fastapi import FastAPI, BackgroundTasks, HTTPException,Request
 from fastapi.middleware.cors import CORSMiddleware
 
-
 app = FastAPI()
+background_tasks = BackgroundTasks()
 
 app.add_middleware(
     CORSMiddleware,
@@ -20,9 +20,15 @@ cred = credentials.Certificate("fbACC.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-def scrape_and_store(url):
+@app.get("/scrape")
+async def scrape(background_tasks: BackgroundTasks):
     ##TODO
-    return
+    ##add scraper automation function here
+    Scraper_Task.load_structure("Resources/SiteInfo.json") #<-- load the structure file that has a scraper presets.
+    scrapeCA = Scraper_Task('maxpreps')# <-- an instance of scraper given maxpreps preset(i will change name later). look in SiteInfo.json for what it does.
+    scrapeCA.seed({"state":"ca","sport":"basketball"}) 
+    background_tasks.add_task(scrapeCA.start_scrape)
+    return {"Scrape": "started"}
 
 @app.get("/")
 def health_check():
