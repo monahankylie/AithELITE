@@ -65,7 +65,7 @@ export default function Login() {
       <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-black">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <Link to="/" className="flex items-center">
-            <img src="public/images/logo-aithelite.svg" alt="Athelite" className="h-7 w-auto" />
+            <img src="/images/logo-aithelite.svg" alt="Athelite" className="h-7 w-auto" />
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex">
