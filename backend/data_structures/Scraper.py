@@ -177,11 +177,8 @@ class Scraper_Task:
         if method == "each":
             ##we only doing json for now. when trying to store links, etc, then we can store in txt files or csv for other data
             for data in self.step_dict.get(step, []):
-                while True:
-                    serial = uuid.uuid4()
-                    file_path = os.path.join(base_path, f"{serial}.json")
-                    if not os.path.exists(file_path):
-                        break
+                serial = uuid.uuid1()
+                file_path = os.path.join(base_path, f"{serial}.json")
                 with open(file_path, 'w') as f:
                     json.dump(data, f, indent=4)        
     def append(self, step_config):
