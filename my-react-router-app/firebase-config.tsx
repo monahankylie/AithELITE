@@ -1,6 +1,6 @@
-import {initializeApp} from "firebase/app";
-import {getAuth} from "firebase/auth";
-import {getFirestore} from "firebase/firestore";
+import {initializeApp, getApps, getApp} from "firebase/app";
+import {getAuth, type Auth} from "firebase/auth";
+import {getFirestore, type Firestore} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -12,7 +12,11 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+const isClient = typeof window !== "undefined";
+const app = isClient
+  ? getApps().length ? getApp() : initializeApp(firebaseConfig)
+  : undefined;
+const auth = (isClient ? getAuth(app!) : null) as Auth;
+const db = (isClient ? getFirestore(app!) : null) as Firestore;
+
 export {app, auth, db};
