@@ -1,36 +1,23 @@
 /**
  * DISCOVER PAGE
- * A placeholder page for recruiters to find new athletes.
+ * A place for recruiters to find new athletes.
  */
 import React from 'react';
-import Navbar from '../components/navbar';
+import PageLayout from '../components/page-layout';
 import { useAuth } from "../auth-context";
 
 const DiscoverPage = () => {
-    const { profile, loading } = useAuth();
+    const { profile } = useAuth();
     const userName = profile?.firstName || "Recruiter";
 
-    if (loading) {
-        return <div className="min-h-screen bg-white flex items-center justify-center">Loading...</div>;
-    }
-
     return (
-        <div className="min-h-screen bg-white">
-            <Navbar />
-
-            <header className="px-8 py-8 text-left">
-                <h1 className="text-3xl font-bold text-black">Discover Athletes</h1>
-                <p className="mt-2 text-black/60">Find your next star recruit, {userName}.</p>
-            </header>
-
-            <main className="px-8">
-                {/* Discovery search/filter tools will go here */}
-            </main>
-
-            <footer className="mt-16 pt-8 border-t border-black/10 text-center text-sm text-black/60">
-                <p>&copy; {new Date().getFullYear()} Aithelite. All rights reserved.</p>
-            </footer>
-        </div>
+        <PageLayout title="Discover Athletes" description="Find your next star recruit using our performance analytics.">
+            <div className="mx-auto max-w-6xl px-6 pb-20">
+                <div className="rounded-3xl border border-black/5 bg-gray-50/50 p-12 text-center">
+                    <p className="text-sm text-black/40">Search and filter tools will appear here.</p>
+                </div>
+            </div>
+        </PageLayout>
     );
 };
 

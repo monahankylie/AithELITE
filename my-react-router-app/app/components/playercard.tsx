@@ -7,6 +7,8 @@ type PlayerCardProps = {
   avatarUrl?: string; // will put placeholder images
 };
 
+
+
 export default function PlayerCard({
   name,
   sportPosition,

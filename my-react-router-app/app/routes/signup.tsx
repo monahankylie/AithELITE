@@ -4,7 +4,7 @@ import {Link, useNavigate} from "react-router";
 import {createUserWithEmailAndPassword} from "firebase/auth";
 import {doc, setDoc} from "firebase/firestore";
 import {auth, db} from "../../firebase-config";
-import Navbar from "../components/navbar";
+import PageLayout from "../components/page-layout";
 
 export function meta({}: Route.MetaArgs) {
   return [{title: "Athelite | Smart Recruiting | Sign Up"}, {name: "description", content: "Smart recruiting for smarter teams."}];
@@ -61,10 +61,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-
-      {/* MAIN */}
+    <PageLayout>
       <section className="relative overflow-hidden bg-white">
         {/* Background Layer  */}
         <div className="absolute inset-0 -z-10 bg-gradient-to-br from-gray-900 via-black to-gray-950" />
@@ -78,15 +75,6 @@ export default function Signup() {
               <p className="mt-6 max-w-xl text-base text-black/80">
                 Create an account to save prospects, compare athletes, and view insights powered by performance analytics.
               </p>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link
-                  to="/"
-                  className="rounded-full border border-white/30 px-6 py-2 text-sm font-medium text-white/90 hover:bg-white/10"
-                >
-                  Back to Home
-                </Link>
-              </div>
             </div>
 
             {/*Right Side-Sign Up Form*/}
@@ -182,7 +170,7 @@ export default function Signup() {
                     className={`
                       mt-2 w-full
                       relative overflow-hidden
-                      rounded-full py-4 text-sm font-semibold text-white
+                      rounded-full py-4 text-sm font-semibold text-black
                       bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700
                       bg-[length:200%_200%] bg-left
                       transition-all duration-500 ease-in-out
@@ -193,29 +181,12 @@ export default function Signup() {
                   >
                     {loading ? "Creating Account…" : "Create Account"}
                   </button>
-
-                  <p className="pt-2 text-center text-xs text-gray-500">
-                    By signing up, you agree to our{" "}
-                    <a href="#" className="underline hover:text-black">
-                      Terms
-                    </a>{" "}
-                    and{" "}
-                    <a href="#" className="underline hover:text-black">
-                      Privacy Policy
-                    </a>
-                    .
-                  </p>
                 </form>
               </div>
             </div>
           </div>
         </div>
       </section>
-
-      {/* FOOTER */}
-      <footer className="border-t border-black/10 bg-white py-6 text-center text-sm text-black/60">
-        &copy; {new Date().getFullYear()}AithELITE. All rights reserved.
-      </footer>
-    </div>
+    </PageLayout>
   );
 }

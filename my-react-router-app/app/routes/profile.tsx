@@ -1,37 +1,23 @@
 /**
  * PROFILE PAGE
- * A placeholder page for authenticated users to view their account information.
- * It uses the global AuthContext to access the user's profile data.
+ * A page for authenticated users to view their account information.
  */
 import React from 'react';
-import Navbar from '../components/navbar';
+import PageLayout from '../components/page-layout';
 import { useAuth } from "../auth-context";
 
 const ProfilePage = () => {
-    const { profile, loading } = useAuth();
+    const { profile } = useAuth();
     const userName = profile?.firstName || "User";
 
-    if (loading) {
-        return <div className="min-h-screen bg-white flex items-center justify-center">Loading...</div>;
-    }
-
     return (
-        <div className="min-h-screen bg-white">
-            <Navbar />
-
-            <header className="px-8 py-8 text-left">
-                <h1 className="text-3xl font-bold text-black">User Profile: {userName}</h1>
-                <p className="mt-2 text-black/60">Welcome to your profile settings page. This is a placeholder.</p>
-            </header>
-
-            <main className="px-8">
-                {/* Profile details will go here */}
-            </main>
-
-            <footer className="mt-16 pt-8 border-t border-black/10 text-center text-sm text-black/60">
-                <p>&copy; {new Date().getFullYear()} Aithelite. All rights reserved.</p>
-            </footer>
-        </div>
+        <PageLayout title="User Profile" description={`Manage your account settings, ${userName}.`}>
+            <div className="mx-auto max-w-6xl px-6 pb-20">
+                <div className="rounded-3xl border border-black/5 bg-gray-50/50 p-12 text-center">
+                    <p className="text-sm text-black/40">Profile settings are coming soon.</p>
+                </div>
+            </div>
+        </PageLayout>
     );
 };
 

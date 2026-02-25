@@ -3,7 +3,7 @@ import {Link, useNavigate} from "react-router";
 import {GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup} from "firebase/auth";
 import {doc, getDoc, setDoc} from "firebase/firestore";
 import {auth, db} from "../../firebase-config";
-import Navbar from "../components/navbar";
+import PageLayout from "../components/page-layout";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -60,11 +60,9 @@ export default function Login() {
       alert("Google sign-in failed");
     }
   };
-  return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
 
-      {/* BODY */}
+  return (
+    <PageLayout>
       <main className="mx-auto max-w-6xl px-6 py-12 md:py-16">
         <div className="grid items-center gap-10 lg:grid-cols-2">
           {/* LEFT (header/info) SECTION */}
@@ -76,8 +74,6 @@ export default function Login() {
             <p className="mt-5 max-w-md text-pretty text-base leading-6 text-black/60">
               Sign-in to save prospects, compare athletes, and view insights powered by performance analytics.
             </p>
-
-            <div className="mt-8 flex flex-wrap items-center gap-3"></div>
           </section>
 
           {/* RIGHT (log-in) SECTION */}
@@ -90,17 +86,15 @@ export default function Login() {
                   <label htmlFor="email" className="text-sm font-semibold text-black/80">
                     Email
                   </label>
-                  <div className="relative">
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      placeholder="coach@recruiter.info"
-                      className="h-11 w-full rounded-full border border-black/15 bg-white px-4 text-sm text-black shadow-[inset_0_1px_0_rgba(0,0,0,0.06)] outline-none transition focus:border-black/30 focus:ring-4 focus:ring-black/10"
-                      required
-                    />
-                  </div>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    placeholder="coach@recruiter.info"
+                    className="h-11 w-full rounded-full border border-black/15 bg-white px-4 text-sm text-black shadow-[inset_0_1px_0_rgba(0,0,0,0.06)] outline-none transition focus:border-black/30 focus:ring-4 focus:ring-black/10"
+                    required
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -138,13 +132,13 @@ export default function Login() {
 
                 <button
                   type="submit"
-                  className="mt-2 h-11 w-full rounded-full bg-black text-sm font-semibold text-white overflow-hidden bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 bg-[length:200%_200%] bg-left transition-all duration-500 ease-in-out hover:bg-right shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400/40 active:scale-[0.99]"
+                  className="mt-2 h-11 w-full rounded-full bg-black text-sm font-semibold text-black overflow-hidden bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 bg-[length:200%_200%] bg-left transition-all duration-500 ease-in-out hover:bg-right shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400/40 active:scale-[0.99]"
                 >
                   Sign In
                 </button>
                 <Link
                   to="/signup"
-                  className="mt-2 flex h-11 w-full items-center justify-center rounded-full bg-black text-sm font-semibold text-white overflow-hidden bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 bg-[length:200%_200%] bg-left transition-all duration-500 ease-in-out hover:bg-right shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400/40 active:scale-[0.99]"
+                  className="mt-2 flex h-11 w-full items-center justify-center rounded-full bg-black text-sm font-semibold text-black overflow-hidden bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 bg-[length:200%_200%] bg-left transition-all duration-500 ease-in-out hover:bg-right shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400/40 active:scale-[0.99]"
                 >
                   Sign Up
                 </Link>
@@ -163,47 +157,11 @@ export default function Login() {
                   <img src="/images/google-icon.svg" alt="Google" className="h-5 w-5" />
                   Sign in with Google
                 </button>
-
-                <p className="pt-1 text-center text-xs text-black/50">
-                  By continuing, you agree to our{" "}
-                  <Link
-                    to="/terms"
-                    className="font-semibold text-black/60 underline decoration-black/20 underline-offset-4 hover:decoration-black/40"
-                  >
-                    Terms
-                  </Link>{" "}
-                  and{" "}
-                  <Link
-                    to="/privacy"
-                    className="font-semibold text-black/60 underline decoration-black/20 underline-offset-4 hover:decoration-black/40"
-                  >
-                    Privacy Policy
-                  </Link>
-                  .
-                </p>
               </form>
             </div>
           </section>
         </div>
       </main>
-
-      {/* FOOTER */}
-      <footer className="border-t border-black/10">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-8 md:flex-row md:items-center md:justify-between">
-          <p className="text-xs text-black/50">© {new Date().getFullYear()} AithELITE. All rights reserved.</p>
-          <div className="flex gap-5">
-            <Link to="/support" className="text-xs font-semibold text-black/60 hover:text-black">
-              Support
-            </Link>
-            <Link to="/privacy" className="text-xs font-semibold text-black/60 hover:text-black">
-              Privacy
-            </Link>
-            <Link to="/terms" className="text-xs font-semibold text-black/60 hover:text-black">
-              Terms
-            </Link>
-          </div>
-        </div>
-      </footer>
-    </div>
+    </PageLayout>
   );
 }
