@@ -1,3 +1,9 @@
+/**
+ * ROOT COMPONENT
+ * This is the entry point of the React Router application.
+ * It sets up the global Layout, AuthProvider for state management, 
+ * and defines global metadata and links (like fonts and icons).
+ */
 import {
   isRouteErrorResponse,
   Links,
@@ -9,6 +15,7 @@ import {
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { AuthProvider } from "./auth-context";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -33,8 +40,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
-        {children}
+      <body className="bg-white">
+        <AuthProvider>
+          {children}
+        </AuthProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

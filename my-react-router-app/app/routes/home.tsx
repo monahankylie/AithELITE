@@ -1,10 +1,11 @@
 import {useEffect, useState} from "react";
 import type {Route} from "./+types/home";
 import {Link} from "react-router";
-import {collection, getDocs, doc, getDoc} from "firebase/firestore";
+import {collection, getDocs, doc, getDoc, query, limit} from "firebase/firestore";
 import {db} from "../../firebase-config";
 import PlayerCard from "~/components/playercard";
 import type {PlayerCardProps} from "~/components/playercard";
+import PageLayout from "../components/page-layout";
 
 export function meta({}: Route.MetaArgs) {
   return [{title: "Athelite | Smart Recruiting"}, {name: "description", content: "Smart recruiting for smarter teams."}];
@@ -28,7 +29,7 @@ function FeaturedCarousel() {
 
     async function fetchPlayers() {
       try {
-        const snap = await getDocs(collection(db, "athletes"));
+        const snap = await getDocs(query(collection(db, "athletes"), limit(30)));
         const allDocs = snap.docs;
         const picked = shuffle(allDocs).slice(0, 30);
 
@@ -63,7 +64,6 @@ function FeaturedCarousel() {
         );
         const withStats = cards.filter((p) => p.averages?.ppg != null && p.averages?.apg != null && p.averages?.rpg != null);
         setPlayers(withStats.slice(0, 10));
-        setPlayers(withStats.slice(0, 10));
       } catch (err) {
         console.error("Failed to load athletes:", err);
       } finally {
@@ -91,14 +91,14 @@ function FeaturedCarousel() {
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-black/10 border-t-black" />
           </div>
         ) : players.length === 0 ? (
-          <p className="px-6 text-sm text-black/50">No athletes found.</p>
+          <p className="px-6 text-sm text-black/50 text-center">No athletes found.</p>
         ) : (
           <div
             className="
               flex w-full gap-6 overflow-x-auto pb-4 pt-6
               px-4 sm:px-6
               snap-x snap-mandatory scroll-smooth scroll-px-4
-              scrollbar-light
+              scrollbar-hide
             "
           >
             {players.map((p) => (
@@ -117,58 +117,29 @@ function FeaturedCarousel() {
  */
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* 
-          NAVBAR (Sticky)
-          */}
-      <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-black">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          {/* Brand / Logo area */}
-          <div className="flex items-center">
-            <img src="/images/logo-aithelite.svg" alt="Athelite Logo" className="h-8 w-auto" />
-          </div>
-
-          {/* Log In Button (Animated gradient hover) */}
-          <Link
-            to="/login"
-            className="
-              relative overflow-hidden
-              rounded-full px-6 py-2 text-sm font-medium text-white
-              bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700
-              bg-[length:200%_200%] bg-left
-              transition-all duration-500 ease-in-out
-              hover:bg-right
-              shadow-md hover:shadow-lg
-              focus:outline-none focus:ring-2 focus:ring-blue-400/40
-            "
-          >
-            Log In
-          </Link>
-        </div>
-      </header>
-
-      {/* HERO */}
-      <section className="relative overflow-hidden bg-white">
+    <PageLayout>
+      {/* HERO SECTION */}
+      <section className="relative overflow-hidden">
         {/* Background Layer*/}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-950 -z-10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-950" />
 
         <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             {/* LEFT COLUMN */}
-            <div>
-              <h1 className="text-5xl font-extrabold tracking-tight text-black sm:text-6xl">
+            <div className="relative z-10">
+              <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-6xl">
                 Smart <br />
                 Recruiting, <br />
                 Smarter Teams
               </h1>
 
-              <p className="mt-6 max-w-xl text-base text-black/80">Competitive athlete discovery for collegiate recruiters.</p>
+              <p className="mt-6 max-w-xl text-base text-white/80">Competitive athlete discovery for collegiate recruiters.</p>
 
               <div className="mt-8">
                 <Link
                   to="/login"
                   className="
-                      relative overflow-hidden
+                      relative inline-block overflow-hidden
                       rounded-full px-8 py-3 text-base font-medium text-white
                       bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700
                       bg-[length:200%_200%] bg-left
@@ -184,27 +155,22 @@ export default function Home() {
             </div>
 
             {/* RIGHT COLUMN */}
-            <div className="flex justify-center lg:justify-end">
-              {/* TO DO: convert to include a motion image carousel to display multiple sports*/}
-              <div className="relative w-full max-w-xl overflow-hidden rounded-3xl shadow-xl sm:h-80 lg:h-[420px]">
+            <div className="relative z-10 flex justify-center lg:justify-end">
+              <div className="relative w-full max-w-xl overflow-hidden rounded-3xl shadow-2xl sm:h-80 lg:h-[420px]">
                 <img
                   src="/images/hero-basketball.png"
                   alt="High school basketball player driving to the hoop"
                   className="h-full w-full object-cover"
                   loading="lazy"
                 />
-                {/* dark overlay for polish */}
                 <div className="absolute inset-0 bg-black/10" />
               </div>
             </div>
           </div>
         </div>
       </section>
-      <FeaturedCarousel />
 
-      <footer className="border-t border-black/10 bg-white py-6 text-center text-sm text-black/60">
-        &copy; {new Date().getFullYear()} AithELITE. All rights reserved.
-      </footer>
-    </div>
+      <FeaturedCarousel />
+    </PageLayout>
   );
 }
