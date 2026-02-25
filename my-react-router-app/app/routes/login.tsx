@@ -24,8 +24,8 @@ export default function Login() {
             
           <Link to="/" className="flex items-center">
             <img
-              src="public/images/logo-aithelite.svg"
-              alt="Athelite"
+              src="/images/logo-aithelite.svg"
+              alt="Aithelite"
               className="h-7 w-auto"
             />
           </Link>
