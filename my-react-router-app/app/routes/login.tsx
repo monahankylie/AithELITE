@@ -3,6 +3,7 @@ import {Link, useNavigate} from "react-router";
 import {GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup} from "firebase/auth";
 import {doc, getDoc, setDoc} from "firebase/firestore";
 import {auth, db} from "../../firebase-config";
+import Navbar from "../components/navbar";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -61,26 +62,7 @@ export default function Login() {
   };
   return (
     <div className="min-h-screen bg-white">
-      {/* NAV */}
-      <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-black">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          <Link to="/" className="flex items-center">
-            <img src="/images/logo-aithelite.svg" alt="Athelite" className="h-7 w-auto" />
-          </Link>
-
-          <nav className="hidden items-center gap-8 md:flex">
-            <Link to="/" className="hidden text-sm font-medium text-white/80 transition hover:text-white">
-              Home
-            </Link>
-            <Link to="/recruits" className="hidden text-sm font-medium text-white/80 transition hover:text-white">
-              Recruits
-            </Link>
-            <Link to="/about" className="hidden text-sm font-medium text-white/80 transition hover:text-white">
-              About
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <Navbar />
 
       {/* BODY */}
       <main className="mx-auto max-w-6xl px-6 py-12 md:py-16">

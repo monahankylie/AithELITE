@@ -4,6 +4,7 @@ import {Link, useNavigate} from "react-router";
 import {createUserWithEmailAndPassword} from "firebase/auth";
 import {doc, setDoc} from "firebase/firestore";
 import {auth, db} from "../../firebase-config";
+import Navbar from "../components/navbar";
 
 export function meta({}: Route.MetaArgs) {
   return [{title: "Athelite | Smart Recruiting | Sign Up"}, {name: "description", content: "Smart recruiting for smarter teams."}];
@@ -61,32 +62,7 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* NAVBAR */}
-      <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-black">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          {/* AithELITE-Logo area */}
-          <Link to="/" className="flex items-center">
-            <img src="/images/logo-aithelite.svg" alt="Athelite Logo" className="h-8 w-auto" />
-          </Link>
-
-          {/* Login Button */}
-          <Link
-            to="/login"
-            className="
-              relative overflow-hidden
-              rounded-full px-6 py-2 text-sm font-medium text-white
-              bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700
-              bg-[length:200%_200%] bg-left
-              transition-all duration-500 ease-in-out
-              hover:bg-right
-              shadow-md hover:shadow-lg
-              focus:outline-none focus:ring-2 focus:ring-blue-400/40
-            "
-          >
-            Log In
-          </Link>
-        </div>
-      </header>
+      <Navbar />
 
       {/* MAIN */}
       <section className="relative overflow-hidden bg-white">

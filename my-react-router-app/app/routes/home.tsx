@@ -1,6 +1,7 @@
 import type { Route } from "./+types/home";
 import { Link } from "react-router";
 import PlayerCard from "~/components/playercard";
+import Navbar from "../components/navbar";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -15,38 +16,7 @@ export function meta({}: Route.MetaArgs) {
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
-      {/* 
-          NAVBAR (Sticky)
-          */}
-      <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-black">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          {/* Brand / Logo area */}
-          <div className="flex items-center">
-            <img
-              src="/images/logo-aithelite.svg"
-              alt="Athelite Logo"
-              className="h-8 w-auto"
-            />
-          </div>
-
-
-          {/* Log In Button (Animated gradient hover) */}
-          <Link
-            to="/login"
-            className="
-              relative overflow-hidden
-              rounded-full px-6 py-2 text-sm font-medium text-white
-              bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700
-              bg-[length:200%_200%] bg-left
-              transition-all duration-500 ease-in-out
-              hover:bg-right
-              shadow-md hover:shadow-lg
-              focus:outline-none focus:ring-2 focus:ring-blue-400/40
-            ">
-            Log In
-          </Link>
-        </div>
-      </header>
+      <Navbar />
 
       {/* HERO */}
       <section className="relative overflow-hidden bg-white">
