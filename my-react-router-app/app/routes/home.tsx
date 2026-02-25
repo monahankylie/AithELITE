@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import type {Route} from "./+types/home";
 import {Link} from "react-router";
-import {collection, getDocs, doc, getDoc} from "firebase/firestore";
+import {collection, getDocs, doc, getDoc, query, limit} from "firebase/firestore";
 import {db} from "../../firebase-config";
 import PlayerCard from "~/components/playercard";
 import type {PlayerCardProps} from "~/components/playercard";
@@ -29,7 +29,7 @@ function FeaturedCarousel() {
 
     async function fetchPlayers() {
       try {
-        const snap = await getDocs(collection(db, "athletes"));
+        const snap = await getDocs(query(collection(db, "athletes"), limit(30)));
         const allDocs = snap.docs;
         const picked = shuffle(allDocs).slice(0, 30);
 
