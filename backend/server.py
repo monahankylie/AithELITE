@@ -25,7 +25,7 @@ async def scrape(background_tasks: BackgroundTasks):
     ##TODO
     ##add scraper automation function here
     Scraper_Task.load_structure("Resources/SiteInfo.json") #<-- load the structure file that has a scraper presets.
-    scrapeCA = Scraper_Task('maxpreps')# <-- an instance of scraper given maxpreps preset(i will change name later). look in SiteInfo.json for what it does.
+    scrapeCA = Scraper_Task('maxpreps2')# <-- an instance of scraper given maxpreps preset(i will change name later). look in SiteInfo.json for what it does.
     scrapeCA.seed({"state":"ca","sport":"basketball"}) 
     background_tasks.add_task(scrapeCA.start_scrape)
     return {"Scrape": "started"}
