@@ -130,7 +130,7 @@ class Scraper_Task:
         i = self.which_step_am_i(step_config)
         if(len(matches) == 0):
             print(f"NO MATCH FOUND FOR STEP {i}")
-            print(f"when looking for {regex.__str__}")
+            print(f"when looking for {regex} in {self.current_url}")
         self.step_dict[i] = matches
         
     #given parameters from json, we extract things of that type. otherwise, if the user so desires to get the whole link/element, they can
@@ -148,7 +148,8 @@ class Scraper_Task:
         if extraction_type == "json":
             unique_set = [json.loads(elem.string) for elem in elements if elem.string]
         else: 
-            unique_set = list({elem.get(extraction_type) for elem in elements if elem.get(extraction_type)})
+            unique_set = list(dict.fromkeys([elem.get(extraction_type) for elem in elements if elem.get(extraction_type)]))
+            
         
         ##print(f"extracted: {unique_set}")
         self.step_dict[current_step] = unique_set
