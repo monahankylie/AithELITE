@@ -71,8 +71,8 @@ class Scraper_Task:
     def run_step(self, step_config):
         step_process = step_config.get("scrape_method", [])
         for process_name in step_process:
+            print("starting " + process_name)
             method = getattr(self, process_name, None)
-            print(process_name + "runinnng")
             if method:
                 method(step_config)
             else:
@@ -128,7 +128,11 @@ class Scraper_Task:
         matches = [match for match in matches if regex.search(match.get(attr, ""))]
         
         i = self.which_step_am_i(step_config)
+        if(len(matches) == 0):
+            print(f"NO MATCH FOUND FOR STEP {i}")
+            print(f"when looking for {regex.__str__}")
         self.step_dict[i] = matches
+        
     #given parameters from json, we extract things of that type. otherwise, if the user so desires to get the whole link/element, they can
     #simply omit extract from methods list
     def extract(self, step_config):
@@ -137,12 +141,17 @@ class Scraper_Task:
         extraction_type = extract_config.get("type")
         #implement some sort of dictionary in the future
         elements = self.step_dict.get(current_step, [])
+        unique_set = None
         if not elements:
             return
+        #when grabbing NEXT DATA we load json blob
         if extraction_type == "json":
-            self.step_dict[current_step] = [json.loads(elem.string) for elem in elements if elem.string]
+            unique_set = [json.loads(elem.string) for elem in elements if elem.string]
         else: 
-            self.step_dict[current_step] = [elem.get(extraction_type) for elem in elements if elem.get(extraction_type)]
+            unique_set = list({elem.get(extraction_type) for elem in elements if elem.get(extraction_type)})
+        
+        ##print(f"extracted: {unique_set}")
+        self.step_dict[current_step] = unique_set
     #this is how we jump steps to perform a DFS style scraping
     ##access the current step's list to step into the next step and set current url and html to that 
     def access_each(self, step_config):
@@ -157,8 +166,9 @@ class Scraper_Task:
         targets = self.step_dict.get(current_idx, [])
         if not targets:
             return #silent exit 
-    
+        ##print(f"accessing {targets}")
         for url in targets:
+            
             full_url = self.site_url + url if not url.startswith('http') else url
             self.current_url = full_url
             time.sleep(random.uniform(12, 20)) ##ADD PARAMETERS OR FUNCTION TO CHANGE INTERVALS
