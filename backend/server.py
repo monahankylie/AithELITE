@@ -40,9 +40,9 @@ def health_check():
 
 def run_server():
     ##start server and listen for requests
-    uvicorn.run(app, 
+    uvicorn.run("server:app", 
                  host="0.0.0.0", 
-                 port=8000)
+                 port=8000)    
 
 
 if __name__ == "__main__":

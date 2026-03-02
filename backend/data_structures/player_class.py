@@ -1,0 +1,132 @@
+from pydantic import BaseModel, Field, field_validator, model_validator, AliasChoices
+from typing import Optional, Any
+from datetime import datetime
+import re
+
+class Player(BaseModel):
+    first_name: str = Field(validation_alias=AliasChoices("firstName", "first_name"))
+    last_name: str = Field(validation_alias=AliasChoices("lastName", "last_name"))
+    grad_class: int = Field(alias="class", validation_alias=AliasChoices("graduatingClass", "class","grad_class"))
+    height: float = 0.0  # inches
+    weight: float = 0.0
+    scouting_report: Optional[str] = None
+    maxpreps_career_id: Optional[str] = None
+    id_247: Optional[str] = None
+    base_player_id: Optional[str] = Field(None,validate_default=True)
+
+    @field_validator("base_player_id", mode="after")
+    @classmethod
+    def gen_id(cls, v, info):
+        if v: 
+            return v
+        
+        # Pulling from validated data
+        fn = info.data.get("first_name", "unknown")
+        ln = info.data.get("last_name", "unknown")
+        gc = info.data.get("grad_class", 0)
+        mpid = info.data.get("maxpreps_career_id", "ABC")
+        raw_id = f"{fn}{ln}{gc}{mpid}".lower().replace(" ", "")
+        return re.sub(r'[^a-z0-9]', '', raw_id) 
+        
+    @field_validator("height", mode="before")
+    @classmethod
+    def parse_height(cls, v):
+        if isinstance(v, str):
+            # find all digits with optional . and optional numbers after that dot
+            height_lst = [n for n in re.findall(r'\d+\.?\d*', v)]
+            height_lst = [float(p) for p in height_lst if p] # filter out empty str
+            if len(height_lst) <= 1:
+                v = height_lst[0]
+            else:
+                v = (height_lst[0] * 12) + height_lst[1]
+
+        return float(v) if v > 12 else float(v * 12)
+
+    @field_validator("weight", mode="before")
+    @classmethod
+    def parse_weight(cls, w):
+        if isinstance(w, str):
+            weight_lst = [n for n in re.findall(r'\d+\.?\d*', w)]
+            weight_lst = [float(p) for p in weight_lst if p]
+            if re.search("kg", w, re.I):
+                w = 2.2 * weight_lst[0]
+            else:
+                w = weight_lst[0]
+        return w
+    
+class BasketballRecord(Player):
+    # Context & Foreign Keys
+    position: Optional[str] = None
+    jersey: Optional[str] = None
+    team_id: str 
+    
+    # --- PER GAME AVERAGES ---
+    games_played: int = 0
+    minutes_per_game: float = 0.0
+    points_per_game: float = 0.0
+    off_rebounds_per_game: float = 0.0
+    def_rebounds_per_game: float = 0.0
+    rebounds_per_game: float = 0.0
+    assists_per_game: float = 0.0
+    steals_per_game: float = 0.0
+    blocks_per_game: float = 0.0
+    turnovers_per_game: float = 0.0
+    fouls_per_game: float = 0.0
+
+    # --- SEASON TOTALS ---
+    minutes_played: int = 0
+    points: int = 0
+    off_rebounds: int = 0
+    def_rebounds: int = 0
+    rebounds: int = 0
+    assists: int = 0
+    steals: int = 0
+    blocks: int = 0
+    turnovers: int = 0
+    fouls: int = 0
+
+    # --- SHOOTING ---
+    fg_made: int = 0
+    fg_attempted: int = 0
+    fg_pct: float = 0.0
+    
+    fg2_made: int = 0
+    fg2_attempted: int = 0
+    fg2_pct: float = 0.0
+
+    fg3_made: int = Field(0, alias="ThreePointsMade")
+    fg3_attempted: int = Field(0, alias="ThreePointAttempts")
+    fg3_pct: float = Field(0.0, alias="ThreePointPercentage")
+    
+    ft_made: int = 0
+    ft_attempted: int = 0
+    ft_pct: float = 0.0
+    
+    points_per_shot: float = 0.0
+    efg_pct: float = 0.0
+
+    # --- ADVANCED / MISC ---
+    ast_to_ratio: float = 0.0
+    stl_to_ratio: float = 0.0
+    stl_pf_ratio: float = 0.0
+    blk_pf_ratio: float = 0.0
+    charges: int = 0
+    deflections: int = 0
+    tech_fouls: int = 0
+    double_doubles: int = 0
+    triple_doubles: int = 0
+    
+    @model_validator(mode='before')
+    @classmethod
+    def clean_empty_strings(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            # List of keys that are intended to be text/strings
+            string_fields = {"position", "jersey", "school_name", "city", "state", "base_player_id"}
+            
+            for key, value in data.items():
+                if value == "" or value is None:
+                    if key in string_fields:
+                        data[key] = None # Safe for Optional[str]
+                    else:
+                        data[key] = 0    # Safe for int/float
+        return data
