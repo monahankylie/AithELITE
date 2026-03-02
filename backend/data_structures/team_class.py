@@ -1,3 +1,9 @@
+from pydantic import BaseModel, Field, field_validator, model_validator, AliasChoices
+from typing import Optional, Any
+from datetime import datetime
+import re
+
+
 class Team(BaseModel):
     sport: str
     mascot: Optional[str] = None
@@ -43,4 +49,12 @@ class Team(BaseModel):
         mptid = info.data.get("maxpreps_team_id", "ABC")
         raw_id = f"{msct}{schl}{state}{mptid}".lower().replace(" ", "")
         return re.sub(r'[^a-z0-9]', '', raw_id) 
+    
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        return self.team_id == other.team_id
+
+    def __hash__(self):
+        return hash(self.team_id)
     

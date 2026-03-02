@@ -1,10 +1,12 @@
 import requests
 from data_structures.Scraper import Scraper_Task
+from data_structures.AthleticsParsingInfo import AthleticsParsingInfo
 import firebase_admin
 from firebase_admin import credentials, firestore, auth
 import uvicorn  
 from fastapi import FastAPI, BackgroundTasks, HTTPException,Request
 from fastapi.middleware.cors import CORSMiddleware
+from specific_scripts import hardcodedparse_script
 
 app = FastAPI()
 background_tasks = BackgroundTasks()
@@ -30,6 +32,11 @@ async def scrape(background_tasks: BackgroundTasks):
     background_tasks.add_task(scrapeCA.start_scrape)
     return {"Scrape": "started"}
 
+@app.get("/parse")
+async def parse(background_tasks: BackgroundTasks):
+    athlete_parse_struct = AthleticsParsingInfo("Resources/player_val_mappings.json","Basketball")
+    return {"Parse": "started"}
+
 @app.get("/test")
 def something():
     pass
@@ -40,7 +47,7 @@ def health_check():
 
 def run_server():
     ##start server and listen for requests
-    uvicorn.run("server:app", 
+    uvicorn.run(app ,
                  host="0.0.0.0", 
                  port=8000)    
 

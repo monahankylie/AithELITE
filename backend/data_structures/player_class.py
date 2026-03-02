@@ -53,6 +53,14 @@ class Player(BaseModel):
             else:
                 w = weight_lst[0]
         return w
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        return self.base_player_id == other.base_player_id
+
+    def __hash__(self):
+        return hash(self.base_player_id)
     
 class BasketballRecord(Player):
     # Context & Foreign Keys
