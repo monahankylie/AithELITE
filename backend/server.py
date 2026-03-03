@@ -34,15 +34,8 @@ async def scrape(background_tasks: BackgroundTasks):
 
 @app.get("/parse")
 async def parse(background_tasks: BackgroundTasks):
-    athlete_parse_struct = AthleticsParsingInfo(
-    **{
-        "sport_type": "Basketball",
-        "player_mapping": "Resources/player_val_mappings.json",
-        "team_mapping":  "Resources/team_val_mappings.json"
-    }
-    )
-    hardcodedparse_script.run_parse("/PlayerStats",athlete_parse_struct)
-    return {"your parse struct": f"{athlete_parse_struct.model_dump()}"}
+    hardcodedparse_script.test_parse()
+    return {"it has started":"parse"}
 
 @app.get("/test")
 def something():

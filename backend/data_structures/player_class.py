@@ -1,11 +1,12 @@
 from pydantic import BaseModel, Field, field_validator, model_validator, AliasChoices
-from typing import Optional, Any
+from typing import Optional, Any, Union, get_args, get_origin
 from datetime import datetime
+from utils.parsing_functions import traverse_paths
 import re
 
 class Player(BaseModel):
-    first_name: str = Field(validation_alias=AliasChoices("firstName", "first_name"))
-    last_name: str = Field(validation_alias=AliasChoices("lastName", "last_name"))
+    first_name: Optional[str] = Field(None,validation_alias=AliasChoices("firstName", "first_name"))
+    last_name: Optional[str] = Field(None,validation_alias=AliasChoices("lastName", "last_name"))
     grad_class: int = Field(alias="class", validation_alias=AliasChoices("graduatingClass", "class","grad_class"))
     height: float = 0.0  # inches
     weight: float = 0.0
@@ -61,12 +62,49 @@ class Player(BaseModel):
 
     def __hash__(self):
         return hash(self.base_player_id)
+
+    @classmethod
+    def extract_and_parse(cls, json_blob, mapping):
+        return traverse_paths(json_blob, mapping)
+
+    @model_validator(mode='before')
+    @classmethod
+    def clean_empty_strings(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+            
+        for name, field_info in cls.model_fields.items():
+            input_key = None
+            if name in data:
+                input_key = name
+            elif field_info.validation_alias:
+                if isinstance(field_info.validation_alias, AliasChoices):
+                    for alias in field_info.validation_alias.choices:
+                        if alias in data:
+                            input_key = alias
+                            break
+                elif field_info.validation_alias in data:
+                    input_key = field_info.validation_alias
+            
+            if input_key:
+                val = data[input_key]
+                if val == "" or val is None:
+                    annotation = field_info.annotation
+                    is_str = False
+                    
+                    if annotation is str:
+                        is_str = True
+                    elif get_origin(annotation) is Union:
+                        is_str = any(arg is str for arg in get_args(annotation))
+                        
+                    data[input_key] = None if is_str else 0
+        return data
     
 class BasketballRecord(Player):
     # Context & Foreign Keys
     position: Optional[str] = None
     jersey: Optional[str] = None
-    team_id: str 
+    team_id: Optional[str] = None 
     
     # --- PER GAME AVERAGES ---
     games_played: int = 0
@@ -123,18 +161,18 @@ class BasketballRecord(Player):
     tech_fouls: int = 0
     double_doubles: int = 0
     triple_doubles: int = 0
+
+def extract_and_parse_player(json_blob, mapping):
+    combined = {}
+    if not isinstance(mapping, dict):
+        return combined
+        
+    is_single_set = any(isinstance(v, list) for v in mapping.values())
     
-    @model_validator(mode='before')
-    @classmethod
-    def clean_empty_strings(cls, data: Any) -> Any:
-        if isinstance(data, dict):
-            # List of keys that are intended to be text/strings
-            string_fields = {"position", "jersey", "school_name", "city", "state", "base_player_id"}
-            
-            for key, value in data.items():
-                if value == "" or value is None:
-                    if key in string_fields:
-                        data[key] = None # Safe for Optional[str]
-                    else:
-                        data[key] = 0    # Safe for int/float
-        return data
+    if is_single_set:
+        combined.update(traverse_paths(json_blob, mapping))
+    else:
+        for sub_mapping in mapping.values():
+            if isinstance(sub_mapping, dict):
+                combined.update(traverse_paths(json_blob, sub_mapping))
+    return combined

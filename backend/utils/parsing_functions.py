@@ -1,5 +1,5 @@
 
-def traverse_paths(json_blob, value_map_json):
+def traverse_paths(json_blob, value_map_json) -> dict:
     new_dict = {}
     for key, path in value_map_json.items():
         current_node = json_blob

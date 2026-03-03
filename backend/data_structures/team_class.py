@@ -1,12 +1,10 @@
 from pydantic import BaseModel, Field, field_validator, model_validator, AliasChoices
 from typing import Optional, Any
 from datetime import datetime
-from utils.parsing_functions import *
+from utils.parsing_functions import traverse_paths
 import re
 
-
 class Team(BaseModel):
-
     sport: str
     mascot: Optional[str] = None
     school_name: Optional[str] = None
@@ -15,6 +13,7 @@ class Team(BaseModel):
     maxpreps_url: Optional[str] = Field(None, validation_alias=AliasChoices("team_canonical_url", "teamCanonicalUrl","maxpreps_url"))
     maxpreps_team_id: Optional[str] = Field(None, validation_alias=AliasChoices("team_id", "teamId","maxpreps_team_id"))
     team_id: Optional[str] = Field(None,validate_default=True)
+
     @model_validator(mode='before')
     @classmethod
     def parse_from_url(cls, data: dict):
@@ -38,36 +37,6 @@ class Team(BaseModel):
                     data["school_name"] = name_parts[0].title()
         return data
 
-    @classmethod
-    #extract all teams with the intent of getting multiple teams
-    #provide json blob that houses teams and mappings
-    #team_mapping should be a dictionary in the right structure
-    def extract_all_teams(cls,json_blob, team_mapping):
-        # 1. Get the path to the list of sports
-        
-        #returns all teams as a dict to root_key, confusing name 
-        all_teams_dict = traverse_paths(json_blob, {"teams": team_mapping})
-        
-        if not all_teams_dict:
-            return []
-        return all_teams_dict
-    
-    #creates multiple Team obj
-    @classmethod
-    def parse_into_teams(cls,teams_list,team_struct):
-        all_teams = []
-
-        for i in range(len(teams_list)):
-            team_dict = traverse_paths(teams_list[i],team_struct)
-            all_teams.append(Team(**team_dict))
-        return all_teams
-    
-    @classmethod
-    def extract_and_parse(cls,json_blob,team_root,inner_team_struct):
-        teams = Team.extract_all_teams(json_blob, team_root)
-        print(teams)
-        teams_lst = Team.parse_into_teams(teams,inner_team_struct)
-    
     @field_validator("team_id", mode="after")
     @classmethod
     def gen_id(cls, v, info):
@@ -89,5 +58,30 @@ class Team(BaseModel):
 
     def __hash__(self):
         return hash(self.team_id)
+
+def extract_all_teams(json_blob, team_mapping):
+    if not team_mapping or not isinstance(team_mapping, dict):
+        return []
     
+    # Notebook logic: the first key is the root key (e.g., "team_root")
+    # and its value is the path to the list of teams.
+    root_key = next(iter(team_mapping))
+    root_path = team_mapping[root_key]
     
+    traversed = traverse_paths(json_blob, {root_key: root_path})
+    teams = traversed.get(root_key)
+    return teams if isinstance(teams, list) else []
+
+def parse_into_teams(teams_list, team_struct):
+    if not teams_list:
+        return []
+    all_teams = []
+    for i in range(len(teams_list)):
+        team_dict = traverse_paths(teams_list[i], team_struct)
+        all_teams.append(Team(**team_dict))
+    return all_teams
+
+def extract_and_parse(json_blob, team_root, inner_team_struct):
+    teams = extract_all_teams(json_blob, team_root)
+    teams_objs = parse_into_teams(teams, inner_team_struct)
+    return teams, teams_objs
