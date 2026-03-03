@@ -11,179 +11,179 @@
   "maxpreps-basketball-stats": {
     "games_played": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Game Stats"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "GamesPlayed"}, "value"
+      {"name": "Game Stats"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "GamesPlayed"}, "value"
     ],
     "minutes_per_game": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Game Stats"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "MinutesPerGame"}, "value"
+      {"name": "Game Stats"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "MinutesPerGame"}, "value"
     ],
     "points_per_game": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Game Stats"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "PointsPerGame"}, "value"
+      {"name": "Game Stats"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "PointsPerGame"}, "value"
     ],
     "def_rebounds_per_game": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Game Stats"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "DefensiveReboundsPerGame"}, "value"
+      {"name": "Game Stats"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "DefensiveReboundsPerGame"}, "value"
     ],
     "off_rebounds_per_game": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Game Stats"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "OffensiveReboundsPerGame"}, "value"
+      {"name": "Game Stats"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "OffensiveReboundsPerGame"}, "value"
     ],
     "rebounds_per_game": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Game Stats"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "ReboundsPerGame"}, "value"
+      {"name": "Game Stats"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "ReboundsPerGame"}, "value"
     ],
     "assists_per_game": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Game Stats"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "AssistsPerGame"}, "value"
+      {"name": "Game Stats"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "AssistsPerGame"}, "value"
     ],
     "steals_per_game": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Game Stats"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "StealsPerGame"}, "value"
+      {"name": "Game Stats"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "StealsPerGame"}, "value"
     ],
     "blocks_per_game": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Game Stats"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "BlocksPerGame"}, "value"
+      {"name": "Game Stats"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "BlocksPerGame"}, "value"
     ],
     "turnovers_per_game": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Game Stats"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "TurnoversPerGame"}, "value"
+      {"name": "Game Stats"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "TurnoversPerGame"}, "value"
     ],
     "fouls_per_game": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Game Stats"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "PersonalFoulsPerGame"}, "value"
+      {"name": "Game Stats"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "PersonalFoulsPerGame"}, "value"
     ],
     "minutes_played": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Shooting"}, "subgroups", {"name": "Shooting (1)"}, "stats", {"year": "24-25"}, "stats", {"name": "MinutesPlayed"}, "value"
+      {"name": "Shooting"}, "subgroups", {"name": "Shooting (1)"}, "totalStats", "stats", {"name": "MinutesPlayed"}, "value"
     ],
     "points": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Shooting"}, "subgroups", {"name": "Shooting (1)"}, "stats", {"year": "24-25"}, "stats", {"name": "Points"}, "value"
+      {"name": "Shooting"}, "subgroups", {"name": "Shooting (1)"}, "totalStats", "stats", {"name": "Points"}, "value"
     ],
     "fg_made": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Shooting"}, "subgroups", {"name": "Shooting (1)"}, "stats", {"year": "24-25"}, "stats", {"name": "FieldGoalsMade"}, "value"
+      {"name": "Shooting"}, "subgroups", {"name": "Shooting (1)"}, "totalStats", "stats", {"name": "FieldGoalsMade"}, "value"
     ],
     "fg_attempted": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Shooting"}, "subgroups", {"name": "Shooting (1)"}, "stats", {"year": "24-25"}, "stats", {"name": "FieldGoalAttempts"}, "value"
+      {"name": "Shooting"}, "subgroups", {"name": "Shooting (1)"}, "totalStats", "stats", {"name": "FieldGoalAttempts"}, "value"
     ],
     "fg_pct": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Shooting"}, "subgroups", {"name": "Shooting (1)"}, "stats", {"year": "24-25"}, "stats", {"name": "FieldGoalPercentage"}, "value"
+      {"name": "Shooting"}, "subgroups", {"name": "Shooting (1)"}, "totalStats", "stats", {"name": "FieldGoalPercentage"}, "value"
     ],
     "points_per_shot": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Shooting"}, "subgroups", {"name": "Shooting (1)"}, "stats", {"year": "24-25"}, "stats", {"name": "PointsPerShot"}, "value"
+      {"name": "Shooting"}, "subgroups", {"name": "Shooting (1)"}, "totalStats", "stats", {"name": "PointsPerShot"}, "value"
     ],
     "efg_pct": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Shooting"}, "subgroups", {"name": "Shooting (1)"}, "stats", {"year": "24-25"}, "stats", {"name": "AdjustedFGPercentage"}, "value"
+      {"name": "Shooting"}, "subgroups", {"name": "Shooting (1)"}, "totalStats", "stats", {"name": "AdjustedFGPercentage"}, "value"
     ],
     "fg3_made": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "stats", {"year": "24-25"}, "stats", {"name": "ThreePointsMade"}, "value"
+      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "totalStats", "stats", {"name": "ThreePointsMade"}, "value"
     ],
     "fg3_attempted": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "stats", {"year": "24-25"}, "stats", {"name": "ThreePointAttempts"}, "value"
+      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "totalStats", "stats", {"name": "ThreePointAttempts"}, "value"
     ],
     "fg3_pct": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "stats", {"year": "24-25"}, "stats", {"name": "ThreePointPercentage"}, "value"
+      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "totalStats", "stats", {"name": "ThreePointPercentage"}, "value"
     ],
     "ft_made": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "stats", {"year": "24-25"}, "stats", {"name": "FreeThrowsMade"}, "value"
+      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "totalStats", "stats", {"name": "FreeThrowsMade"}, "value"
     ],
     "ft_attempted": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "stats", {"year": "24-25"}, "stats", {"name": "FreeThrowAttempts"}, "value"
+      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "totalStats", "stats", {"name": "FreeThrowAttempts"}, "value"
     ],
     "ft_pct": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "stats", {"year": "24-25"}, "stats", {"name": "FreeThrowPercentage"}, "value"
+      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "totalStats", "stats", {"name": "FreeThrowPercentage"}, "value"
     ],
     "fg2_made": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "stats", {"year": "24-25"}, "stats", {"name": "TwoPointsMade"}, "value"
+      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "totalStats", "stats", {"name": "TwoPointsMade"}, "value"
     ],
     "fg2_attempted": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "stats", {"year": "24-25"}, "stats", {"name": "TwoPointAttempts"}, "value"
+      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "totalStats", "stats", {"name": "TwoPointAttempts"}, "value"
     ],
     "fg2_pct": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "stats", {"year": "24-25"}, "stats", {"name": "TwoPointPercentage"}, "value"
+      {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "totalStats", "stats", {"name": "TwoPointPercentage"}, "value"
     ],
     "off_rebounds": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "OffensiveRebounds"}, "value"
+      {"name": "Totals"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "OffensiveRebounds"}, "value"
     ],
     "def_rebounds": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "DefensiveRebounds"}, "value"
+      {"name": "Totals"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "DefensiveRebounds"}, "value"
     ],
     "rebounds": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "Rebounds"}, "value"
+      {"name": "Totals"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "Rebounds"}, "value"
     ],
     "assists": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "Assists"}, "value"
+      {"name": "Totals"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "Assists"}, "value"
     ],
     "steals": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "Steals"}, "value"
+      {"name": "Totals"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "Steals"}, "value"
     ],
     "blocks": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "BlockedShots"}, "value"
+      {"name": "Totals"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "BlockedShots"}, "value"
     ],
     "turnovers": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "Turnovers"}, "value"
+      {"name": "Totals"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "Turnovers"}, "value"
     ],
     "fouls": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "PersonalFouls"}, "value"
+      {"name": "Totals"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "PersonalFouls"}, "value"
     ],
     "ast_to_ratio": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "AssistsPerTurnover"}, "value"
+      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "AssistsPerTurnover"}, "value"
     ],
     "stl_to_ratio": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "StealsPerTurnover"}, "value"
+      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "StealsPerTurnover"}, "value"
     ],
     "stl_pf_ratio": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "StealsPerPersonalFoul"}, "value"
+      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "StealsPerPersonalFoul"}, "value"
     ],
     "blk_pf_ratio": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "BlocksPerPersonalFoul"}, "value"
+      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "BlocksPerPersonalFoul"}, "value"
     ],
     "charges": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "Charges"}, "value"
+      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "Charges"}, "value"
     ],
     "deflections": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "Deflections"}, "value"
+      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "Deflections"}, "value"
     ],
     "tech_fouls": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "TechnicalFouls"}, "value"
+      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "TechnicalFouls"}, "value"
     ],
     "double_doubles": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "DoubleDouble"}, "value"
+      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "DoubleDouble"}, "value"
     ],
     "triple_doubles": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
-      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "TripleDouble"}, "value"
+      {"name": "Misc Totals"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "TripleDouble"}, "value"
     ]
   }
   

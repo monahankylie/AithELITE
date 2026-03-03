@@ -105,6 +105,27 @@ def run_parse(root_path:str, Athletics : AthleticsParsingInfo, PARSE_ALL = True)
 
     return list(unique_teams.values()), player_records
 
+def save_results(players, output_dir="ParsedPlayers"):
+    """
+    Saves each player's model_dump into an individual JSON file.
+    """
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        print(f"Created directory: {output_dir}")
+
+    for record in players:
+        # Use base_player_id as filename for uniqueness
+        filename = f"{record.base_player_id}.json"
+        file_path = os.path.join(output_dir, filename)
+        
+        try:
+            with open(file_path, "w") as f:
+                json.dump(record.model_dump(), f, indent=4)
+        except Exception as e:
+            print(f"Error saving {filename}: {e}")
+    
+    print(f"Successfully saved {len(players)} players to {output_dir}/")
+
 def test_parse():
     print("Starting test parse...")
     athlete_parse_struct = AthleticsParsingInfo(
@@ -121,6 +142,9 @@ def test_parse():
         test_path = "Resources"
 
     teams, players = run_parse(test_path, athlete_parse_struct, PARSE_ALL=True)
+    
+    # Save the mfs to disk
+    save_results(players)
     
     print(f"\n--- Results ---")
     print(f"Total Unique Teams Found: {len(teams)}")
