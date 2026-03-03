@@ -5,3 +5,5 @@ fbACC.json
 __pycache__/
 PlayerData/
 PlayerStats/
+geminifiles*
+ParsedPlayers/*
