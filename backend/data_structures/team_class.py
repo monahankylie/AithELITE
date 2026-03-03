@@ -1,10 +1,12 @@
 from pydantic import BaseModel, Field, field_validator, model_validator, AliasChoices
 from typing import Optional, Any
 from datetime import datetime
+from utils.parsing_functions import *
 import re
 
 
 class Team(BaseModel):
+
     sport: str
     mascot: Optional[str] = None
     school_name: Optional[str] = None
@@ -36,6 +38,36 @@ class Team(BaseModel):
                     data["school_name"] = name_parts[0].title()
         return data
 
+    @classmethod
+    #extract all teams with the intent of getting multiple teams
+    #provide json blob that houses teams and mappings
+    #team_mapping should be a dictionary in the right structure
+    def extract_all_teams(cls,json_blob, team_mapping):
+        # 1. Get the path to the list of sports
+        
+        #returns all teams as a dict to root_key, confusing name 
+        all_teams_dict = traverse_paths(json_blob, {"teams": team_mapping})
+        
+        if not all_teams_dict:
+            return []
+        return all_teams_dict
+    
+    #creates multiple Team obj
+    @classmethod
+    def parse_into_teams(cls,teams_list,team_struct):
+        all_teams = []
+
+        for i in range(len(teams_list)):
+            team_dict = traverse_paths(teams_list[i],team_struct)
+            all_teams.append(Team(**team_dict))
+        return all_teams
+    
+    @classmethod
+    def extract_and_parse(cls,json_blob,team_root,inner_team_struct):
+        teams = Team.extract_all_teams(json_blob, team_root)
+        print(teams)
+        teams_lst = Team.parse_into_teams(teams,inner_team_struct)
+    
     @field_validator("team_id", mode="after")
     @classmethod
     def gen_id(cls, v, info):
@@ -57,4 +89,5 @@ class Team(BaseModel):
 
     def __hash__(self):
         return hash(self.team_id)
+    
     

@@ -185,15 +185,6 @@
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
       {"name": "Misc Totals"}, "subgroups", {"name": ""}, "stats", {"year": "24-25"}, "stats", {"name": "TripleDouble"}, "value"
     ]
-  },
-  "team_mapping":{
-
-    "team_root": ["props", "pageProps", "careerContext", "careerPlayerData", "careerSports"]
-  },
-  "team_structure": {
-    "sport": ["sport"],
-    "maxpreps_team_id": ["teamId"],
-    "maxpreps_url": ["teamCanonicalUrl"]
-}
+  }
   
 }

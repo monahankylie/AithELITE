@@ -2,10 +2,10 @@ from utils.parsing_functions import *
 from data_structures import player_class,team_class, AthleticsParsingInfo
 import os
 
-def run_parse(root_path:str, Athletics):
+
+def run_parse(root_path:str, Athletics : AthleticsParsingInfo.AthleticsParsingInfo, PARSE_ALL = True):
     plyer_dict = {}
     path = root_path
-    mappings = Athletics.mappings
     
     # Extract specific maps
     # bio_maps = maps.get("maxpreps-stats", {}) # For Player base fields
