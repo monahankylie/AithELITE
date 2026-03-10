@@ -14,6 +14,7 @@ class Player(BaseModel):
     maxpreps_career_id: Optional[str] = None
     id_247: Optional[str] = None
     base_player_id: Optional[str] = Field(None,validate_default=True)
+    maxpreps_link: Optional[str] = Field(None)
 
     @field_validator("base_player_id", mode="after")
     @classmethod
@@ -63,9 +64,22 @@ class Player(BaseModel):
     def __hash__(self):
         return hash(self.base_player_id)
 
+    @model_validator(mode='before')
     @classmethod
-    def extract_and_parse(cls, json_blob, mapping):
-        return traverse_paths(json_blob, mapping)
+    def handle_split_height(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            # Check for feet and inches in various common formats
+            h_ft = data.get("heightFeet") or data.get("height_ft") or data.get("heightFeet")
+            h_in = data.get("heightInches") or data.get("height_in") or data.get("heightInches")
+            
+            # If we found feet, calculate total inches and set the 'height' field
+            if h_ft is not None:
+                try:
+                    total_inches = float(h_ft) * 12 + float(h_in or 0)
+                    data["height"] = total_inches
+                except (ValueError, TypeError):
+                    pass
+        return data
 
     @model_validator(mode='before')
     @classmethod

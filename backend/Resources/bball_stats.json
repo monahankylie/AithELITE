@@ -1,14 +1,12 @@
 {
-  "maxpreps-base": {
+  "ball": {
     "first_name": ["props", "pageProps", "careerContext", "careerData", "firstName"],
     "last_name": ["props", "pageProps", "careerContext", "careerData", "lastName"],
     "grad_class": ["props", "pageProps", "careerContext", "careerData", "graduatingClass"],
     "height_ft": ["props", "pageProps", "careerContext", "careerData", "heightFeet"],
     "height_in": ["props", "pageProps", "careerContext", "careerData", "heightInches"],
     "weight": ["props", "pageProps", "careerContext", "careerData", "weight"],
-    "maxpreps_career_id":["props","pageProps","careerContext","careerData","careerId"]
-  },
-  "maxpreps-basketball-stats": {
+    "maxpreps_career_id":["props","pageProps","careerContext","careerData","careerId"],
     "games_played": [
       "props", "pageProps", "statsCardProps", "careerRollup", "groups", 
       {"name": "Game Stats"}, "subgroups", {"name": ""}, "totalStats", "stats", {"name": "GamesPlayed"}, "value"

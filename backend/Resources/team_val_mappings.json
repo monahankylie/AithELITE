@@ -1,10 +1,5 @@
 {
     "team_mapping":{
     "team_root": ["props", "pageProps", "careerContext", "careerPlayerData", "careerSports"]
-  },
-  "team_structure": {
-    "sport": ["sport"],
-    "maxpreps_team_id": ["teamId"],
-    "maxpreps_url": ["teamCanonicalUrl"]
-}
+  }
 }

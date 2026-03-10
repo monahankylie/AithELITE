@@ -1,6 +1,7 @@
 from . import player_class
 from . import  team_class
 import json 
+import os
 from typing import Optional, Callable, Dict, Any, ClassVar
 from pydantic import BaseModel, Field, field_validator, model_validator, AliasChoices
 
@@ -29,21 +30,25 @@ class AthleticsParsingInfo(BaseModel):
     @model_validator(mode='before')
     @classmethod
     def setup_data(cls, data: Any) -> Any:
-        # 1. If input is a string, assume it is a path and load the JSON
-        def _load_if_path(value):
-            if isinstance(value, str) and value.endswith('.json'):
-                with open(value, 'r') as f:
-                    return json.load(f)
-            return value
-        data = _load_if_path(data)
+        def _load_json(val):
+            if isinstance(val, str) and val.strip().lower().endswith('.json'):
+                if os.path.exists(val):
+                    with open(val, 'r', encoding='utf-8') as f:
+                        return json.load(f)
+            return val
+
+        # 1. Load the primary model input if it's a path
+        data = _load_json(data)
+        
+        # 2. Recursively check if sub-mappings (player/team) are paths
         if isinstance(data, dict):
-            try:
-                if "player_mapping" in data:
-                    data["player_mapping"] = _load_if_path(data.get("player_mapping"))
-                if "team_mapping" in data:
-                    data["team_mapping"] = _load_if_path(data.get("team_mapping"))
-            except FileNotFoundError:
-                raise ValueError(f"External mapping file not found")
+            for key in ["player_mapping", "team_mapping"]:
+                if key in data:
+                    try:
+                        data[key] = _load_json(data[key])
+                    except (json.JSONDecodeError, IOError) as e:
+                        raise ValueError(f"Failed to load external mapping for '{key}': {e}")
+            return data
         return data
 
 

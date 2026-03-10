@@ -1,160 +1,139 @@
 import json
-from data_structures.AthleticsParsingInfo import AthleticsParsingInfo
-from data_structures.player_class import Player, BasketballRecord, extract_and_parse_player
-from data_structures.team_class import Team, extract_and_parse as extract_and_parse_teams
 import os
+from data_structures.AthleticsParsingInfo import AthleticsParsingInfo
+from data_structures.player_class import Player, BasketballRecord
+from data_structures.team_class import Team
+from utils.parsing_functions import traverse_paths
+from utils.IO import save_json
 
+def extract_raw_blob(json_blob, mapping):
+    """
+    Extracts data using traverse_paths.
+    If the mapping points to a single container (dict/list), it returns that container.
+    Otherwise, it returns the full dictionary of results.
+    """
+    m = mapping
+    # Skip top-level wrapper keys (e.g., {"ball": {...}})
+    if len(m) == 1 and isinstance(next(iter(m.values())), dict):
+        m = next(iter(m.values()))
+    
+    res = traverse_paths(json_blob, m)
+    
+    # If single path results in a container, return the container itself
+    if len(res) == 1:
+        val = next(iter(res.values()))
+        if isinstance(val, (dict, list)):
+            return val
+    return res
 
-def run_parse(root_path:str, Athletics : AthleticsParsingInfo, PARSE_ALL = True):
+def get_best_team_match(teams_raw, target_sport):
     """
-    Goes through each JSON file in root_path, parses it using the AthleticsParsingInfo mapping,
-    and returns two lists: (teams, players).
+    Selects the most recent team matching the target sport.
     """
+    if not isinstance(teams_raw, list):
+        return teams_raw if isinstance(teams_raw, dict) else None
+    
+    sport_key = target_sport.lower()
+    matches = [
+        t for t in teams_raw 
+        if isinstance(t, dict) and t.get("sport") and sport_key in t["sport"].lower()
+    ]
+    
+    if not matches: return None
+    
+    # Sort by year descending to get the latest season
+    try:
+        matches.sort(key=lambda x: str(x.get("year", "")), reverse=True)
+    except: pass
+    
+    return matches[0]
+
+def parse_athlete_file(json_blob, Athletics: AthleticsParsingInfo):
+    """
+    Converts raw JSON blob into validated Team and Player objects.
+    """
+    player_raw = extract_raw_blob(json_blob, Athletics.player_mapping)
+    teams_raw_all = extract_raw_blob(json_blob, Athletics.team_mapping)
+    
+    # Determine the team (with fallback logic)
+    team_raw = get_best_team_match(teams_raw_all, Athletics.sport_type)
+    if team_raw:
+        team_obj = Team(**team_raw)
+    else:
+        # User-provided fallback ID
+        team_obj = Team(
+            sport=Athletics.sport_type, 
+            team_id="6c68b5d21cab449d9140bd7c8adb2791", 
+            school_name="Unknown Fallback"
+        )
+
+    if not isinstance(player_raw, dict):
+        return team_obj, None
+        
+    # Merge data and let Pydantic handle aliases and types
+    final_player_data = player_raw | team_obj.model_dump()
+    player_obj = Athletics.sport_record_maker(final_player_data)
+    
+    return team_obj, player_obj
+
+def run_parse(root_path: str, Athletics: AthleticsParsingInfo, PARSE_ALL=True):
     unique_teams = {}
     player_records = []
+    errors = 0
     
-    path = root_path
+    path = root_path if os.path.exists(root_path) else root_path.lstrip('/')
     if not os.path.exists(path):
-        # Fallback for local execution
-        path = root_path.lstrip('/')
-        if not os.path.exists(path):
-            print(f"Path {root_path} and {path} do not exist.")
-            return [], []
-    
-    # Iterate through all files in the directory
+        return [], [], 0
+
     for filename in os.listdir(path):
-        if not filename.endswith(".json"):
-            continue
-            
-        file_path = os.path.join(path, filename)
-        try:
-            with open(file_path, "r") as f:
-                json_blob = json.load(f)
-        except (json.JSONDecodeError, IOError) as e:
-            print(f"Error reading {file_path}: {e}")
-            continue
-
-        try:
-            # 1. Extract and Parse Teams using standalone helper
-            team_root_cfg = Athletics.team_mapping.get("team_mapping")
-            team_struct_cfg = Athletics.team_mapping.get("team_structure")
-            
-            recent_team_val = {}
-            current_team_obj = None
-
-            if team_root_cfg and team_struct_cfg:
-                # Use helper to get raw and objects
-                raw_teams, teams_objs = extract_and_parse_teams(json_blob, team_root_cfg, team_struct_cfg)
-                
-                if raw_teams:
-                    # Filter for the most recent team matching the target sport
-                    target_sport = Athletics.sport_type.lower()
-                    for raw, obj in zip(raw_teams, teams_objs):
-                        if obj.sport and target_sport in obj.sport.lower():
-                            current_team_obj = obj
-                            recent_team_val = raw | obj.model_dump()
-                            break
-                    
-                    if not current_team_obj:
-                        print(f"No team matching sport '{target_sport}' found in {filename}")
-                        continue
-                        
-                    # Store unique teams across the entire run
-                    if current_team_obj.team_id not in unique_teams:
-                        unique_teams[current_team_obj.team_id] = current_team_obj
-                else:
-                    print(f"No teams found in {filename}")
-                    continue
-            else:
-                # Basic fallback
-                from utils.parsing_functions import traverse_paths
-                recent_team_val = traverse_paths(json_blob, Athletics.team_mapping)
-                if "sport" not in recent_team_val:
-                    recent_team_val["sport"] = Athletics.sport_type
-                current_team_obj = Team(**recent_team_val)
-                recent_team_val = current_team_obj.model_dump()
-                if current_team_obj.team_id not in unique_teams:
-                    unique_teams[current_team_obj.team_id] = current_team_obj
-
-            # 2. Extract and Parse Player Data using standalone helper
-            combined_player_data = extract_and_parse_player(json_blob, Athletics.player_mapping)
-
-            # 3. Combine and Finalize
-            final_data = combined_player_data | recent_team_val
-            
-            # Height calculation
-            if "height_ft" in final_data and "height_in" in final_data:
-                h_ft = final_data.get("height_ft")
-                h_in = final_data.get("height_in")
-                if h_ft is not None and h_in is not None:
-                    try:
-                        final_data["height"] = 12 * float(h_ft) + float(h_in)
-                    except (ValueError, TypeError):
-                        pass
-
-            # Athletics.sport_record_maker returns the appropriate model instance
-            record = Athletics.sport_record_maker(final_data)
-            player_records.append(record)
-
-        except Exception as e:
-            print(f"Failed to parse data from {filename}: {e}")
-            continue
-
-        if not PARSE_ALL and len(player_records) > 0:
-            break
-
-    return list(unique_teams.values()), player_records
-
-def save_results(players, output_dir="ParsedPlayers"):
-    """
-    Saves each player's model_dump into an individual JSON file.
-    """
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-        print(f"Created directory: {output_dir}")
-
-    for record in players:
-        # Use base_player_id as filename for uniqueness
-        filename = f"{record.base_player_id}.json"
-        file_path = os.path.join(output_dir, filename)
+        if not filename.endswith(".json"): continue
         
         try:
-            with open(file_path, "w") as f:
-                json.dump(record.model_dump(), f, indent=4)
+            with open(os.path.join(path, filename), "r") as f:
+                json_blob = json.load(f)
+            
+            team, player = parse_athlete_file(json_blob, Athletics)
+            
+            if team and player:
+                if team.team_id not in unique_teams:
+                    unique_teams[team.team_id] = team
+                player_records.append(player)
+            else:
+                errors += 1
         except Exception as e:
-            print(f"Error saving {filename}: {e}")
-    
-    print(f"Successfully saved {len(players)} players to {output_dir}/")
+            errors += 1
+            continue
+            
+        if not PARSE_ALL and len(player_records) > 0: break
+
+    return list(unique_teams.values()), player_records, errors
 
 def test_parse():
-    print("Starting test parse...")
+    # Use fallback mapping for maximum data retrieval
     athlete_parse_struct = AthleticsParsingInfo(
-        **{
-            "sport_type": "Basketball",
-            "player_mapping": "Resources/player_val_mappings.json",
-            "team_mapping":  "Resources/team_val_mappings.json"
-        }
+        sport_type="Basketball",
+        player_mapping="Resources/bball_stats_fallback.json",
+        team_mapping="Resources/team_val_mappings.json"
     )
     
-    test_path = "PlayerStats"
-    if not os.path.exists(test_path) or not os.listdir(test_path):
-        print(f"No files in {test_path}, checking Resources for examples...")
-        test_path = "Resources"
-
-    teams, players = run_parse(test_path, athlete_parse_struct, PARSE_ALL=True)
+    test_path = "PlayerStats" if os.path.exists("PlayerStats") else "Resources"
+    teams, players, errors = run_parse(test_path, athlete_parse_struct, PARSE_ALL=True)
     
-    # Save the mfs to disk
-    save_results(players)
+    # Save results using the generic IO utility
+    if players: 
+        for p in players:
+            save_json(p.model_dump(), "ParsedPlayers2", p.base_player_id)
+            
+    if teams:
+        for t in teams:
+            save_json(t.model_dump(), "ParsedTeams", t.team_id)
     
-    print(f"\n--- Results ---")
-    print(f"Total Unique Teams Found: {len(teams)}")
-    for team in teams:
-        print(f"  - Team: {team.school_name} {team.mascot} ({team.team_id})")
-        
-    print(f"Total Players Parsed: {len(players)}")
-    for record in players:
-        print(f"  - Player: {record.first_name} {record.last_name} (Team ID: {record.team_id})")
-    print(f"---------------\n")
+    print(f"\n" + "="*40)
+    print(f"PARSE COMPLETE")
+    print(f"Success: {len(players)} players")
+    print(f"Teams:   {len(teams)} unique teams")
+    print(f"Skipped: {errors} files (no match or invalid)")
+    print(f"="*40 + "\n")
 
 if __name__ == "__main__":
     test_parse()

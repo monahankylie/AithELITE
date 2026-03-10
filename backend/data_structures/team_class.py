@@ -12,44 +12,34 @@ class Team(BaseModel):
     state: Optional[str] = None
     maxpreps_url: Optional[str] = Field(None, validation_alias=AliasChoices("team_canonical_url", "teamCanonicalUrl","maxpreps_url"))
     maxpreps_team_id: Optional[str] = Field(None, validation_alias=AliasChoices("team_id", "teamId","maxpreps_team_id"))
-    team_id: Optional[str] = Field(None,validate_default=True)
+    team_id: Optional[str] = None
 
-    @model_validator(mode='before')
-    @classmethod
-    def parse_from_url(cls, data: dict):
-        url = data.get("maxpreps_url")
-        if url and isinstance(url, str):
-            # Format: "/state/city/school-mascot/sport/"
-            parts = [p for p in url.split("/") if p]
-            
-            # Populate missing fields from URL parts
+    @model_validator(mode='after')
+    def finalize_data(self) -> 'Team':
+        # 1. Parse missing fields from URL (aliases already resolved by Pydantic)
+        if self.maxpreps_url and isinstance(self.maxpreps_url, str):
+            parts = [p for p in self.maxpreps_url.split("/") if p]
             if len(parts) >= 3:
-                data["state"] = data.get("state") or parts[0].lower()
-                data["city"] = data.get("city") or parts[1].replace("-", " ").title()
-                name_parts = parts[2].split("-")
+                self.state = self.state or parts[0].lower()
+                self.city = self.city or parts[1].replace("-", " ").title()
                 
+                name_parts = parts[2].split("-")
                 if len(name_parts) > 1:
-                    # [:-1] = "Rainier Beach", [-1] = "Vikings"
-                    data["school_name"] = " ".join(name_parts[:-1]).title()
-                    data["mascot"] = name_parts[-1].title()
+                    self.school_name = self.school_name or " ".join(name_parts[:-1]).title()
+                    self.mascot = self.mascot or name_parts[-1].title()
                 else:
-                    # Fallback if there is no hyphen
-                    data["school_name"] = name_parts[0].title()
-        return data
+                    self.school_name = self.school_name or name_parts[0].title()
 
-    @field_validator("team_id", mode="after")
-    @classmethod
-    def gen_id(cls, v, info):
-        if v: 
-            return v
-        
-        # Pulling from validated data
-        msct = info.data.get("mascot", "unknown")
-        schl = info.data.get("school_name", "unknown")
-        state = info.data.get("state", 0)
-        mptid = info.data.get("maxpreps_team_id", "ABC")
-        raw_id = f"{msct}{schl}{state}{mptid}".lower().replace(" ", "")
-        return re.sub(r'[^a-z0-9]', '', raw_id) 
+        # 2. Generate team_id if not provided
+        if not self.team_id:
+            msct = self.mascot or "unknown"
+            schl = self.school_name or "unknown"
+            st = self.state or "unknown"
+            mptid = self.maxpreps_team_id or "abc"
+            raw_id = f"{msct}{schl}{st}{mptid}".lower().replace(" ", "")
+            self.team_id = re.sub(r'[^a-z0-9]', '', raw_id) 
+
+        return self
     
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -63,8 +53,6 @@ def extract_all_teams(json_blob, team_mapping):
     if not team_mapping or not isinstance(team_mapping, dict):
         return []
     
-    # Notebook logic: the first key is the root key (e.g., "team_root")
-    # and its value is the path to the list of teams.
     root_key = next(iter(team_mapping))
     root_path = team_mapping[root_key]
     
