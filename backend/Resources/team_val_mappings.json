@@ -1,0 +1,5 @@
+{
+    "team_mapping":{
+    "team_root": ["props", "pageProps", "careerContext", "careerPlayerData", "careerSports"]
+  }
+}
