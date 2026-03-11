@@ -8,11 +8,12 @@ from pydantic import BaseModel, Field, field_validator, model_validator, AliasCh
 class AthleticsParsingInfo(BaseModel):
 
     rec_func_dict: ClassVar[Dict[Optional[str], Callable]] = {
-        None : lambda raw: player_class.Player(**raw),
+        None : lambda raw: player_class.Record(**raw),
         "basketball": lambda raw: player_class.BasketballRecord(**raw),
     }
     sport_type : Optional[str] = Field(alias = "sport",validation_alias = AliasChoices("stype","sport_type"))
     player_mapping : dict = Field(validation_alias = AliasChoices("player_mapping"))
+    record_mapping : dict = Field(validation_alias = AliasChoices("record","record_mapping"))
     team_mapping : dict = Field(validation_alias = AliasChoices("team_mapping"))
 
     @property
