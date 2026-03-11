@@ -4,6 +4,70 @@ from datetime import datetime
 from utils.parsing_functions import traverse_paths
 import re
 
+class Record:
+    sport: Optional[str] = None
+    season: Optional[str] = None
+class BasketballRecord(Record):
+    position: Optional[str] = None
+    jersey: Optional[str] = None
+    team_id: Optional[str] = None 
+    
+    # --- PER GAME AVERAGES ---
+    games_played: int = 0
+    minutes_per_game: float = 0.0
+    points_per_game: float = 0.0
+    off_rebounds_per_game: float = 0.0
+    def_rebounds_per_game: float = 0.0
+    rebounds_per_game: float = 0.0
+    assists_per_game: float = 0.0
+    steals_per_game: float = 0.0
+    blocks_per_game: float = 0.0
+    turnovers_per_game: float = 0.0
+    fouls_per_game: float = 0.0
+
+    # --- SEASON TOTALS ---
+    minutes_played: int = 0
+    points: int = 0
+    off_rebounds: int = 0
+    def_rebounds: int = 0
+    rebounds: int = 0
+    assists: int = 0
+    steals: int = 0
+    blocks: int = 0
+    turnovers: int = 0
+    fouls: int = 0
+
+    # --- SHOOTING ---
+    fg_made: int = 0
+    fg_attempted: int = 0
+    fg_pct: float = 0.0
+    
+    fg2_made: int = 0
+    fg2_attempted: int = 0
+    fg2_pct: float = 0.0
+
+    fg3_made: int = Field(0, alias="ThreePointsMade")
+    fg3_attempted: int = Field(0, alias="ThreePointAttempts")
+    fg3_pct: float = Field(0.0, alias="ThreePointPercentage")
+    
+    ft_made: int = 0
+    ft_attempted: int = 0
+    ft_pct: float = 0.0
+    
+    points_per_shot: float = 0.0
+    efg_pct: float = 0.0
+
+    # --- ADVANCED / MISC ---
+    ast_to_ratio: float = 0.0
+    stl_to_ratio: float = 0.0
+    stl_pf_ratio: float = 0.0
+    blk_pf_ratio: float = 0.0
+    charges: int = 0
+    deflections: int = 0
+    tech_fouls: int = 0
+    double_doubles: int = 0
+    triple_doubles: int = 0
+
 class Player(BaseModel):
     first_name: Optional[str] = Field(None,validation_alias=AliasChoices("firstName", "first_name"))
     last_name: Optional[str] = Field(None,validation_alias=AliasChoices("lastName", "last_name"))
@@ -15,6 +79,11 @@ class Player(BaseModel):
     id_247: Optional[str] = None
     base_player_id: Optional[str] = Field(None,validate_default=True)
     maxpreps_link: Optional[str] = Field(None)
+    records: list[Any] = Field(default_factory=list)
+
+    def add_record(self, record: Record):
+        """Adds a sport record to the player's records list."""
+        self.records.append(record)
 
     @field_validator("base_player_id", mode="after")
     @classmethod
@@ -114,67 +183,7 @@ class Player(BaseModel):
                     data[input_key] = None if is_str else 0
         return data
     
-class BasketballRecord(Player):
-    # Context & Foreign Keys
-    position: Optional[str] = None
-    jersey: Optional[str] = None
-    team_id: Optional[str] = None 
-    
-    # --- PER GAME AVERAGES ---
-    games_played: int = 0
-    minutes_per_game: float = 0.0
-    points_per_game: float = 0.0
-    off_rebounds_per_game: float = 0.0
-    def_rebounds_per_game: float = 0.0
-    rebounds_per_game: float = 0.0
-    assists_per_game: float = 0.0
-    steals_per_game: float = 0.0
-    blocks_per_game: float = 0.0
-    turnovers_per_game: float = 0.0
-    fouls_per_game: float = 0.0
 
-    # --- SEASON TOTALS ---
-    minutes_played: int = 0
-    points: int = 0
-    off_rebounds: int = 0
-    def_rebounds: int = 0
-    rebounds: int = 0
-    assists: int = 0
-    steals: int = 0
-    blocks: int = 0
-    turnovers: int = 0
-    fouls: int = 0
-
-    # --- SHOOTING ---
-    fg_made: int = 0
-    fg_attempted: int = 0
-    fg_pct: float = 0.0
-    
-    fg2_made: int = 0
-    fg2_attempted: int = 0
-    fg2_pct: float = 0.0
-
-    fg3_made: int = Field(0, alias="ThreePointsMade")
-    fg3_attempted: int = Field(0, alias="ThreePointAttempts")
-    fg3_pct: float = Field(0.0, alias="ThreePointPercentage")
-    
-    ft_made: int = 0
-    ft_attempted: int = 0
-    ft_pct: float = 0.0
-    
-    points_per_shot: float = 0.0
-    efg_pct: float = 0.0
-
-    # --- ADVANCED / MISC ---
-    ast_to_ratio: float = 0.0
-    stl_to_ratio: float = 0.0
-    stl_pf_ratio: float = 0.0
-    blk_pf_ratio: float = 0.0
-    charges: int = 0
-    deflections: int = 0
-    tech_fouls: int = 0
-    double_doubles: int = 0
-    triple_doubles: int = 0
 
 def extract_and_parse_player(json_blob, mapping):
     combined = {}
