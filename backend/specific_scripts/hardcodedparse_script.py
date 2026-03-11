@@ -19,7 +19,6 @@ def run_parse(root_path: str, Athletics: AthleticsParsingInfo, PARSE_ALL=True):
             with open(os.path.join(path, filename), "r") as f:
                 json_blob = json.load(f)
             
-            # Use the centralized assembly logic
             team, player = Athletics.assemble_player(json_blob)
             
             if player:
@@ -30,7 +29,7 @@ def run_parse(root_path: str, Athletics: AthleticsParsingInfo, PARSE_ALL=True):
                 errors += 1
         except Exception as e:
             errors += 1
-            print(f"[DEBUG] Exception in run_parse for {filename}: {e}")
+            print(f"Error parsing {filename}: {e}")
             continue
             
         if not PARSE_ALL and len(player_records) > 0: break
@@ -42,16 +41,16 @@ def test_parse():
     athlete_parse_struct = AthleticsParsingInfo(
         sport_type="Basketball",
         player_mapping="Resources/player_bio.json",
-        record_mapping="Resources/bball_record.json",
+        record_mapping="Resources/bball_record.json", # This now points to all season stats
         team_mapping="Resources/team_val_mappings.json"
     )
     
     test_path = "PlayerStats" if os.path.exists("PlayerStats") else "Resources"
     teams, players, errors = run_parse(test_path, athlete_parse_struct, PARSE_ALL=True)
     
-    # Save results
     if players: 
         for p in players:
+            print(f"Player: {p.first_name} {p.last_name}, Records: {len(p.records)}")
             save_json(p.model_dump(), "ParsedPlayers2", p.base_player_id)
             
     if teams:

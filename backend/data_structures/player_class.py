@@ -6,7 +6,7 @@ import re
 
 class Record(BaseModel):
     sport: Optional[str] = None
-    season: Optional[str] = None
+    year: Optional[str] = None
 
     @model_validator(mode='before')
     @classmethod
@@ -29,65 +29,65 @@ class Record(BaseModel):
 
 class BasketballRecord(Record):
     sport: str = "basketball"
-    position: Optional[str] = None
+    positions: Optional[list] = None
     jersey: Optional[str] = None
     team_id: Optional[str] = None 
     
     # --- PER GAME AVERAGES ---
-    games_played: int = 0
-    minutes_per_game: float = 0.0
-    points_per_game: float = 0.0
-    off_rebounds_per_game: float = 0.0
-    def_rebounds_per_game: float = 0.0
-    rebounds_per_game: float = 0.0
-    assists_per_game: float = 0.0
-    steals_per_game: float = 0.0
-    blocks_per_game: float = 0.0
-    turnovers_per_game: float = 0.0
-    fouls_per_game: float = 0.0
+    games_played: int = Field(0, validation_alias=AliasChoices("GamesPlayed", "games_played"))
+    minutes_per_game: float = Field(0.0, validation_alias=AliasChoices("MinutesPerGame", "minutes_per_game"))
+    points_per_game: float = Field(0.0, validation_alias=AliasChoices("PointsPerGame", "points_per_game"))
+    off_rebounds_per_game: float = Field(0.0, validation_alias=AliasChoices("OffensiveReboundsPerGame", "off_rebounds_per_game"))
+    def_rebounds_per_game: float = Field(0.0, validation_alias=AliasChoices("DefensiveReboundsPerGame", "def_rebounds_per_game"))
+    rebounds_per_game: float = Field(0.0, validation_alias=AliasChoices("ReboundsPerGame", "rebounds_per_game"))
+    assists_per_game: float = Field(0.0, validation_alias=AliasChoices("AssistsPerGame", "assists_per_game"))
+    steals_per_game: float = Field(0.0, validation_alias=AliasChoices("StealsPerGame", "steals_per_game"))
+    blocks_per_game: float = Field(0.0, validation_alias=AliasChoices("BlocksPerGame", "blocks_per_game"))
+    turnovers_per_game: float = Field(0.0, validation_alias=AliasChoices("TurnoversPerGame", "turnovers_per_game"))
+    fouls_per_game: float = Field(0.0, validation_alias=AliasChoices("PersonalFoulsPerGame", "fouls_per_game"))
 
     # --- SEASON TOTALS ---
-    minutes_played: int = 0
-    points: int = 0
-    off_rebounds: int = 0
-    def_rebounds: int = 0
-    rebounds: int = 0
-    assists: int = 0
-    steals: int = 0
-    blocks: int = 0
-    turnovers: int = 0
-    fouls: int = 0
+    minutes_played: int = Field(0, validation_alias=AliasChoices("MinutesPlayed", "minutes_played"))
+    points: int = Field(0, validation_alias=AliasChoices("Points", "points"))
+    off_rebounds: int = Field(0, validation_alias=AliasChoices("OffensiveRebounds", "off_rebounds"))
+    def_rebounds: int = Field(0, validation_alias=AliasChoices("DefensiveRebounds", "def_rebounds"))
+    rebounds: int = Field(0, validation_alias=AliasChoices("Rebounds", "rebounds"))
+    assists: int = Field(0, validation_alias=AliasChoices("Assists", "assists"))
+    steals: int = Field(0, validation_alias=AliasChoices("Steals", "steals"))
+    blocks: int = Field(0, validation_alias=AliasChoices("BlockedShots", "blocks"))
+    turnovers: int = Field(0, validation_alias=AliasChoices("Turnovers", "turnovers"))
+    fouls: int = Field(0, validation_alias=AliasChoices("PersonalFouls", "fouls"))
 
     # --- SHOOTING ---
-    fg_made: int = 0
-    fg_attempted: int = 0
-    fg_pct: float = 0.0
+    fg_made: int = Field(0, validation_alias=AliasChoices("FieldGoalsMade", "fg_made"))
+    fg_attempted: int = Field(0, validation_alias=AliasChoices("FieldGoalAttempts", "fg_attempted"))
+    fg_pct: float = Field(0.0, validation_alias=AliasChoices("FieldGoalPercentage", "fg_pct"))
     
-    fg2_made: int = 0
-    fg2_attempted: int = 0
-    fg2_pct: float = 0.0
+    fg2_made: int = Field(0, validation_alias=AliasChoices("TwoPointsMade", "fg2_made"))
+    fg2_attempted: int = Field(0, validation_alias=AliasChoices("TwoPointAttempts", "fg2_attempted"))
+    fg2_pct: float = Field(0.0, validation_alias=AliasChoices("TwoPointPercentage", "fg2_pct"))
 
-    fg3_made: int = Field(0, alias="ThreePointsMade")
-    fg3_attempted: int = Field(0, alias="ThreePointAttempts")
-    fg3_pct: float = Field(0.0, alias="ThreePointPercentage")
+    fg3_made: int = Field(0, validation_alias=AliasChoices("ThreePointsMade", "fg3_made"))
+    fg3_attempted: int = Field(0, validation_alias=AliasChoices("ThreePointAttempts", "fg3_attempted"))
+    fg3_pct: float = Field(0.0, validation_alias=AliasChoices("ThreePointPercentage", "fg3_pct"))
     
-    ft_made: int = 0
-    ft_attempted: int = 0
-    ft_pct: float = 0.0
+    ft_made: int = Field(0, validation_alias=AliasChoices("FreeThrowsMade", "ft_made"))
+    ft_attempted: int = Field(0, validation_alias=AliasChoices("FreeThrowAttempts", "ft_attempted"))
+    ft_pct: float = Field(0.0, validation_alias=AliasChoices("FreeThrowPercentage", "ft_pct"))
     
-    points_per_shot: float = 0.0
-    efg_pct: float = 0.0
+    points_per_shot: float = Field(0.0, validation_alias=AliasChoices("PointsPerShot", "points_per_shot"))
+    efg_pct: float = Field(0.0, validation_alias=AliasChoices("AdjustedFGPercentage", "efg_pct"))
 
     # --- ADVANCED / MISC ---
-    ast_to_ratio: float = 0.0
-    stl_to_ratio: float = 0.0
-    stl_pf_ratio: float = 0.0
-    blk_pf_ratio: float = 0.0
-    charges: int = 0
-    deflections: int = 0
-    tech_fouls: int = 0
-    double_doubles: int = 0
-    triple_doubles: int = 0
+    ast_to_ratio: float = Field(0.0, validation_alias=AliasChoices("AssistsPerTurnover", "ast_to_ratio"))
+    stl_to_ratio: float = Field(0.0, validation_alias=AliasChoices("StealsPerTurnover", "stl_to_ratio"))
+    stl_pf_ratio: float = Field(0.0, validation_alias=AliasChoices("StealsPerPersonalFoul", "stl_pf_ratio"))
+    blk_pf_ratio: float = Field(0.0, validation_alias=AliasChoices("BlocksPerPersonalFoul", "blk_pf_ratio"))
+    charges: int = Field(0, validation_alias=AliasChoices("Charges", "charges"))
+    deflections: int = Field(0, validation_alias=AliasChoices("Deflections", "deflections"))
+    tech_fouls: int = Field(0, validation_alias=AliasChoices("TechnicalFouls", "tech_fouls"))
+    double_doubles: int = Field(0, validation_alias=AliasChoices("DoubleDouble", "double_doubles"))
+    triple_doubles: int = Field(0, validation_alias=AliasChoices("TripleDouble", "triple_doubles"))
 
     @property
     def is_empty(self) -> bool:
@@ -165,6 +165,7 @@ class Player(BaseModel):
     def __hash__(self):
         return hash(self.base_player_id)
 
+    ##becuz maxpreps wanna separate them
     @model_validator(mode='before')
     @classmethod
     def handle_split_height(cls, data: Any) -> Any:
