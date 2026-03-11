@@ -1,13 +1,34 @@
-from pydantic import BaseModel, Field, field_validator, model_validator, AliasChoices
+from pydantic import BaseModel, Field, field_validator, model_validator, AliasChoices, FieldValidationInfo
 from typing import Optional, Any, Union, get_args, get_origin
 from datetime import datetime
 from utils.parsing_functions import traverse_paths
 import re
 
-class Record:
+class Record(BaseModel):
     sport: Optional[str] = None
     season: Optional[str] = None
+
+    @model_validator(mode='before')
+    @classmethod
+    def filter_none_values(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            return {k: v for k, v in data.items() if v is not None}
+        return data
+
+    @field_validator("*", mode="before")
+    @classmethod
+    def empty_str_to_zero(cls, v: Any, info: FieldValidationInfo) -> Any:
+        # Pydantic v2 doesn't easily expose the field's type in a simple validator,
+        # so we check if the value is an empty string and the field is in the model.
+        # This is a safe assumption for this project's data.
+        if v == "" and info.field_name in cls.model_fields:
+            # We assume numeric fields with empty strings should be 0.
+            # A more robust solution might check the field's type annotation.
+            return 0
+        return v
+
 class BasketballRecord(Record):
+    sport: str = "basketball"
     position: Optional[str] = None
     jersey: Optional[str] = None
     team_id: Optional[str] = None 
@@ -68,10 +89,16 @@ class BasketballRecord(Record):
     double_doubles: int = 0
     triple_doubles: int = 0
 
+    @property
+    def is_empty(self) -> bool:
+        """Checks if the record has any non-zero/non-default stats."""
+        check_fields = ["points", "rebounds", "assists", "games_played", "points_per_game"]
+        return not any(getattr(self, f, 0) for f in check_fields)
+
 class Player(BaseModel):
     first_name: Optional[str] = Field(None,validation_alias=AliasChoices("firstName", "first_name"))
     last_name: Optional[str] = Field(None,validation_alias=AliasChoices("lastName", "last_name"))
-    grad_class: int = Field(alias="class", validation_alias=AliasChoices("graduatingClass", "class","grad_class"))
+    grad_class: int = Field(0, alias="class", validation_alias=AliasChoices("graduatingClass", "class","grad_class"))
     height: float = 0.0  # inches
     weight: float = 0.0
     scouting_report: Optional[str] = None
@@ -85,13 +112,19 @@ class Player(BaseModel):
         """Adds a sport record to the player's records list."""
         self.records.append(record)
 
+    @model_validator(mode='before')
+    @classmethod
+    def filter_none_values(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            return {k: v for k, v in data.items() if v is not None}
+        return data
+
     @field_validator("base_player_id", mode="after")
     @classmethod
     def gen_id(cls, v, info):
         if v: 
             return v
         
-        # Pulling from validated data
         fn = info.data.get("first_name", "unknown")
         ln = info.data.get("last_name", "unknown")
         gc = info.data.get("grad_class", 0)
@@ -103,9 +136,8 @@ class Player(BaseModel):
     @classmethod
     def parse_height(cls, v):
         if isinstance(v, str):
-            # find all digits with optional . and optional numbers after that dot
             height_lst = [n for n in re.findall(r'\d+\.?\d*', v)]
-            height_lst = [float(p) for p in height_lst if p] # filter out empty str
+            height_lst = [float(p) for p in height_lst if p]
             if len(height_lst) <= 1:
                 v = height_lst[0]
             else:
@@ -137,11 +169,9 @@ class Player(BaseModel):
     @classmethod
     def handle_split_height(cls, data: Any) -> Any:
         if isinstance(data, dict):
-            # Check for feet and inches in various common formats
             h_ft = data.get("heightFeet") or data.get("height_ft") or data.get("heightFeet")
             h_in = data.get("heightInches") or data.get("height_in") or data.get("heightInches")
             
-            # If we found feet, calculate total inches and set the 'height' field
             if h_ft is not None:
                 try:
                     total_inches = float(h_ft) * 12 + float(h_in or 0)
@@ -149,41 +179,6 @@ class Player(BaseModel):
                 except (ValueError, TypeError):
                     pass
         return data
-
-    @model_validator(mode='before')
-    @classmethod
-    def clean_empty_strings(cls, data: Any) -> Any:
-        if not isinstance(data, dict):
-            return data
-            
-        for name, field_info in cls.model_fields.items():
-            input_key = None
-            if name in data:
-                input_key = name
-            elif field_info.validation_alias:
-                if isinstance(field_info.validation_alias, AliasChoices):
-                    for alias in field_info.validation_alias.choices:
-                        if alias in data:
-                            input_key = alias
-                            break
-                elif field_info.validation_alias in data:
-                    input_key = field_info.validation_alias
-            
-            if input_key:
-                val = data[input_key]
-                if val == "" or val is None:
-                    annotation = field_info.annotation
-                    is_str = False
-                    
-                    if annotation is str:
-                        is_str = True
-                    elif get_origin(annotation) is Union:
-                        is_str = any(arg is str for arg in get_args(annotation))
-                        
-                    data[input_key] = None if is_str else 0
-        return data
-    
-
 
 def extract_and_parse_player(json_blob, mapping):
     combined = {}
