@@ -1,13 +1,104 @@
-from pydantic import BaseModel, Field, field_validator, model_validator, AliasChoices
+from pydantic import BaseModel, Field, field_validator, model_validator, AliasChoices, FieldValidationInfo
 from typing import Optional, Any, Union, get_args, get_origin
 from datetime import datetime
 from utils.parsing_functions import traverse_paths
 import re
 
+class Record(BaseModel):
+    sport: Optional[str] = None
+    year: Optional[str] = None
+
+    @model_validator(mode='before')
+    @classmethod
+    def filter_none_values(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            return {k: v for k, v in data.items() if v is not None}
+        return data
+
+    @field_validator("*", mode="before")
+    @classmethod
+    def empty_str_to_zero(cls, v: Any, info: FieldValidationInfo) -> Any:
+        # Pydantic v2 doesn't easily expose the field's type in a simple validator,
+        # so we check if the value is an empty string and the field is in the model.
+        # This is a safe assumption for this project's data.
+        if v == "" and info.field_name in cls.model_fields:
+            # We assume numeric fields with empty strings should be 0.
+            # A more robust solution might check the field's type annotation.
+            return 0
+        return v
+
+class BasketballRecord(Record):
+    sport: str = "basketball"
+    positions: Optional[list] = None
+    jersey: Optional[str] = None
+    team_id: Optional[str] = None 
+    
+    # --- PER GAME AVERAGES ---
+    games_played: int = Field(0, validation_alias=AliasChoices("GamesPlayed", "games_played"))
+    minutes_per_game: float = Field(0.0, validation_alias=AliasChoices("MinutesPerGame", "minutes_per_game"))
+    points_per_game: float = Field(0.0, validation_alias=AliasChoices("PointsPerGame", "points_per_game"))
+    off_rebounds_per_game: float = Field(0.0, validation_alias=AliasChoices("OffensiveReboundsPerGame", "off_rebounds_per_game"))
+    def_rebounds_per_game: float = Field(0.0, validation_alias=AliasChoices("DefensiveReboundsPerGame", "def_rebounds_per_game"))
+    rebounds_per_game: float = Field(0.0, validation_alias=AliasChoices("ReboundsPerGame", "rebounds_per_game"))
+    assists_per_game: float = Field(0.0, validation_alias=AliasChoices("AssistsPerGame", "assists_per_game"))
+    steals_per_game: float = Field(0.0, validation_alias=AliasChoices("StealsPerGame", "steals_per_game"))
+    blocks_per_game: float = Field(0.0, validation_alias=AliasChoices("BlocksPerGame", "blocks_per_game"))
+    turnovers_per_game: float = Field(0.0, validation_alias=AliasChoices("TurnoversPerGame", "turnovers_per_game"))
+    fouls_per_game: float = Field(0.0, validation_alias=AliasChoices("PersonalFoulsPerGame", "fouls_per_game"))
+
+    # --- SEASON TOTALS ---
+    minutes_played: int = Field(0, validation_alias=AliasChoices("MinutesPlayed", "minutes_played"))
+    points: int = Field(0, validation_alias=AliasChoices("Points", "points"))
+    off_rebounds: int = Field(0, validation_alias=AliasChoices("OffensiveRebounds", "off_rebounds"))
+    def_rebounds: int = Field(0, validation_alias=AliasChoices("DefensiveRebounds", "def_rebounds"))
+    rebounds: int = Field(0, validation_alias=AliasChoices("Rebounds", "rebounds"))
+    assists: int = Field(0, validation_alias=AliasChoices("Assists", "assists"))
+    steals: int = Field(0, validation_alias=AliasChoices("Steals", "steals"))
+    blocks: int = Field(0, validation_alias=AliasChoices("BlockedShots", "blocks"))
+    turnovers: int = Field(0, validation_alias=AliasChoices("Turnovers", "turnovers"))
+    fouls: int = Field(0, validation_alias=AliasChoices("PersonalFouls", "fouls"))
+
+    # --- SHOOTING ---
+    fg_made: int = Field(0, validation_alias=AliasChoices("FieldGoalsMade", "fg_made"))
+    fg_attempted: int = Field(0, validation_alias=AliasChoices("FieldGoalAttempts", "fg_attempted"))
+    fg_pct: float = Field(0.0, validation_alias=AliasChoices("FieldGoalPercentage", "fg_pct"))
+    
+    fg2_made: int = Field(0, validation_alias=AliasChoices("TwoPointsMade", "fg2_made"))
+    fg2_attempted: int = Field(0, validation_alias=AliasChoices("TwoPointAttempts", "fg2_attempted"))
+    fg2_pct: float = Field(0.0, validation_alias=AliasChoices("TwoPointPercentage", "fg2_pct"))
+
+    fg3_made: int = Field(0, validation_alias=AliasChoices("ThreePointsMade", "fg3_made"))
+    fg3_attempted: int = Field(0, validation_alias=AliasChoices("ThreePointAttempts", "fg3_attempted"))
+    fg3_pct: float = Field(0.0, validation_alias=AliasChoices("ThreePointPercentage", "fg3_pct"))
+    
+    ft_made: int = Field(0, validation_alias=AliasChoices("FreeThrowsMade", "ft_made"))
+    ft_attempted: int = Field(0, validation_alias=AliasChoices("FreeThrowAttempts", "ft_attempted"))
+    ft_pct: float = Field(0.0, validation_alias=AliasChoices("FreeThrowPercentage", "ft_pct"))
+    
+    points_per_shot: float = Field(0.0, validation_alias=AliasChoices("PointsPerShot", "points_per_shot"))
+    efg_pct: float = Field(0.0, validation_alias=AliasChoices("AdjustedFGPercentage", "efg_pct"))
+
+    # --- ADVANCED / MISC ---
+    ast_to_ratio: float = Field(0.0, validation_alias=AliasChoices("AssistsPerTurnover", "ast_to_ratio"))
+    stl_to_ratio: float = Field(0.0, validation_alias=AliasChoices("StealsPerTurnover", "stl_to_ratio"))
+    stl_pf_ratio: float = Field(0.0, validation_alias=AliasChoices("StealsPerPersonalFoul", "stl_pf_ratio"))
+    blk_pf_ratio: float = Field(0.0, validation_alias=AliasChoices("BlocksPerPersonalFoul", "blk_pf_ratio"))
+    charges: int = Field(0, validation_alias=AliasChoices("Charges", "charges"))
+    deflections: int = Field(0, validation_alias=AliasChoices("Deflections", "deflections"))
+    tech_fouls: int = Field(0, validation_alias=AliasChoices("TechnicalFouls", "tech_fouls"))
+    double_doubles: int = Field(0, validation_alias=AliasChoices("DoubleDouble", "double_doubles"))
+    triple_doubles: int = Field(0, validation_alias=AliasChoices("TripleDouble", "triple_doubles"))
+
+    @property
+    def is_empty(self) -> bool:
+        """Checks if the record has any non-zero/non-default stats."""
+        check_fields = ["points", "rebounds", "assists", "games_played", "points_per_game"]
+        return not any(getattr(self, f, 0) for f in check_fields)
+
 class Player(BaseModel):
     first_name: Optional[str] = Field(None,validation_alias=AliasChoices("firstName", "first_name"))
     last_name: Optional[str] = Field(None,validation_alias=AliasChoices("lastName", "last_name"))
-    grad_class: int = Field(alias="class", validation_alias=AliasChoices("graduatingClass", "class","grad_class"))
+    grad_class: int = Field(0, alias="class", validation_alias=AliasChoices("graduatingClass", "class","grad_class"))
     height: float = 0.0  # inches
     weight: float = 0.0
     scouting_report: Optional[str] = None
@@ -15,6 +106,18 @@ class Player(BaseModel):
     id_247: Optional[str] = None
     base_player_id: Optional[str] = Field(None,validate_default=True)
     maxpreps_link: Optional[str] = Field(None)
+    records: list[Any] = Field(default_factory=list)
+
+    def add_record(self, record: Record):
+        """Adds a sport record to the player's records list."""
+        self.records.append(record)
+
+    @model_validator(mode='before')
+    @classmethod
+    def filter_none_values(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            return {k: v for k, v in data.items() if v is not None}
+        return data
 
     @field_validator("base_player_id", mode="after")
     @classmethod
@@ -22,7 +125,6 @@ class Player(BaseModel):
         if v: 
             return v
         
-        # Pulling from validated data
         fn = info.data.get("first_name", "unknown")
         ln = info.data.get("last_name", "unknown")
         gc = info.data.get("grad_class", 0)
@@ -34,9 +136,8 @@ class Player(BaseModel):
     @classmethod
     def parse_height(cls, v):
         if isinstance(v, str):
-            # find all digits with optional . and optional numbers after that dot
             height_lst = [n for n in re.findall(r'\d+\.?\d*', v)]
-            height_lst = [float(p) for p in height_lst if p] # filter out empty str
+            height_lst = [float(p) for p in height_lst if p]
             if len(height_lst) <= 1:
                 v = height_lst[0]
             else:
@@ -64,15 +165,14 @@ class Player(BaseModel):
     def __hash__(self):
         return hash(self.base_player_id)
 
+    ##becuz maxpreps wanna separate them
     @model_validator(mode='before')
     @classmethod
     def handle_split_height(cls, data: Any) -> Any:
         if isinstance(data, dict):
-            # Check for feet and inches in various common formats
             h_ft = data.get("heightFeet") or data.get("height_ft") or data.get("heightFeet")
             h_in = data.get("heightInches") or data.get("height_in") or data.get("heightInches")
             
-            # If we found feet, calculate total inches and set the 'height' field
             if h_ft is not None:
                 try:
                     total_inches = float(h_ft) * 12 + float(h_in or 0)
@@ -80,101 +180,6 @@ class Player(BaseModel):
                 except (ValueError, TypeError):
                     pass
         return data
-
-    @model_validator(mode='before')
-    @classmethod
-    def clean_empty_strings(cls, data: Any) -> Any:
-        if not isinstance(data, dict):
-            return data
-            
-        for name, field_info in cls.model_fields.items():
-            input_key = None
-            if name in data:
-                input_key = name
-            elif field_info.validation_alias:
-                if isinstance(field_info.validation_alias, AliasChoices):
-                    for alias in field_info.validation_alias.choices:
-                        if alias in data:
-                            input_key = alias
-                            break
-                elif field_info.validation_alias in data:
-                    input_key = field_info.validation_alias
-            
-            if input_key:
-                val = data[input_key]
-                if val == "" or val is None:
-                    annotation = field_info.annotation
-                    is_str = False
-                    
-                    if annotation is str:
-                        is_str = True
-                    elif get_origin(annotation) is Union:
-                        is_str = any(arg is str for arg in get_args(annotation))
-                        
-                    data[input_key] = None if is_str else 0
-        return data
-    
-class BasketballRecord(Player):
-    # Context & Foreign Keys
-    position: Optional[str] = None
-    jersey: Optional[str] = None
-    team_id: Optional[str] = None 
-    
-    # --- PER GAME AVERAGES ---
-    games_played: int = 0
-    minutes_per_game: float = 0.0
-    points_per_game: float = 0.0
-    off_rebounds_per_game: float = 0.0
-    def_rebounds_per_game: float = 0.0
-    rebounds_per_game: float = 0.0
-    assists_per_game: float = 0.0
-    steals_per_game: float = 0.0
-    blocks_per_game: float = 0.0
-    turnovers_per_game: float = 0.0
-    fouls_per_game: float = 0.0
-
-    # --- SEASON TOTALS ---
-    minutes_played: int = 0
-    points: int = 0
-    off_rebounds: int = 0
-    def_rebounds: int = 0
-    rebounds: int = 0
-    assists: int = 0
-    steals: int = 0
-    blocks: int = 0
-    turnovers: int = 0
-    fouls: int = 0
-
-    # --- SHOOTING ---
-    fg_made: int = 0
-    fg_attempted: int = 0
-    fg_pct: float = 0.0
-    
-    fg2_made: int = 0
-    fg2_attempted: int = 0
-    fg2_pct: float = 0.0
-
-    fg3_made: int = Field(0, alias="ThreePointsMade")
-    fg3_attempted: int = Field(0, alias="ThreePointAttempts")
-    fg3_pct: float = Field(0.0, alias="ThreePointPercentage")
-    
-    ft_made: int = 0
-    ft_attempted: int = 0
-    ft_pct: float = 0.0
-    
-    points_per_shot: float = 0.0
-    efg_pct: float = 0.0
-
-    # --- ADVANCED / MISC ---
-    ast_to_ratio: float = 0.0
-    stl_to_ratio: float = 0.0
-    stl_pf_ratio: float = 0.0
-    blk_pf_ratio: float = 0.0
-    charges: int = 0
-    deflections: int = 0
-    tech_fouls: int = 0
-    double_doubles: int = 0
-    triple_doubles: int = 0
 
 def extract_and_parse_player(json_blob, mapping):
     combined = {}

@@ -1,0 +1,7 @@
+{
+    "game_stats_root": ["props", "pageProps", "statsCardProps", "careerRollup", "groups", {"name": "Game Stats"}, "subgroups", {"name": ""}, "stats"],
+    "shooting_stats_root": ["props", "pageProps", "statsCardProps", "careerRollup", "groups", {"name": "Shooting"}, "subgroups", {"name": "Shooting (1)"}, "stats"],
+    "shooting_stats_2_root": ["props", "pageProps", "statsCardProps", "careerRollup", "groups", {"name": "Shooting"}, "subgroups", {"name": "Shooting (2)"}, "stats"],
+    "totals_stats_root": ["props", "pageProps", "statsCardProps", "careerRollup", "groups", {"name": "Totals"}, "subgroups", {"name": ""}, "stats"],
+    "misc_stats_root": ["props", "pageProps", "statsCardProps", "careerRollup", "groups", {"name": "Misc Totals"}, "subgroups", {"name": ""}, "stats"]
+}
