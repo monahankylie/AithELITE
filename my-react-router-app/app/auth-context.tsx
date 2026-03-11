@@ -4,10 +4,10 @@
  * It listens to Firebase Auth changes and fetches additional user profile data from Firestore.
  * Components can use the `useAuth` hook to access the current user, their profile, and loading state.
  */
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { onAuthStateChanged, User } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, db } from "../firebase-config";
+import React, {createContext, useContext, useEffect, useState} from "react";
+import {onAuthStateChanged, type User} from "firebase/auth";
+import {doc, getDoc} from "firebase/firestore";
+import {auth, db} from "../firebase-config";
 
 interface UserProfile {
   firstName: string;
@@ -31,22 +31,20 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-
+export const AuthProvider = ({children}: {children: React.ReactNode}) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
-      
+
       if (firebaseUser) {
         try {
           const userRef = doc(db, "users", firebaseUser.uid);
           const userSnap = await getDoc(userRef);
-          
+
           if (userSnap.exists()) {
             setProfile(userSnap.data() as UserProfile);
           } else {
@@ -64,15 +62,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } else {
         setProfile(null);
       }
-      
+
       setLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
-  return (
-    <AuthContext.Provider value={{ user, profile, loading }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{user, profile, loading}}>{children}</AuthContext.Provider>;
 };
