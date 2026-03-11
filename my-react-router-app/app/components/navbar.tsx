@@ -6,8 +6,10 @@
  * - Responsive: Hides links on mobile (hidden) and shows them on medium screens (md:flex).
  */
 import React from 'react';
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { signOut } from "firebase/auth";
 import { useAuth } from "../auth-context";
+import { auth } from "../../firebase-config";
 
 // NAVIGATION DICTIONARY
 // This maps user states to the specific text links they should see.
@@ -24,10 +26,19 @@ const NAV_CONFIG = {
 
 const Navbar = () => {
     const { user, profile } = useAuth();
+    const navigate = useNavigate();
     
-    // Choose the menu based on whether the user is logged in or not.
     const roleKey = !user ? 'guest' : 'recruiter';
     const navLinks = NAV_CONFIG[roleKey];
+
+    const handleSignOut = async () => {
+        try {
+            await signOut(auth);
+            navigate("/");
+        } catch (err) {
+            console.error("Sign out failed:", err);
+        }
+    };
 
     return (
         <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-black">
@@ -48,24 +59,32 @@ const Navbar = () => {
                         </Link>
                     ))}
                     {user && (
-                        <Link to="/profile" className="flex items-center text-white/80 hover:text-white transition ml-2">
-                            <div className="h-9 w-9 rounded-full border border-white/20 flex items-center justify-center bg-white/5 overflow-hidden hover:border-white/40 transition-colors">
-                                <svg 
-                                    xmlns="http://www.w3.org/2000/svg" 
-                                    className="h-5 w-5" 
-                                    fill="none" 
-                                    viewBox="0 0 24 24" 
-                                    stroke="currentColor"
-                                >
-                                    <path 
-                                        strokeLinecap="round" 
-                                        strokeLinejoin="round" 
-                                        strokeWidth={2} 
-                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" 
-                                    />
-                                </svg>
-                            </div>
-                        </Link>
+                        <>
+                            <Link to="/profile" className="flex items-center text-white/80 hover:text-white transition ml-2">
+                                <div className="h-9 w-9 rounded-full border border-white/20 flex items-center justify-center bg-white/5 overflow-hidden hover:border-white/40 transition-colors">
+                                    <svg 
+                                        xmlns="http://www.w3.org/2000/svg" 
+                                        className="h-5 w-5" 
+                                        fill="none" 
+                                        viewBox="0 0 24 24" 
+                                        stroke="currentColor"
+                                    >
+                                        <path 
+                                            strokeLinecap="round" 
+                                            strokeLinejoin="round" 
+                                            strokeWidth={2} 
+                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" 
+                                        />
+                                    </svg>
+                                </div>
+                            </Link>
+                            <button
+                                onClick={handleSignOut}
+                                className="rounded-full border border-white/20 px-4 py-1.5 text-xs font-medium text-white/70 transition hover:border-white/40 hover:text-white"
+                            >
+                                Sign Out
+                            </button>
+                        </>
                     )}
                 </nav>
             </div>
