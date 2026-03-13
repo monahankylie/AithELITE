@@ -12,6 +12,7 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
+
 const isClient = typeof window !== "undefined";
 const app = isClient
   ? getApps().length ? getApp() : initializeApp(firebaseConfig)
