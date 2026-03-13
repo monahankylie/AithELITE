@@ -19,16 +19,16 @@ function buildStatsLine(averages?: PlayerCardProps["averages"]): string {
   return parts.slice(0, 3).join(" \u2022 ");
 }
 
-export default function PlayerCard({name, sport, position, school, gradYear, avatarUrl, averages}: PlayerCardProps) {
+export default function PlayerCard({ name, sport, position, school, gradYear, avatarUrl, averages }: PlayerCardProps) {
   const statsText = buildStatsLine(averages);
 
   return (
     <article
       className="
-    w-[320px] h-[420px] shrink-0
-    rounded-3xl bg-white p-8 shadow-xl ring-1 ring-black/10
-    flex flex-col
-  "
+        w-[320px] h-[420px] shrink-0
+        rounded-3xl bg-white p-8 shadow-xl ring-1 ring-black/10
+        flex flex-col
+      "
     >
       <div className="flex items-start gap-6">
         {avatarUrl ? (
@@ -50,7 +50,7 @@ export default function PlayerCard({name, sport, position, school, gradYear, ava
       </div>
       <div className="mt-10 flex-1 overflow-hidden text-2xl font-extrabold tracking-tight text-black">
         <div className="line-clamp-3">{statsText}</div>
-      </div>{" "}
+      </div>
       <div className="mt-10 flex justify-center">
         <span className="rounded-full bg-black/75 px-6 py-2 text-xs font-semibold text-white">Class of {gradYear}</span>
       </div>
