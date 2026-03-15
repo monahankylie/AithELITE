@@ -6,6 +6,6 @@ export default [
   route("/signup", "routes/signup.tsx"),
   route("/dashboard", "routes/dashboard.tsx"),
   route("/profile", "routes/profile.tsx"),
-  route("/Watchlists", "routes/watchlists.tsx"),
-  route("/Discover", "routes/discover.tsx"),
+  route("/watchlists", "routes/watchlists.tsx"),
+  route("/discover", "routes/discover.tsx"),
 ] satisfies RouteConfig;

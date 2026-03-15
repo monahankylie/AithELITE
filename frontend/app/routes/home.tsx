@@ -1,69 +1,33 @@
 import {useEffect, useState} from "react";
 import type {Route} from "./+types/home";
 import {Link} from "react-router";
-import {collection, getDocs, doc, getDoc, query, limit} from "firebase/firestore";
-import {db} from "../../firebase-config";
 import PlayerCard from "~/components/playercard";
-import type {PlayerCardProps} from "~/components/playercard";
 import PageLayout from "../components/page-layout";
+import { athleteService, type BasketballPlayer } from "../lib/athlete-service";
+import {auth} from "../../firebase-config";
 
 export function meta({}: Route.MetaArgs) {
   return [{title: "Athelite | Smart Recruiting"}, {name: "description", content: "Smart recruiting for smarter teams."}];
 }
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
 function FeaturedCarousel() {
-  const [players, setPlayers] = useState<(PlayerCardProps & {id: string})[]>([]);
+  const [players, setPlayers] = useState<BasketballPlayer[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!db) return;
-
     async function fetchPlayers() {
+      // Use cache to avoid reads on navigation back to home
+      const cached = athleteService.getCache('featured');
+      if (cached) {
+          setPlayers(cached);
+          setLoading(false);
+          return;
+      }
+
       try {
-        const snap = await getDocs(query(collection(db, "athletes"), limit(30)));
-        const allDocs = snap.docs;
-        const picked = shuffle(allDocs).slice(0, 30);
-
-        const cards = await Promise.all(
-          picked.map(async (d) => {
-            const data = d.data();
-            let position = "";
-            let averages: PlayerCardProps["averages"] = undefined;
-
-            try {
-              const recordSnap = await getDoc(doc(db, "athletes", d.id, "sports_records", "bball_record"));
-              if (recordSnap.exists()) {
-                const rec = recordSnap.data();
-                position = rec.position ?? "";
-                if (rec.averages) averages = rec.averages;
-              }
-            } catch {
-              // subcollection may not exist
-            }
-
-            return {
-              id: d.id,
-              name: `${data.firstName ?? ""} ${data.lastName ?? ""}`.trim(),
-              sport: data.sport ?? "",
-              position,
-              school: data.school ?? "",
-              gradYear: data.gradYear ?? "",
-              avatarUrl: data.imageUrl || undefined,
-              averages,
-            };
-          }),
-        );
-        const withStats = cards.filter((p) => p.averages?.ppg != null && p.averages?.apg != null && p.averages?.rpg != null);
-        setPlayers(withStats.slice(0, 10));
+        const { players: initialPlayers } = await athleteService.fetchBasketballPlayers(10);
+        setPlayers(initialPlayers);
+        athleteService.setCache('featured', initialPlayers);
       } catch (err) {
         console.error("Failed to load athletes:", err);
       } finally {
@@ -112,32 +76,25 @@ function FeaturedCarousel() {
     </section>
   );
 }
-/**
- * Home Route ("/")
- */
+
 export default function Home() {
+  const {user, profile} = useAuth();
   return (
     <PageLayout>
-      {/* HERO SECTION */}
       <section className="relative overflow-hidden">
-        {/* Background Layer*/}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-950" />
-
         <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6">
           <div className="grid items-center gap-12 lg:grid-cols-2">
-            {/* LEFT COLUMN */}
             <div className="relative z-10">
               <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-6xl">
                 Smart <br />
                 Recruiting, <br />
                 Smarter Teams
               </h1>
-
               <p className="mt-6 max-w-xl text-base text-white/80">Competitive athlete discovery for collegiate recruiters.</p>
-
               <div className="mt-8">
                 <Link
-                  to="/login"
+                  to= {user ? "/home" : "/login"}
                   className="
                       relative inline-block overflow-hidden
                       rounded-full px-8 py-3 text-base font-medium text-white
@@ -153,8 +110,6 @@ export default function Home() {
                 </Link>
               </div>
             </div>
-
-            {/* RIGHT COLUMN */}
             <div className="relative z-10 flex justify-center lg:justify-end">
               <div className="relative w-full max-w-xl overflow-hidden rounded-3xl shadow-2xl sm:h-80 lg:h-[420px]">
                 <img
@@ -169,7 +124,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
       <FeaturedCarousel />
     </PageLayout>
   );
