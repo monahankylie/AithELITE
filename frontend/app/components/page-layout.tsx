@@ -1,9 +1,5 @@
 /**
  * PAGE LAYOUT COMPONENT
- * A universal wrapper for all pages that provides:
- * - A consistent Navbar and Footer.
- * - Automatic handling of the authentication loading state.
- * - A standardized page structure (min-height, background, etc.).
  */
 import React from 'react';
 import Navbar from './navbar';
@@ -14,33 +10,59 @@ interface PageLayoutProps {
     children: React.ReactNode;
     requireAuth?: boolean;
     title?: string;
+    subtitle?: React.ReactNode;
     description?: string;
+    variant?: 'default' | 'hero';
+    actions?: React.ReactNode;
 }
 
-const PageLayout = ({ children, requireAuth = false, title, description }: PageLayoutProps) => {
-    const { user, loading, profile } = useAuth();
+const PageLayout = ({ 
+    children, 
+    requireAuth = false, 
+    title, 
+    subtitle,
+    description, 
+    variant = 'default',
+    actions 
+}: PageLayoutProps) => {
+    const { loading } = useAuth();
 
-    // Handle initial auth loading state globally
     if (loading) {
         return (
-            <div className="min-h-screen bg-white flex items-center justify-center">
-                <div className="animate-pulse text-sm font-medium text-black/40">Loading AithELITE...</div>
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="animate-pulse text-sm font-black uppercase tracking-widest text-[#00599c]/40">
+                    AithELITE
+                </div>
             </div>
         );
     }
 
-    // Optional: Redirect or show access denied if page requires auth and user isn't logged in
-    // For now, we'll just render the children, but this is a great place for protection logic.
-
     return (
-        <div className="min-h-screen bg-white flex flex-col">
+        <div className="min-h-screen bg-gray-50 flex flex-col">
             <Navbar />
             
             <main className="flex-1">
-                {(title || description) && (
-                    <header className="mx-auto max-w-6xl px-6 py-8 md:py-12">
-                        {title && <h1 className="text-3xl font-extrabold tracking-tight text-black sm:text-4xl">{title}</h1>}
-                        {description && <p className="mt-3 text-base text-black/60">{description}</p>}
+                {title && (
+                    <header className="mx-auto w-full px-4 sm:px-6 md:px-12 lg:px-24 py-8 md:py-12">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+                            <div className="min-w-0 flex-1">
+                                <h1 className="truncate text-3xl font-black tracking-tight text-slate-900 leading-[1.1] sm:text-4xl md:text-5xl uppercase">
+                                    {title}
+                                    {subtitle && (
+                                        <>
+                                            <br />
+                                            <span className="text-[#00599c] truncate block">{subtitle}</span>
+                                        </>
+                                    )}
+                                </h1>
+                                {description && (
+                                    <p className="mt-2 text-base font-medium text-[#00599c]/70 max-w-2xl">
+                                        {description}
+                                    </p>
+                                )}
+                            </div>
+                            {actions && <div className="flex shrink-0 items-center gap-4">{actions}</div>}
+                        </div>
                     </header>
                 )}
                 {children}

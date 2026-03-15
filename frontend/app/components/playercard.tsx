@@ -1,14 +1,6 @@
-export type PlayerCardProps = {
-  name: string;
-  sport: string;
-  position: string;
-  school: string;
-  gradYear: number | string;
-  avatarUrl?: string;
-  averages?: {ppg?: number; rpg?: number; apg?: number; spg?: number; bpg?: number};
-};
+import type { BasketballPlayer } from "../lib/athlete-service";
 
-function buildStatsLine(averages?: PlayerCardProps["averages"]): string {
+function buildStatsLine(averages?: BasketballPlayer["averages"]): string {
   if (!averages) return "";
   const parts: string[] = [];
   if (averages.ppg != null) parts.push(`${averages.ppg} PPG`);
@@ -19,7 +11,7 @@ function buildStatsLine(averages?: PlayerCardProps["averages"]): string {
   return parts.slice(0, 3).join(" \u2022 ");
 }
 
-export default function PlayerCard({ name, sport, position, school, gradYear, avatarUrl, averages }: PlayerCardProps) {
+export default function PlayerCard({ name, sport, position, school, gradYear, avatarUrl, averages }: BasketballPlayer) {
   const statsText = buildStatsLine(averages);
 
   return (
