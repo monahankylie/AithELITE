@@ -1,6 +1,11 @@
 import {initializeApp, getApps, getApp} from "firebase/app";
 import {getAuth, type Auth} from "firebase/auth";
-import {getFirestore, type Firestore} from "firebase/firestore";
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  type Firestore,
+} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -18,6 +23,14 @@ const app = isClient
   ? getApps().length ? getApp() : initializeApp(firebaseConfig)
   : undefined;
 const auth = (isClient ? getAuth(app!) : null) as Auth;
-const db = (isClient ? getFirestore(app!) : null) as Firestore;
+
+// Initialize Firestore with local cache for persistence if on the client
+const db = (isClient
+  ? initializeFirestore(app!, {
+      localCache: persistentLocalCache({
+        tabManager: persistentMultipleTabManager(),
+      }),
+    })
+  : null) as Firestore;
 
 export {app, auth, db};

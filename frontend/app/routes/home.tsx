@@ -4,7 +4,7 @@ import {Link} from "react-router";
 import PlayerCard from "~/components/playercard";
 import PageLayout from "../components/page-layout";
 import { athleteService, type BasketballPlayer } from "../lib/athlete-service";
-import {auth} from "../../firebase-config";
+import {useAuth} from "../auth-context";
 
 export function meta({}: Route.MetaArgs) {
   return [{title: "Athelite | Smart Recruiting"}, {name: "description", content: "Smart recruiting for smarter teams."}];
