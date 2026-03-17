@@ -335,24 +335,41 @@ function buildStrengths(player: BasketballPlayerProfile): string[] {
 }
 
 function buildAutoSummary(player: BasketballPlayerProfile) {
-  const name = player.name;
-  const position = player.position || "prospect";
-  const school = player.school || "the listed program";
-  const ppg = player.averages?.ppg;
-  const apg = player.averages?.apg;
-  const rpg = player.averages?.rpg;
+  const { name, position, school, averages, physicalMetrics } = player;
+  const ppg = averages?.ppg ?? 0;
+  const apg = averages?.apg ?? 0;
+  const rpg = averages?.rpg ?? 0;
+  const spg = averages?.spg ?? 0;
+  const bpg = averages?.bpg ?? 0;
 
-  const scoringLine = ppg != null
-    ? `${name} is currently producing ${ppg.toFixed(1)} points per game`
-    : `${name} has an active Firebase athlete record`;
+  // 1. Contextual Intro
+  const posName = position || "prospect";
+  const intro = `${name} is a ${physicalMetrics?.height || ""} ${posName} competing for ${school || "the program"}, establishing a consistent presence on both ends of the floor.`;
 
-  const playmakingLine = apg != null && apg > 0
-    ? ` while adding ${apg.toFixed(1)} assists per game`
-    : "";
+  // 2. Performance Analysis
+  let analysis = "";
+  if (ppg >= 18) {
+    analysis = `As a primary scoring option averaging ${ppg.toFixed(1)} PPG, ${name} demonstrates high-level offensive instincts and the ability to carry a significant scoring load.`;
+  } else if (ppg >= 12) {
+    analysis = `Contributing a steady ${ppg.toFixed(1)} PPG, ${name} serves as a reliable offensive catalyst who finds ways to impact the scoreboard within the flow of the game.`;
+  } else {
+    analysis = `${name} currently contributes ${ppg.toFixed(1)} PPG, focusing on efficient role execution and supplementary scoring while the game matures.`;
+  }
 
-  const reboundingLine = rpg != null && rpg > 0
-    ? ` and ${rpg.toFixed(1)} rebounds per game`
-    : "";
+  // 3. Versatility / Secondary Impact
+  let secondary = "";
+  if (apg >= 4) {
+    secondary = ` Beyond scoring, the playmaking is evident with ${apg.toFixed(1)} APG, showcasing vision and unselfishness in transition and half-court sets.`;
+  } else if (rpg >= 8) {
+    secondary = ` Dominance on the glass is a standout trait, as ${rpg.toFixed(1)} RPG indicates a high motor and physical toughness in the paint.`;
+  } else if (spg + bpg >= 3) {
+    secondary = ` Defensively, ${name} is a disruptor, averaging a combined ${(spg + bpg).toFixed(1)} stocks (steals + blocks) per game, highlighting quick hands and rim protection.`;
+  } else {
+    secondary = ` The stat line is rounded out by ${rpg.toFixed(1)} rebounds and ${apg.toFixed(1)} assists, reflecting a balanced approach to the ${posName} position.`;
+  }
 
-  return `${scoringLine}${playmakingLine}${reboundingLine} for ${school}. This recruiter view expands the discover-card preview into a deeper ${position}-specific evaluation page using your stored Firebase athlete document, physical metrics, and basketball subcollection record.`;
+  // 4. Scouting Outlook
+  const outlook = ` Recruiters should monitor ${name}'s development closely, as the current production profile suggests a high ceiling for growth at the next level.`;
+
+  return `${intro} ${analysis}${secondary}${outlook}`;
 }
