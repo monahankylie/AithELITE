@@ -5,6 +5,7 @@ from utils.parsing_functions import traverse_paths
 import re
 
 class Team(BaseModel):
+    image_link : Optional[str] = None
     sport: str
     mascot: Optional[str] = None
     school_name: Optional[str] = None

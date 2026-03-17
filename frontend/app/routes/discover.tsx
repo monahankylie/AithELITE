@@ -7,6 +7,7 @@ import PageLayout from '../components/page-layout';
 import AthleteList from "../components/athlete-list";
 import { athleteService, type BasketballPlayer } from "../lib/athlete-service";
 import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
+import WatchlistPopup from '../components/watchlist-popup';
 
 const DiscoverPage = () => {
     const [players, setPlayers] = useState<BasketballPlayer[]>([]);
@@ -16,6 +17,7 @@ const DiscoverPage = () => {
     const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
     const [isSelectMode, setIsSelectMode] = useState(false);
     const [hasMore, setHasMore] = useState(true);
+    const [showWatchlistPopup, setShowWatchlistPopup] = useState(false);
 
     const togglePlayerSelection = useCallback((id: string) => {
         setSelectedIds(prev => {
@@ -49,10 +51,20 @@ const DiscoverPage = () => {
 
     const currentSport = players.length > 0 ? players[0].sport : "Basketball";
 
+    const handleWatchlistSuccess = () => {
+        setShowWatchlistPopup(false);
+        setSelectedIds(new Set());
+        setIsSelectMode(false);
+        // Maybe add a toast notification here later
+    };
+
     const headerActions = (
         <div className="flex items-center gap-4">
             {selectedIds.size > 0 && isSelectMode && (
-                <button className="rounded-2xl bg-[#00599c] px-8 py-4 text-xs font-black uppercase tracking-widest text-white shadow-2xl hover:bg-[#004a82] transition-all hover:scale-105 active:scale-95 whitespace-nowrap">
+                <button 
+                    onClick={() => setShowWatchlistPopup(true)}
+                    className="rounded-2xl bg-[#00599c] px-8 py-4 text-xs font-black uppercase tracking-widest text-white shadow-2xl hover:bg-[#004a82] transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
+                >
                     Add to Watchlist ({selectedIds.size})
                 </button>
             )}
@@ -104,6 +116,14 @@ const DiscoverPage = () => {
                     </div>
                 )}
             </div>
+
+            {showWatchlistPopup && (
+                <WatchlistPopup 
+                    playerIds={Array.from(selectedIds)}
+                    onClose={() => setShowWatchlistPopup(false)}
+                    onSuccess={handleWatchlistSuccess}
+                />
+            )}
         </PageLayout>
     );
 };
