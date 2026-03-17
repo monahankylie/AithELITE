@@ -129,7 +129,7 @@ export class BaseDashboardCard<T extends DashboardCardProps = DashboardCardProps
  * BASKETBALL DASHBOARD CARD
  */
 export type BasketballDashboardCardProps = DashboardCardProps & {
-  averages: {
+  averages?: {
     ppg: number;
     rpg: number;
     apg: number;
