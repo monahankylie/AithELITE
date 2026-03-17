@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { watchlistService, type UserList } from "../lib/watchlist-service";
 import { useAuth } from "../auth-context";
+import { useNotification } from "../notification-context";
 
 interface WatchlistPopupProps {
   playerIds: string[];
@@ -10,6 +11,7 @@ interface WatchlistPopupProps {
 
 const WatchlistPopup: React.FC<WatchlistPopupProps> = ({ playerIds, onClose, onSuccess }) => {
   const { user, profile } = useAuth();
+  const { showNotification } = useNotification();
   const [isCreating, setIsCreating] = useState(false);
   const [newListName, setNewListName] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -23,12 +25,16 @@ const WatchlistPopup: React.FC<WatchlistPopupProps> = ({ playerIds, onClose, onS
   const handleAddToList = async (listId: string) => {
     if (!user || processing) return;
     setProcessing(true);
+    // Find the name for the notification
+    const listName = lists.find(l => l.id === listId)?.name || "WATCHLIST";
+    const count = playerIds.length;
     try {
       await watchlistService.addPlayersToList(user.uid, listId, playerIds);
+      showNotification(`${count} PLAYER${count !== 1 ? 'S' : ''} ADDED TO ${listName.toUpperCase()}`, "success");
       onSuccess();
     } catch (error) {
       console.error("Failed to add players to list:", error);
-      alert("Error adding players to list");
+      showNotification("FAILED TO ADD", "error");
     } finally {
       setProcessing(false);
     }
@@ -37,12 +43,15 @@ const WatchlistPopup: React.FC<WatchlistPopupProps> = ({ playerIds, onClose, onS
   const handleCreateAndAdd = async () => {
     if (!user || !newListName.trim() || processing) return;
     setProcessing(true);
+    const targetName = newListName.trim();
+    const count = playerIds.length;
     try {
-      await watchlistService.createList(user.uid, newListName.trim(), playerIds);
+      await watchlistService.createList(user.uid, targetName, playerIds);
+      showNotification(`${count} PLAYER${count !== 1 ? 'S' : ''} ADDED TO ${targetName.toUpperCase()}`, "success");
       onSuccess();
     } catch (error) {
       console.error("Failed to create list:", error);
-      alert("Error creating list");
+      showNotification("FAILED TO CREATE LIST", "error");
     } finally {
       setProcessing(false);
     }

@@ -51,13 +51,14 @@ export type FetchResult = {
 
 class AthleteService {
   private cache: Map<string, BasketballPlayer[]> = new Map();
+  private playerCache: Map<string, BasketballPlayer> = new Map();
 
   private mapAthleteData(
     id: string,
     athleteData: DocumentData,
     recordData?: DocumentData
   ): BasketballPlayer {
-    return {
+    const player: BasketballPlayer = {
       id,
       name: `${athleteData.firstName ?? ""} ${athleteData.lastName ?? ""}`.trim(),
       sport: athleteData.sport ?? "Basketball",
@@ -70,6 +71,10 @@ class AthleteService {
       totals: recordData?.totals ?? undefined,
       source: athleteData.source ?? "firebase",
     };
+    
+    // Store in playerCache whenever we map data
+    this.playerCache.set(id, player);
+    return player;
   }
 
   async fetchBasketballPlayers(
@@ -117,6 +122,10 @@ class AthleteService {
   async fetchBasketballPlayerById(id: string): Promise<BasketballPlayerProfile> {
     if (!db) throw new Error("Firestore not initialized");
 
+    // Check individual player cache first
+    const cached = this.playerCache.get(id);
+    if (cached) return cached;
+
     const athleteRef = doc(db, "athletes", id);
     const athleteSnap = await getDoc(athleteRef);
 
@@ -139,7 +148,7 @@ class AthleteService {
   async fetchBasketballPlayersByIds(ids: string[]): Promise<BasketballPlayer[]> {
     if (!db || ids.length === 0) return [];
 
-    // Promise.all to fetch them in parallel
+    // Promise.all to fetch them in parallel, fetchBasketballPlayerById will handle caching
     const players = await Promise.all(
       ids.map(async (id) => {
         try {
