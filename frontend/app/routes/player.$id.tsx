@@ -47,13 +47,13 @@ export default function PlayerProfilePage() {
   const derived = useMemo(() => {
     if (!player) return null;
 
-    const ppg = player.averages?.ppg ?? 0;
-    const rpg = player.averages?.rpg ?? 0;
-    const apg = player.averages?.apg ?? 0;
-    const spg = player.averages?.spg ?? 0;
-    const bpg = player.averages?.bpg ?? 0;
-    const gp = player.totals?.gp ?? 0;
-    const pts = player.totals?.pts ?? 0;
+    const ppg = player.averages?.ppg ?? "N/A";
+    const rpg = player.averages?.rpg ?? "N/A";
+    const apg = player.averages?.apg ?? "N/A";
+    const spg = player.averages?.spg ?? "N/A";
+    const bpg = player.averages?.bpg ?? "N/A";
+    const gp = player.totals?.gp ?? "N/A";
+    const pts = player.totals?.pts ?? "N/A";
 
     const strengths = buildStrengths(player);
     const summary = buildAutoSummary(player);
@@ -73,7 +73,7 @@ export default function PlayerProfilePage() {
       { label: "Position", value: player.position || "—" },
       { label: "School", value: player.school || "—" },
       { label: "Grad Year", value: String(player.gradYear || "—") },
-      { label: "Height", value: player.physicalMetrics?.height || "—" },
+      { label: "Height", value: (!player.physicalMetrics?.height || player.physicalMetrics?.height === "0" || player.physicalMetrics?.height === 0) ? "—" : player.physicalMetrics.height },
       { label: "Weight", value: formatWeight(player.physicalMetrics?.weight) },
     ];
 
@@ -174,7 +174,7 @@ export default function PlayerProfilePage() {
               </div>
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <Metric value={player.physicalMetrics?.height || "—"} label="Height" />
+                <Metric value={(!player.physicalMetrics?.height || player.physicalMetrics?.height === "0" || player.physicalMetrics?.height === 0) ? "—" : player.physicalMetrics.height} label="Height" />
                 <Metric value={formatWeight(player.physicalMetrics?.weight)} label="Weight" />
                 <Metric value={formatNumber(player.averages?.ppg)} label="PPG" />
                 <Metric value={formatNumber(player.averages?.apg)} label="APG" />
@@ -306,11 +306,11 @@ function MiniMetric({ label, value }: { label: string; value: string }) {
 }
 
 function formatNumber(value?: number) {
-  return value != null ? value.toFixed(1) : "—";
+  return typeof value === "number" ? value.toFixed(1) : "N/A";
 }
 
 function formatWeight(value?: number | string) {
-  if (value == null || value === "") return "—";
+  if (value == null || value === "" || value === 0 || value === "0") return "—";
   return typeof value === "number" ? `${value} lbs` : String(value);
 }
 
