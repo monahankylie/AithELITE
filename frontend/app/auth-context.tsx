@@ -6,7 +6,7 @@
  */
 import React, {createContext, useContext, useEffect, useState} from "react";
 import {onAuthStateChanged, type User} from "firebase/auth";
-import {doc, getDoc} from "firebase/firestore";
+import {doc, onSnapshot} from "firebase/firestore";
 import {auth, db} from "../firebase-config";
 
 interface UserProfile {
@@ -15,6 +15,7 @@ interface UserProfile {
   email: string;
   organization?: string;
   role?: string;
+  watchlistIndex?: Record<string, { name: string; count: number }>;
 }
 
 interface AuthContextType {
@@ -37,35 +38,40 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+    let unsubscribeProfile: (() => void) | null = null;
+
+    const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
 
       if (firebaseUser) {
-        try {
-          const userRef = doc(db, "users", firebaseUser.uid);
-          const userSnap = await getDoc(userRef);
-
-          if (userSnap.exists()) {
-            setProfile(userSnap.data() as UserProfile);
+        const userRef = doc(db, "users", firebaseUser.uid);
+        
+        // Use onSnapshot for real-time updates and to avoid extra manual fetches
+        unsubscribeProfile = onSnapshot(userRef, (docSnap) => {
+          if (docSnap.exists()) {
+            setProfile(docSnap.data() as UserProfile);
           } else {
-            // Fallback if profile doesn't exist yet
             setProfile({
               firstName: firebaseUser.displayName?.split(" ")[0] || "User",
               lastName: firebaseUser.displayName?.split(" ").slice(1).join(" ") || "",
               email: firebaseUser.email || "",
             });
           }
-        } catch (error) {
-          console.error("Error fetching user profile:", error);
-          setProfile(null);
-        }
+          setLoading(false);
+        }, (error) => {
+          console.error("Error listening to user profile:", error);
+          setLoading(false);
+        });
       } else {
         setProfile(null);
+        setLoading(false);
       }
-
-      setLoading(false);
     });
-    return () => unsubscribe();
+
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeProfile) unsubscribeProfile();
+    };
   }, []);
 
   return <AuthContext.Provider value={{user, profile, loading}}>{children}</AuthContext.Provider>;
