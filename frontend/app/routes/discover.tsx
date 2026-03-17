@@ -32,7 +32,10 @@ const DiscoverPage = () => {
 
         try {
             const result = await athleteService.fetchBasketballPlayers(20, isLoadMore ? lastDoc : null);
-            setPlayers(prev => isLoadMore ? [...prev, ...result.players] : result.players);
+            // Filter out athletes without stats for the Discover page to maintain quality
+            const playersWithStats = result.players.filter(p => p.averages && p.averages.ppg != null);
+            
+            setPlayers(prev => isLoadMore ? [...prev, ...playersWithStats] : playersWithStats);
             setLastDoc(result.lastDoc);
             setHasMore(result.hasMore);
         } catch (error) {
