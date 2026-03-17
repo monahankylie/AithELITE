@@ -289,6 +289,7 @@ export default function PlayerProfilePage() {
       {showWatchlistPopup && player && (
         <WatchlistPopup 
           playerIds={[player.id]}
+          context="single"
           onClose={() => setShowWatchlistPopup(false)}
           onSuccess={() => {
             setShowWatchlistPopup(false);
