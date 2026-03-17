@@ -96,6 +96,7 @@ class BasketballRecord(Record):
         return not any(getattr(self, f, 0) for f in check_fields)
 
 class Player(BaseModel):
+    image_link : Optional[str] = None
     first_name: Optional[str] = Field(None,validation_alias=AliasChoices("firstName", "first_name"))
     last_name: Optional[str] = Field(None,validation_alias=AliasChoices("lastName", "last_name"))
     grad_class: int = Field(0, alias="class", validation_alias=AliasChoices("graduatingClass", "class","grad_class"))
