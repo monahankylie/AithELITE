@@ -152,17 +152,17 @@ export default class BasketballDashboardCard extends BaseDashboardCard<Basketbal
       `}>
         <div className="flex flex-col items-center px-5">
           <span className={`text-[0.65rem] font-black uppercase tracking-[0.2em] mb-1 ${checked ? "text-[#00599c]/60" : "text-[#00599c]/40"}`}>PPG</span>
-          <span className="font-black tabular-nums">{averages.ppg?.toFixed(1) ?? "0.0"}</span>
+          <span className="font-black tabular-nums">{typeof averages.ppg === "number" ? averages.ppg.toFixed(1) : "N/A"}</span>
         </div>
         <div className={`h-10 w-px ${checked ? "bg-[#00599c]/20" : "bg-[#00599c]/10"}`} />
         <div className="flex flex-col items-center px-5">
           <span className={`text-[0.65rem] font-black uppercase tracking-[0.2em] mb-1 ${checked ? "text-[#00599c]/60" : "text-[#00599c]/40"}`}>RPG</span>
-          <span className="font-black tabular-nums">{averages.rpg?.toFixed(1) ?? "0.0"}</span>
+          <span className="font-black tabular-nums">{typeof averages.rpg === "number" ? averages.rpg.toFixed(1) : "N/A"}</span>
         </div>
         <div className={`h-10 w-px ${checked ? "bg-[#00599c]/20" : "bg-[#00599c]/10"}`} />
         <div className="flex flex-col items-center px-5">
           <span className={`text-[0.65rem] font-black uppercase tracking-[0.2em] mb-1 ${checked ? "text-[#00599c]/60" : "text-[#00599c]/40"}`}>APG</span>
-          <span className="font-black tabular-nums">{averages.apg?.toFixed(1) ?? "0.0"}</span>
+          <span className="font-black tabular-nums">{typeof averages.apg === "number" ? averages.apg.toFixed(1) : "N/A"}</span>
         </div>
       </div>
     );
