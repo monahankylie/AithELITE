@@ -37,10 +37,9 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
       <div 
         className={`${bgColor} flex items-center gap-4 rounded-3xl px-8 py-5 text-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] transition-all duration-500 animate-in slide-in-from-bottom-8 fade-in pointer-events-auto`}
       >
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
-          {icon}
-        </div>
-        <p className="text-sm font-bold uppercase tracking-widest">{message}</p>
+        <p className="text-[12px] font-normal uppercase tracking-widest">{message}</p>
+        
+
         <button 
           onClick={onClose}
           className="ml-4 rounded-full p-1 hover:bg-white/20 transition-colors"
@@ -49,6 +48,8 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
+
+
       </div>
     </div>
   );

@@ -62,7 +62,7 @@ class WatchlistService {
   /**
    * Creates a new list in /users/{userId}/lists and updates the user profile index
    */
-  async createList(userId: string, name: string, playerIds: string[] = []): Promise<string> {
+  async createList(userId: string, name: string, playerIds: string[] = []): Promise<{ id: string; addedCount: number }> {
     if (!db) throw new Error("Firestore not initialized");
 
     const listsRef = collection(db, "users", userId, "lists");
@@ -83,13 +83,14 @@ class WatchlistService {
       }
     }, { merge: true });
 
-    return docRef.id;
+    return { id: docRef.id, addedCount: playerIds.length };
   }
 
   /**
    * Adds player IDs to an existing list and increments the count in the profile index
+   * Returns information about how many were added vs how many were already there
    */
-  async addPlayersToList(userId: string, listId: string, playerIds: string[]): Promise<void> {
+  async addPlayersToList(userId: string, listId: string, playerIds: string[]): Promise<{ addedCount: number; alreadyPresentCount: number }> {
     if (!db) throw new Error("Firestore not initialized");
 
     const listRef = doc(db, "users", userId, "lists", listId);
@@ -103,11 +104,12 @@ class WatchlistService {
 
     // 2. Determine which player IDs are actually new
     const newUniquePlayerIds = playerIds.filter(id => !existingPlayerIds.includes(id));
+    const alreadyPresentCount = playerIds.length - newUniquePlayerIds.length;
 
     if (newUniquePlayerIds.length === 0) {
       // No new unique players to add, so don't perform any writes
       console.log("No new unique players to add to list:", listId);
-      return; 
+      return { addedCount: 0, alreadyPresentCount }; 
     }
 
     // 3. Update the list document with only the new unique player IDs
@@ -120,6 +122,8 @@ class WatchlistService {
     await updateDoc(userRef, {
       [`watchlistIndex.${listId}.count`]: increment(newUniquePlayerIds.length)
     });
+
+    return { addedCount: newUniquePlayerIds.length, alreadyPresentCount };
   }
 
   /**
