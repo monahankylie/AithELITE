@@ -17,11 +17,26 @@ export type BasketballAverages = {
   apg: number;
   spg?: number;
   bpg?: number;
+  turnovers?: number;
+  turnovers_per_game?: number;
+  fg_pct?: number;
+  ft_pct?: number;
+  fg3_pct?: number;
+  off_rebounds_per_game?: number;
+  def_rebounds_per_game?: number;
+  [key: string]: number | undefined;
 };
 
 export type BasketballTotals = {
   gp?: number;
   pts?: number;
+  turnovers?: number;
+  fg_pct?: number;
+  ft_pct?: number;
+  fg3_pct?: number;
+  off_rebounds?: number;
+  def_rebounds?: number;
+  [key: string]: number | undefined;
 };
 
 export type BasketballPlayer = {

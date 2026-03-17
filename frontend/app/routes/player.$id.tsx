@@ -47,11 +47,11 @@ export default function PlayerProfilePage() {
   const derived = useMemo(() => {
     if (!player) return null;
 
-    const ppg = player.averages?.ppg ?? "N/A";
-    const rpg = player.averages?.rpg ?? "N/A";
-    const apg = player.averages?.apg ?? "N/A";
-    const spg = player.averages?.spg ?? "N/A";
-    const bpg = player.averages?.bpg ?? "N/A";
+    const ppg = player.averages?.ppg;
+    const rpg = player.averages?.rpg;
+    const apg = player.averages?.apg;
+    const spg = player.averages?.spg;
+    const bpg = player.averages?.bpg;
     const gp = player.totals?.gp ?? "N/A";
     const pts = player.totals?.pts ?? "N/A";
 
@@ -73,7 +73,7 @@ export default function PlayerProfilePage() {
       { label: "Position", value: player.position || "—" },
       { label: "School", value: player.school || "—" },
       { label: "Grad Year", value: String(player.gradYear || "—") },
-      { label: "Height", value: (!player.physicalMetrics?.height || player.physicalMetrics?.height === "0" || player.physicalMetrics?.height === 0) ? "—" : player.physicalMetrics.height },
+      { label: "Height", value: !player.physicalMetrics?.height || player.physicalMetrics?.height === "0" ? "—" : player.physicalMetrics.height },
       { label: "Weight", value: formatWeight(player.physicalMetrics?.weight) },
     ];
 
@@ -104,7 +104,7 @@ export default function PlayerProfilePage() {
               Profile unavailable
             </p>
             <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-              We couldn't open this player page.
+              We couldn&apos;t open this player page.
             </h1>
             <p className="mt-4 text-sm leading-7 text-slate-600">
               {error ?? "This athlete record does not exist in your Firebase collection."}
@@ -173,11 +173,27 @@ export default function PlayerProfilePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <Metric value={(!player.physicalMetrics?.height || player.physicalMetrics?.height === "0" || player.physicalMetrics?.height === 0) ? "—" : player.physicalMetrics.height} label="Height" />
-                <Metric value={formatWeight(player.physicalMetrics?.weight)} label="Weight" />
-                <Metric value={formatNumber(player.averages?.ppg)} label="PPG" />
-                <Metric value={formatNumber(player.averages?.apg)} label="APG" />
+              <div className="flex flex-col items-start gap-4 lg:items-end">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <Metric value={!player.physicalMetrics?.height || player.physicalMetrics?.height === "0" ? "—" : player.physicalMetrics.height} label="Height" />
+                  <Metric value={formatWeight(player.physicalMetrics?.weight)} label="Weight" />
+                  <Metric value={formatNumber(player.averages?.ppg)} label="PPG" />
+                  <Metric value={formatNumber(player.averages?.apg)} label="APG" />
+                </div>
+                <div className="flex flex-wrap gap-3 lg:justify-end">
+                  <Link
+                    to={`/players/${player.id}/stats`}
+                    className="inline-flex rounded-full border border-white/20 bg-white/10 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:-translate-y-0.5 hover:bg-white/15"
+                  >
+                    Stats Profile
+                  </Link>
+                  <Link
+                    to={`/players/${player.id}/games`}
+                    className="inline-flex rounded-full border border-white/20 bg-white/10 px-5 py-3 text-xs font-black uppercase tracking-[0.18em] text-white transition hover:-translate-y-0.5 hover:bg-white/15"
+                  >
+                    Games Profile
+                  </Link>
+                </div>
               </div>
             </div>
           </section>
@@ -207,7 +223,7 @@ export default function PlayerProfilePage() {
                   ))}
                 </div>
               </Panel>
-            {/* See buildStrengths() --> would be cool to swap with AI if time allows */}
+
               <Panel title="Recruiter Takeaways" eyebrow="Derived Insights">
                 <div className="space-y-3">
                   {derived.strengths.map((strength) => (
@@ -314,7 +330,6 @@ function formatWeight(value?: number | string) {
   return typeof value === "number" ? `${value} lbs` : String(value);
 }
 
-// temporary function to auto summary a strengths list. would be interesting to replace with AI for future iteration 
 function buildStrengths(player: BasketballPlayerProfile): string[] {
   const strengths: string[] = [];
   const { averages, totals, position } = player;
@@ -341,12 +356,9 @@ function buildAutoSummary(player: BasketballPlayerProfile) {
   const rpg = averages?.rpg ?? 0;
   const spg = averages?.spg ?? 0;
   const bpg = averages?.bpg ?? 0;
-
-  // 1. Contextual Intro
   const posName = position || "prospect";
   const intro = `${name} is a ${physicalMetrics?.height || ""} ${posName} competing for ${school || "the program"}, establishing a consistent presence on both ends of the floor.`;
 
-  // 2. Performance Analysis
   let analysis = "";
   if (ppg >= 18) {
     analysis = `As a primary scoring option averaging ${ppg.toFixed(1)} PPG, ${name} demonstrates high-level offensive instincts and the ability to carry a significant scoring load.`;
@@ -356,7 +368,6 @@ function buildAutoSummary(player: BasketballPlayerProfile) {
     analysis = `${name} currently contributes ${ppg.toFixed(1)} PPG, focusing on efficient role execution and supplementary scoring while the game matures.`;
   }
 
-  // 3. Versatility / Secondary Impact
   let secondary = "";
   if (apg >= 4) {
     secondary = ` Beyond scoring, the playmaking is evident with ${apg.toFixed(1)} APG, showcasing vision and unselfishness in transition and half-court sets.`;
@@ -368,7 +379,6 @@ function buildAutoSummary(player: BasketballPlayerProfile) {
     secondary = ` The stat line is rounded out by ${rpg.toFixed(1)} rebounds and ${apg.toFixed(1)} assists, reflecting a balanced approach to the ${posName} position.`;
   }
 
-  // 4. Scouting Outlook
   const outlook = ` Recruiters should monitor ${name}'s development closely, as the current production profile suggests a high ceiling for growth at the next level.`;
 
   return `${intro} ${analysis}${secondary}${outlook}`;

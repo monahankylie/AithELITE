@@ -9,4 +9,6 @@ export default [
   route("/watchlists", "routes/watchlists.tsx"), 
   route("/discover", "routes/discover.tsx"), 
   route("/players/:id", "routes/player.$id.tsx"),
+  route("/players/:id/stats", "routes/player.$id.stats.tsx"),
+  route("/players/:id/games", "routes/player.$id.games.tsx"),
 ] satisfies RouteConfig;
