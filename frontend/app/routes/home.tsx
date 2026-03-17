@@ -7,7 +7,7 @@ import { athleteService, type BasketballPlayer } from "../lib/athlete-service";
 import {useAuth} from "../auth-context";
 
 export function meta({}: Route.MetaArgs) {
-  return [{title: "Athelite | Smart Recruiting"}, {name: "description", content: "Smart recruiting for smarter teams."}];
+  return [{title: "Aithelite | Smarter Recruiting"}, {name: "description", content: "Smarter recruiting for smarter teams."}];
 }
 
 function FeaturedCarousel() {
@@ -87,7 +87,7 @@ export default function Home() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div className="relative z-10">
               <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-6xl">
-                Smart <br />
+                Smarter <br />
                 Recruiting, <br />
                 Smarter Teams
               </h1>
