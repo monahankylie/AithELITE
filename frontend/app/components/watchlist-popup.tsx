@@ -1,15 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { watchlistService, type UserList } from "../lib/watchlist-service";
 import { useAuth } from "../auth-context";
+import { useNotification } from "../notification-context";
 
 interface WatchlistPopupProps {
   playerIds: string[];
   onClose: () => void;
   onSuccess: () => void;
+  context?: 'single' | 'bulk'; // Add context to differentiate messaging
 }
 
-const WatchlistPopup: React.FC<WatchlistPopupProps> = ({ playerIds, onClose, onSuccess }) => {
+const WatchlistPopup: React.FC<WatchlistPopupProps> = ({ 
+  playerIds, 
+  onClose, 
+  onSuccess,
+  context = 'bulk' // Default to bulk if not specified
+}) => {
   const { user, profile } = useAuth();
+  const { showNotification } = useNotification();
   const [isCreating, setIsCreating] = useState(false);
   const [newListName, setNewListName] = useState("");
   const [processing, setProcessing] = useState(false);
@@ -23,12 +31,35 @@ const WatchlistPopup: React.FC<WatchlistPopupProps> = ({ playerIds, onClose, onS
   const handleAddToList = async (listId: string) => {
     if (!user || processing) return;
     setProcessing(true);
+    // Find the name for the notification
+    const listName = lists.find(l => l.id === listId)?.name || "WATCHLIST";
+    
     try {
-      await watchlistService.addPlayersToList(user.uid, listId, playerIds);
+      const { addedCount, alreadyPresentCount } = await watchlistService.addPlayersToList(user.uid, listId, playerIds);
+      
+      if (context === 'single') {
+        if (addedCount > 0) {
+          showNotification(`Player added to ${listName}`, "success");
+        } else {
+          showNotification(`Player already part of ${listName}`, "error");
+        }
+      } else {
+        // Bulk context
+        if (addedCount > 0) {
+          let msg = `${addedCount} player${addedCount !== 1 ? 's' : ''} added to ${listName}`;
+          if (alreadyPresentCount > 0) {
+            msg += `. ${alreadyPresentCount} player${alreadyPresentCount !== 1 ? 's' : ''} already in list.`;
+          }
+          showNotification(msg, "success");
+        } else {
+          showNotification(`All players already in ${listName}`, "error");
+        }
+      }
+      
       onSuccess();
     } catch (error) {
       console.error("Failed to add players to list:", error);
-      alert("Error adding players to list");
+      showNotification("Failed to add player(s)", "error");
     } finally {
       setProcessing(false);
     }
@@ -37,12 +68,20 @@ const WatchlistPopup: React.FC<WatchlistPopupProps> = ({ playerIds, onClose, onS
   const handleCreateAndAdd = async () => {
     if (!user || !newListName.trim() || processing) return;
     setProcessing(true);
+    const targetName = newListName.trim();
     try {
-      await watchlistService.createList(user.uid, newListName.trim(), playerIds);
+      const { addedCount } = await watchlistService.createList(user.uid, targetName, playerIds);
+      
+      if (context === 'single') {
+        showNotification(`Player added to ${targetName}`, "success");
+      } else {
+        showNotification(`${addedCount} player${addedCount !== 1 ? 's' : ''} added to ${targetName}`, "success");
+      }
+      
       onSuccess();
     } catch (error) {
       console.error("Failed to create list:", error);
-      alert("Error creating list");
+      showNotification("Failed to create list", "error");
     } finally {
       setProcessing(false);
     }

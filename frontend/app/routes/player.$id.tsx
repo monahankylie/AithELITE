@@ -5,12 +5,16 @@ import {
   athleteService,
   type BasketballPlayerProfile,
 } from "../lib/athlete-service";
+import { athleteFormatter } from "../lib/athlete-formatter";
+import WatchlistPopup from "../components/watchlist-popup";
 
 export default function PlayerProfilePage() {
   const { id } = useParams();
   const [player, setPlayer] = useState<BasketballPlayerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showWatchlistPopup, setShowWatchlistPopup] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -29,7 +33,7 @@ export default function PlayerProfilePage() {
         if (!isMounted) return;
         setPlayer(result);
       } catch (err) {
-        console.error("Failed to load athlete profile:", err);
+        console.error("Failed to load athlete profile:", id, err);
         if (!isMounted) return;
         setError("We couldn't load this athlete profile from Firebase.");
       } finally {
@@ -47,34 +51,34 @@ export default function PlayerProfilePage() {
   const derived = useMemo(() => {
     if (!player) return null;
 
-    const ppg = player.averages?.ppg ?? "N/A";
-    const rpg = player.averages?.rpg ?? "N/A";
-    const apg = player.averages?.apg ?? "N/A";
-    const spg = player.averages?.spg ?? "N/A";
-    const bpg = player.averages?.bpg ?? "N/A";
-    const gp = player.totals?.gp ?? "N/A";
-    const pts = player.totals?.pts ?? "N/A";
+    const ppg = player.averages?.ppg;
+    const rpg = player.averages?.rpg;
+    const apg = player.averages?.apg;
+    const spg = player.averages?.spg;
+    const bpg = player.averages?.bpg;
+    const gp = player.totals?.gp;
+    const pts = player.totals?.pts;
 
     const strengths = buildStrengths(player);
     const summary = buildAutoSummary(player);
     const statCards = [
-      { label: "PPG", value: formatNumber(ppg) },
-      { label: "RPG", value: formatNumber(rpg) },
-      { label: "APG", value: formatNumber(apg) },
-      { label: "STL", value: formatNumber(spg) },
-      { label: "BLK", value: formatNumber(bpg) },
-      { label: "GP", value: gp ? String(gp) : "—" },
-      { label: "PTS", value: pts ? String(pts) : "—" },
-      { label: "CLASS", value: String(player.gradYear || "—") },
+      { label: "PPG", value: athleteFormatter.formatStat(ppg) },
+      { label: "RPG", value: athleteFormatter.formatStat(rpg) },
+      { label: "APG", value: athleteFormatter.formatStat(apg) },
+      { label: "STL", value: athleteFormatter.formatStat(spg) },
+      { label: "BLK", value: athleteFormatter.formatStat(bpg) },
+      { label: "GP", value: gp != null ? String(gp) : "—" },
+      { label: "PTS", value: pts != null ? String(pts) : "—" },
+      { label: "CLASS", value: athleteFormatter.formatGradYear(player.gradYear) },
     ];
 
     const profileDetails = [
       { label: "Sport", value: player.sport || "Basketball" },
       { label: "Position", value: player.position || "—" },
       { label: "School", value: player.school || "—" },
-      { label: "Grad Year", value: String(player.gradYear || "—") },
-      { label: "Height", value: (!player.physicalMetrics?.height || player.physicalMetrics?.height === "0" || player.physicalMetrics?.height === 0) ? "—" : player.physicalMetrics.height },
-      { label: "Weight", value: formatWeight(player.physicalMetrics?.weight) },
+      { label: "Grad Year", value: athleteFormatter.formatGradYear(player.gradYear) },
+      { label: "Height", value: athleteFormatter.formatHeight(player.physicalMetrics?.height) },
+      { label: "Weight", value: athleteFormatter.formatWeight(player.physicalMetrics?.weight) },
     ];
 
     return { strengths, summary, statCards, profileDetails };
@@ -139,6 +143,43 @@ export default function PlayerProfilePage() {
               <div className="absolute bottom-0 left-0 h-56 w-56 rounded-full bg-blue-500 blur-3xl" />
             </div>
 
+            {/* Actions Menu */}
+            <div className="absolute right-6 top-6 z-20">
+              <div className="relative">
+                <button
+                  onClick={() => setShowMenu(!showMenu)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-all hover:bg-white/20 active:scale-90"
+                >
+                  <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                  </svg>
+                </button>
+
+                {showMenu && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-10" 
+                      onClick={() => setShowMenu(false)} 
+                    />
+                    <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-2xl bg-white p-2 shadow-2xl ring-1 ring-black/5 z-20 animate-in fade-in zoom-in duration-200">
+                      <button
+                        onClick={() => {
+                          setShowMenu(false);
+                          setShowWatchlistPopup(true);
+                        }}
+                        className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-bold text-slate-900 transition-colors hover:bg-slate-50"
+                      >
+                        <svg className="h-5 w-5 text-[#00599c]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Add to Watchlist
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
             <div className="relative flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
               <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
                 <div className="relative">
@@ -167,17 +208,17 @@ export default function PlayerProfilePage() {
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     <Tag>{player.position || "Position TBD"}</Tag>
-                    <Tag>Class of {player.gradYear || "—"}</Tag>
-                    <Tag>{player.physicalMetrics?.height || "Height unavailable"}</Tag>
+                    <Tag>Class of {athleteFormatter.formatGradYear(player.gradYear)}</Tag>
+                    <Tag>{athleteFormatter.formatHeight(player.physicalMetrics?.height)}</Tag>
                   </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <Metric value={(!player.physicalMetrics?.height || player.physicalMetrics?.height === "0" || player.physicalMetrics?.height === 0) ? "—" : player.physicalMetrics.height} label="Height" />
-                <Metric value={formatWeight(player.physicalMetrics?.weight)} label="Weight" />
-                <Metric value={formatNumber(player.averages?.ppg)} label="PPG" />
-                <Metric value={formatNumber(player.averages?.apg)} label="APG" />
+                <Metric value={athleteFormatter.formatHeight(player.physicalMetrics?.height)} label="Height" />
+                <Metric value={athleteFormatter.formatWeight(player.physicalMetrics?.weight)} label="Weight" />
+                <Metric value={athleteFormatter.formatStat(player.averages?.ppg)} label="PPG" />
+                <Metric value={athleteFormatter.formatStat(player.averages?.apg)} label="APG" />
               </div>
             </div>
           </section>
@@ -236,14 +277,25 @@ export default function PlayerProfilePage() {
                 <div className="grid grid-cols-2 gap-4">
                   <MiniMetric label="Games Played" value={player.totals?.gp ? String(player.totals.gp) : "—"} />
                   <MiniMetric label="Total Points" value={player.totals?.pts ? String(player.totals.pts) : "—"} />
-                  <MiniMetric label="Steals / Game" value={formatNumber(player.averages?.spg)} />
-                  <MiniMetric label="Blocks / Game" value={formatNumber(player.averages?.bpg)} />
+                  <MiniMetric label="Steals / Game" value={athleteFormatter.formatStat(player.averages?.spg)} />
+                  <MiniMetric label="Blocks / Game" value={athleteFormatter.formatStat(player.averages?.bpg)} />
                 </div>
               </Panel>
             </aside>
           </div>
         </div>
       </div>
+
+      {showWatchlistPopup && player && (
+        <WatchlistPopup 
+          playerIds={[player.id]}
+          context="single"
+          onClose={() => setShowWatchlistPopup(false)}
+          onSuccess={() => {
+            setShowWatchlistPopup(false);
+          }}
+        />
+      )}
     </PageLayout>
   );
 }
@@ -303,15 +355,6 @@ function MiniMetric({ label, value }: { label: string; value: string }) {
       <div className="mt-2 text-xl font-black tracking-tight text-slate-950">{value}</div>
     </div>
   );
-}
-
-function formatNumber(value?: number) {
-  return typeof value === "number" ? value.toFixed(1) : "N/A";
-}
-
-function formatWeight(value?: number | string) {
-  if (value == null || value === "" || value === 0 || value === "0") return "—";
-  return typeof value === "number" ? `${value} lbs` : String(value);
 }
 
 // temporary function to auto summary a strengths list. would be interesting to replace with AI for future iteration 
