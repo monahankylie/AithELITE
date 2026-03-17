@@ -1,43 +1,15 @@
-import {useEffect, useState} from "react";
-import type {Route} from "./+types/home";
-import {Link} from "react-router";
+import type { Route } from "./+types/home";
+import { Link } from "react-router";
 import PlayerCard from "~/components/playercard";
 import PageLayout from "../components/page-layout";
-import { athleteService, type BasketballPlayer } from "../lib/athlete-service";
-import {useAuth} from "../auth-context";
+import { useAuth } from "../auth-context";
+import { FEATURED_ATHLETES } from "../lib/featured-athletes";
 
 export function meta({}: Route.MetaArgs) {
   return [{title: "Aithelite | Smarter Recruiting"}, {name: "description", content: "Smarter recruiting for smarter teams."}];
 }
 
 function FeaturedCarousel() {
-  const [players, setPlayers] = useState<BasketballPlayer[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchPlayers() {
-      // Use cache to avoid reads on navigation back to home
-      const cached = athleteService.getCache('featured');
-      if (cached) {
-          setPlayers(cached);
-          setLoading(false);
-          return;
-      }
-
-      try {
-        const { players: initialPlayers } = await athleteService.fetchBasketballPlayers(10);
-        setPlayers(initialPlayers);
-        athleteService.setCache('featured', initialPlayers);
-      } catch (err) {
-        console.error("Failed to load athletes:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchPlayers();
-  }, []);
-
   return (
     <section className="bg-white py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -50,28 +22,20 @@ function FeaturedCarousel() {
       </div>
 
       <div className="mt-10 w-full">
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-black/10 border-t-black" />
-          </div>
-        ) : players.length === 0 ? (
-          <p className="px-6 text-sm text-black/50 text-center">No athletes found.</p>
-        ) : (
-          <div
-            className="
-              flex w-full gap-6 overflow-x-auto pb-4 pt-6
-              px-4 sm:px-6
-              snap-x snap-mandatory scroll-smooth scroll-px-4
-              scrollbar-hide
-            "
-          >
-            {players.map((p) => (
-              <div key={p.id} className="snap-start">
-                <PlayerCard {...p} />
-              </div>
-            ))}
-          </div>
-        )}
+        <div
+          className="
+            flex w-full gap-6 overflow-x-auto pb-4 pt-6
+            px-4 sm:px-6
+            snap-x snap-mandatory scroll-smooth scroll-px-4
+            scrollbar-hide
+          "
+        >
+          {FEATURED_ATHLETES.map((p) => (
+            <div key={p.id} className="snap-start">
+              <PlayerCard {...p} />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

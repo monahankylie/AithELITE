@@ -91,7 +91,7 @@ const DashboardPage = () => {
                         <div className="px-4 sm:px-6 md:px-12 lg:px-24">
                             <div className="px-2">
                                 <h2 className="text-2xl font-black tracking-tight text-slate-800 uppercase">
-                                    My <span className="text-[#00599c]">{firstListName}</span>
+                                     <span className="text-[#00599c]">{firstListName}:</span>
                                 </h2>
                             </div>
                         </div>
@@ -119,7 +119,7 @@ const DashboardPage = () => {
                                         to={`/players/${p.id}`}
                                         className="snap-start block transition-transform hover:-translate-y-1"
                                     >
-                                        <PlayerCard {...p} />
+                                        <PlayerCard {...p} variant="flat" />
                                     </Link>
                                 ))}
                             </div>
