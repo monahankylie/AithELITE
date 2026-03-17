@@ -1,15 +1,19 @@
 import {
   collection,
   doc,
+  getDoc,
   getDocs,
   setDoc,
   updateDoc,
   arrayUnion,
+  arrayRemove, // Added arrayRemove
   query,
   where,
   serverTimestamp,
   addDoc,
   increment,
+  FieldValue, // Added FieldValue
+  deleteDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase-config";
 
@@ -35,6 +39,24 @@ class WatchlistService {
       name: d.data().name || "Untitled List",
       playerIds: d.data().playerIds || [],
     }));
+  }
+
+  /**
+   * Fetches a specific list by its ID
+   */
+  async fetchListById(userId: string, listId: string): Promise<UserList | null> {
+    if (!db) throw new Error("Firestore not initialized");
+
+    const listRef = doc(db, "users", userId, "lists", listId);
+    const snap = await getDoc(listRef);
+
+    if (!snap.exists()) return null;
+
+    return {
+      id: snap.id,
+      name: snap.data().name || "Untitled List",
+      playerIds: snap.data().playerIds || [],
+    };
   }
 
   /**
@@ -71,14 +93,101 @@ class WatchlistService {
     if (!db) throw new Error("Firestore not initialized");
 
     const listRef = doc(db, "users", userId, "lists", listId);
+    
+    // 1. Fetch the current list to get existing player IDs
+    const listSnap = await getDoc(listRef);
+    if (!listSnap.exists()) {
+      throw new Error(`Watchlist ${listId} not found.`);
+    }
+    const existingPlayerIds: string[] = listSnap.data().playerIds || [];
+
+    // 2. Determine which player IDs are actually new
+    const newUniquePlayerIds = playerIds.filter(id => !existingPlayerIds.includes(id));
+
+    if (newUniquePlayerIds.length === 0) {
+      // No new unique players to add, so don't perform any writes
+      console.log("No new unique players to add to list:", listId);
+      return; 
+    }
+
+    // 3. Update the list document with only the new unique player IDs
     await updateDoc(listRef, {
-      playerIds: arrayUnion(...playerIds),
+      playerIds: arrayUnion(...newUniquePlayerIds),
     });
 
-    // Update count in the user profile index
+    // 4. Update count in the user profile index by the number of truly new players
     const userRef = doc(db, "users", userId);
     await updateDoc(userRef, {
-      [`watchlistIndex.${listId}.count`]: increment(playerIds.length)
+      [`watchlistIndex.${listId}.count`]: increment(newUniquePlayerIds.length)
+    });
+  }
+
+  /**
+   * Removes player IDs from an existing list and decrements the count in the profile index
+   */
+  async removePlayersFromList(userId: string, listId: string, playerIds: string[]): Promise<void> {
+    if (!db) throw new Error("Firestore not initialized");
+
+    const listRef = doc(db, "users", userId, "lists", listId);
+    
+    // 1. Fetch the current list to get existing player IDs
+    const listSnap = await getDoc(listRef);
+    if (!listSnap.exists()) {
+      throw new Error(`Watchlist ${listId} not found.`);
+    }
+    const existingPlayerIds: string[] = listSnap.data().playerIds || [];
+
+    // 2. Determine which player IDs are actually in the list and should be removed
+    const playersToRemove = playerIds.filter(id => existingPlayerIds.includes(id));
+
+    if (playersToRemove.length === 0) {
+      console.log("No matching players to remove from list:", listId);
+      return;
+    }
+
+    // 3. Update the list document by removing the players
+    await updateDoc(listRef, {
+      playerIds: arrayRemove(...playersToRemove),
+    });
+
+    // 4. Update count in the user profile index by decrementing the number of removed players
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, {
+      [`watchlistIndex.${listId}.count`]: increment(-playersToRemove.length)
+    });
+  }
+
+  /**
+   * Renames a list and updates its name in the profile index
+   */
+  async renameList(userId: string, listId: string, newName: string): Promise<void> {
+    if (!db) throw new Error("Firestore not initialized");
+
+    const listRef = doc(db, "users", userId, "lists", listId);
+    await updateDoc(listRef, {
+      name: newName,
+    });
+
+    // Update name in the user profile index
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, {
+      [`watchlistIndex.${listId}.name`]: newName
+    });
+  }
+
+  /**
+   * Deletes a list and removes its entry from the profile index
+   */
+  async deleteList(userId: string, listId: string): Promise<void> {
+    if (!db) throw new Error("Firestore not initialized");
+
+    const listRef = doc(db, "users", userId, "lists", listId);
+    await deleteDoc(listRef); // Assuming deleteDoc is also imported or available
+
+    // Remove entry from the user profile index
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, {
+      [`watchlistIndex.${listId}`]: FieldValue.delete()
     });
   }
 }
