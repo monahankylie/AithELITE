@@ -136,6 +136,24 @@ class AthleteService {
     );
   }
 
+  async fetchBasketballPlayersByIds(ids: string[]): Promise<BasketballPlayer[]> {
+    if (!db || ids.length === 0) return [];
+
+    // Promise.all to fetch them in parallel
+    const players = await Promise.all(
+      ids.map(async (id) => {
+        try {
+          return await this.fetchBasketballPlayerById(id);
+        } catch (error) {
+          console.error(`Failed to fetch player ${id}:`, error);
+          return null;
+        }
+      })
+    );
+
+    return players.filter((p): p is BasketballPlayer => p !== null);
+  }
+
   setCache(key: string, players: BasketballPlayer[]) {
     this.cache.set(key, players);
   }
