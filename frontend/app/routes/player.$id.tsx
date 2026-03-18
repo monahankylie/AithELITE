@@ -1,15 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router";
+import {useEffect, useMemo, useState} from "react";
+import {Link, useParams} from "react-router";
 import PageLayout from "../components/page-layout";
-import {
-  athleteService,
-  type BasketballPlayerProfile,
-} from "../lib/athlete-service";
-import { athleteFormatter } from "../lib/athlete-formatter";
+import {athleteService, type BasketballPlayerProfile} from "../lib/athlete-service";
+import {athleteFormatter} from "../lib/athlete-formatter";
 import WatchlistPopup from "../components/watchlist-popup";
 
 export default function PlayerProfilePage() {
-  const { id } = useParams();
+  const {id} = useParams();
   const [player, setPlayer] = useState<BasketballPlayerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -62,39 +59,37 @@ export default function PlayerProfilePage() {
     const strengths = buildStrengths(player);
     const summary = buildAutoSummary(player);
     const statCards = [
-      { label: "PPG", value: athleteFormatter.formatStat(ppg) },
-      { label: "RPG", value: athleteFormatter.formatStat(rpg) },
-      { label: "APG", value: athleteFormatter.formatStat(apg) },
-      { label: "STL", value: athleteFormatter.formatStat(spg) },
-      { label: "BLK", value: athleteFormatter.formatStat(bpg) },
-      { label: "GP", value: gp != null ? String(gp) : "—" },
-      { label: "PTS", value: pts != null ? String(pts) : "—" },
-      { label: "CLASS", value: athleteFormatter.formatGradYear(player.gradYear) },
+      {label: "PPG", value: athleteFormatter.formatStat(ppg)},
+      {label: "RPG", value: athleteFormatter.formatStat(rpg)},
+      {label: "APG", value: athleteFormatter.formatStat(apg)},
+      {label: "STL", value: athleteFormatter.formatStat(spg)},
+      {label: "BLK", value: athleteFormatter.formatStat(bpg)},
+      {label: "GP", value: gp != null ? String(gp) : "—"},
+      {label: "PTS", value: pts != null ? String(pts) : "—"},
+      {label: "CLASS", value: athleteFormatter.formatGradYear(player.gradYear)},
     ];
 
     const profileDetails = [
-      { label: "Sport", value: player.sport || "Basketball" },
-      { label: "Position", value: player.position || "—" },
-      { label: "School", value: player.school || "—" },
-      { label: "Mascot", value: player.mascot || "—" },
-      { label: "State", value: player.state ? player.state.toUpperCase() : "—" },
-      { label: "Grad Year", value: athleteFormatter.formatGradYear(player.gradYear) },
-      { label: "Height", value: athleteFormatter.formatHeight(player.physicalMetrics?.height) },
-      { label: "Weight", value: athleteFormatter.formatWeight(player.physicalMetrics?.weight) },
+      {label: "Sport", value: player.sport || "Basketball"},
+      {label: "Position", value: player.position || "—"},
+      {label: "School", value: player.school || "—"},
+      {label: "Mascot", value: player.mascot || "—"},
+      {label: "State", value: player.state ? player.state.toUpperCase() : "—"},
+      {label: "Grad Year", value: athleteFormatter.formatGradYear(player.gradYear)},
+      {label: "Height", value: athleteFormatter.formatHeight(player.physicalMetrics?.height)},
+      {label: "Weight", value: athleteFormatter.formatWeight(player.physicalMetrics?.weight)},
     ];
 
-    return { strengths, summary, statCards, profileDetails };
+    return {strengths, summary, statCards, profileDetails};
   }, [player]);
 
   if (loading) {
     return (
-      <PageLayout>
+      <PageLayout requireAuth>
         <div className="mx-auto flex min-h-[70vh] max-w-7xl items-center justify-center px-6 py-16">
           <div className="flex flex-col items-center gap-4">
             <div className="h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-[#00599c]" />
-            <p className="text-sm font-black uppercase tracking-[0.22em] text-[#00599c]/50">
-              Loading athlete profile
-            </p>
+            <p className="text-sm font-black uppercase tracking-[0.22em] text-[#00599c]/50">Loading athlete profile</p>
           </div>
         </div>
       </PageLayout>
@@ -103,15 +98,11 @@ export default function PlayerProfilePage() {
 
   if (error || !player || !derived) {
     return (
-      <PageLayout>
+      <PageLayout requireAuth>
         <div className="mx-auto max-w-3xl px-6 py-20">
           <div className="rounded-[28px] border border-red-200 bg-white p-8 shadow-sm">
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-red-500">
-              Profile unavailable
-            </p>
-            <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-              We couldn&apos;t open this player page.
-            </h1>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-red-500">Profile unavailable</p>
+            <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950">We couldn&apos;t open this player page.</h1>
             <p className="mt-4 text-sm leading-7 text-slate-600">
               {error ?? "This athlete record does not exist in your Firebase collection."}
             </p>
@@ -128,7 +119,7 @@ export default function PlayerProfilePage() {
   }
 
   return (
-    <PageLayout>
+    <PageLayout requireAuth>
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-5 flex items-center gap-3 text-sm font-semibold text-slate-500">
           <Link to="/discover" className="transition hover:text-[#00599c]">
@@ -159,10 +150,7 @@ export default function PlayerProfilePage() {
 
                 {showMenu && (
                   <>
-                    <div 
-                      className="fixed inset-0 z-10" 
-                      onClick={() => setShowMenu(false)} 
-                    />
+                    <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
                     <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-2xl bg-white p-2 shadow-2xl ring-1 ring-black/5 z-20 animate-in fade-in zoom-in duration-200">
                       <button
                         onClick={() => {
@@ -202,11 +190,11 @@ export default function PlayerProfilePage() {
                   <div className="mb-3 inline-flex items-center rounded-full border border-white/15 bg-white/10 px-4 py-1 text-xs font-black uppercase tracking-[0.24em] text-white/85">
                     Prospect Profile
                   </div>
-                  <h1 className="text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
-                    {player.name}
-                  </h1>
+                  <h1 className="text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">{player.name}</h1>
                   <p className="mt-3 text-sm font-medium text-white/80 sm:text-base">
-                    {player.sport || "Basketball"} / {player.position || "Unlisted"} • {player.school}{player.mascot ? ` ${player.mascot}` : ""}{player.state ? ` (${player.state.toUpperCase()})` : ""}
+                    {player.sport || "Basketball"} / {player.position || "Unlisted"} • {player.school}
+                    {player.mascot ? ` ${player.mascot}` : ""}
+                    {player.state ? ` (${player.state.toUpperCase()})` : ""}
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     <Tag>{player.position || "Position TBD"}</Tag>
@@ -244,9 +232,7 @@ export default function PlayerProfilePage() {
           <div className="grid gap-6 bg-[#f7f9fc] p-6 sm:p-8 lg:grid-cols-[1.45fr_0.95fr] lg:p-10">
             <section className="space-y-6">
               <Panel title="Scouting Snapshot" eyebrow="Summary">
-                <p className="max-w-3xl text-sm leading-7 text-slate-600 sm:text-[15px]">
-                  {derived.summary}
-                </p>
+                <p className="max-w-3xl text-sm leading-7 text-slate-600 sm:text-[15px]">{derived.summary}</p>
               </Panel>
 
               <Panel title="Season Production" eyebrow="Performance">
@@ -256,12 +242,8 @@ export default function PlayerProfilePage() {
                       key={stat.label}
                       className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                     >
-                      <div className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">
-                        {stat.label}
-                      </div>
-                      <div className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-                        {stat.value}
-                      </div>
+                      <div className="text-xs font-black uppercase tracking-[0.22em] text-slate-400">{stat.label}</div>
+                      <div className="mt-3 text-3xl font-black tracking-tight text-slate-950">{stat.value}</div>
                     </div>
                   ))}
                 </div>
@@ -270,10 +252,7 @@ export default function PlayerProfilePage() {
               <Panel title="Recruiter Takeaways" eyebrow="Derived Insights">
                 <div className="space-y-3">
                   {derived.strengths.map((strength) => (
-                    <div
-                      key={strength}
-                      className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
-                    >
+                    <div key={strength} className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
                       <div className="mt-1 h-2.5 w-2.5 rounded-full bg-[#00599c]" />
                       <p className="text-sm leading-6 text-slate-700">{strength}</p>
                     </div>
@@ -305,7 +284,7 @@ export default function PlayerProfilePage() {
       </div>
 
       {showWatchlistPopup && player && (
-        <WatchlistPopup 
+        <WatchlistPopup
           playerIds={[player.id]}
           context="single"
           onClose={() => setShowWatchlistPopup(false)}
@@ -318,15 +297,7 @@ export default function PlayerProfilePage() {
   );
 }
 
-function Panel({
-  eyebrow,
-  title,
-  children,
-}: {
-  eyebrow: string;
-  title: string;
-  children: React.ReactNode;
-}) {
+function Panel({eyebrow, title, children}: {eyebrow: string; title: string; children: React.ReactNode}) {
   return (
     <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-[0_10px_30px_-18px_rgba(15,23,42,0.35)]">
       <div className="text-xs font-black uppercase tracking-[0.22em] text-[#00599c]">{eyebrow}</div>
@@ -336,18 +307,16 @@ function Panel({
   );
 }
 
-function Metric({ value, label }: { value: string; label: string }) {
+function Metric({value, label}: {value: string; label: string}) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-4 backdrop-blur-sm">
       <div className="text-2xl font-black tracking-tight text-white">{value}</div>
-      <div className="mt-1 text-[11px] font-black uppercase tracking-[0.18em] text-white/60">
-        {label}
-      </div>
+      <div className="mt-1 text-[11px] font-black uppercase tracking-[0.18em] text-white/60">{label}</div>
     </div>
   );
 }
 
-function Tag({ children }: { children: React.ReactNode }) {
+function Tag({children}: {children: React.ReactNode}) {
   return (
     <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold text-white/85 backdrop-blur-sm">
       {children}
@@ -355,7 +324,7 @@ function Tag({ children }: { children: React.ReactNode }) {
   );
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
+function InfoRow({label, value}: {label: string; value: string}) {
   return (
     <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-3 last:border-none last:pb-0">
       <span className="font-semibold text-slate-500">{label}</span>
@@ -364,21 +333,19 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function MiniMetric({ label, value }: { label: string; value: string }) {
+function MiniMetric({label, value}: {label: string; value: string}) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-      <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
-        {label}
-      </div>
+      <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">{label}</div>
       <div className="mt-2 text-xl font-black tracking-tight text-slate-950">{value}</div>
     </div>
   );
 }
 
-// temporary function to auto summary a strengths list. would be interesting to replace with AI for future iteration 
+// temporary function to auto summary a strengths list. would be interesting to replace with AI for future iteration
 function buildStrengths(player: BasketballPlayerProfile): string[] {
   const strengths: string[] = [];
-  const { averages, totals, position } = player;
+  const {averages, totals, position} = player;
 
   if ((averages?.ppg ?? 0) >= 20) strengths.push("High-volume scorer with proven point production.");
   if ((averages?.apg ?? 0) >= 5) strengths.push("Creates offense efficiently and shows strong playmaking value.");
@@ -398,7 +365,7 @@ function buildStrengths(player: BasketballPlayerProfile): string[] {
 function buildAutoSummary(player: BasketballPlayerProfile) {
   if (player.scoutingReport) return player.scoutingReport;
 
-  const { name, position, school, averages, physicalMetrics } = player;
+  const {name, position, school, averages, physicalMetrics} = player;
   const ppg = averages?.ppg ?? 0;
   const apg = averages?.apg ?? 0;
   const rpg = averages?.rpg ?? 0;

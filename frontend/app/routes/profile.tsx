@@ -72,7 +72,7 @@ export default function ProfilePage() {
   const initials = `${(profile?.firstName ?? "")[0] ?? ""}${(profile?.lastName ?? "")[0] ?? ""}`.toUpperCase() || "?";
 
   return (
-    <PageLayout>
+    <PageLayout requireAuth>
       <div className="mx-auto w-full max-w-3xl px-6 py-10 md:py-16">
         {/* Header */}
         <div className="flex items-center justify-between">
