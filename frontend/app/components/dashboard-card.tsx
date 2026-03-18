@@ -7,6 +7,8 @@ export type DashboardCardProps = {
   sport: string;
   position: string;
   school: string;
+  mascot?: string;
+  state?: string;
   gradYear: number | string;
   avatarUrl?: string;
   checked?: boolean;
@@ -54,6 +56,8 @@ export class BaseDashboardCard<T extends DashboardCardProps = DashboardCardProps
       name,
       sport,
       school,
+      mascot,
+      state,
       position,
       gradYear,
       avatarUrl,
@@ -61,6 +65,8 @@ export class BaseDashboardCard<T extends DashboardCardProps = DashboardCardProps
       selectable = false,
       onToggle,
     } = this.props;
+
+    const fullSchoolName = `${school}${mascot ? ` ${mascot}` : ""}${state ? ` (${state.toUpperCase()})` : ""}`;
 
     return (
       <div 
@@ -108,7 +114,7 @@ export class BaseDashboardCard<T extends DashboardCardProps = DashboardCardProps
             </p>
             <span className="text-[#00599c]/30">•</span>
             <p className="truncate text-[1.1rem] font-medium text-[#00599c]/60 uppercase">
-              {school}
+              {fullSchoolName}
             </p>
             <span className="text-[#00599c]/30">•</span>
             <p className="text-[1.1rem] font-bold text-[#00599c]/40 uppercase tracking-tight whitespace-nowrap">

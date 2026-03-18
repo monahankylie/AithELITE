@@ -5,6 +5,7 @@ import {
   athleteService,
   type BasketballPlayerProfile,
 } from "../lib/athlete-service";
+import { athleteFormatter } from "../lib/athlete-formatter";
 
 type DerivedProfile = {
   summary: string;
@@ -89,7 +90,7 @@ export default function PlayerStatsPage() {
         { label: "Position", value: player.position || "Unlisted" },
         { label: "School", value: player.school || "School unavailable" },
         { label: "Class", value: formatClassYear(player.gradYear) },
-        { label: "Height", value: formatHeight(player.physicalMetrics?.height) },
+        { label: "Height", value: athleteFormatter.formatHeight(player.physicalMetrics?.height) },
         { label: "Weight", value: formatWeight(player.physicalMetrics?.weight) },
       ],
       spotlightStats: [
@@ -525,6 +526,8 @@ function buildStrengths(player: BasketballPlayerProfile): string[] {
 }
 
 function buildAutoSummary(player: BasketballPlayerProfile) {
+  if (player.scoutingReport) return player.scoutingReport;
+
   const { name, position, school, averages, physicalMetrics } = player;
   const ppg = averages?.ppg ?? 0;
   const apg = averages?.apg ?? 0;

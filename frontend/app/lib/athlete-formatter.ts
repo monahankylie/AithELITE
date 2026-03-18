@@ -6,14 +6,32 @@
 export const athleteFormatter = {
   /**
    * Formats height string or number.
+   * If numeric (inches), converts to x'y" format.
    * Returns "—" for 0, "0'0"", or missing values.
    */
   formatHeight(height?: string | number): string {
     if (!height) return "—";
     
+    // If it's a number (inches), convert to x'y"
+    if (typeof height === "number") {
+      if (height === 0) return "—";
+      const feet = Math.floor(height / 12);
+      const inches = Math.round(height % 12);
+      return `${feet}'${inches}"`;
+    }
+
     const h = String(height).trim();
     if (h === "0" || h === "0'0\"" || h === "0\"") return "—";
     
+    // If it's a numeric string, try to parse it as inches
+    if (/^\d+(\.\d+)?$/.test(h)) {
+      const numHeight = parseFloat(h);
+      if (numHeight === 0) return "—";
+      const feet = Math.floor(numHeight / 12);
+      const inches = Math.round(numHeight % 12);
+      return `${feet}'${inches}"`;
+    }
+
     return h;
   },
 

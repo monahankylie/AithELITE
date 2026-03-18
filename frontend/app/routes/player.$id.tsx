@@ -76,6 +76,8 @@ export default function PlayerProfilePage() {
       { label: "Sport", value: player.sport || "Basketball" },
       { label: "Position", value: player.position || "—" },
       { label: "School", value: player.school || "—" },
+      { label: "Mascot", value: player.mascot || "—" },
+      { label: "State", value: player.state ? player.state.toUpperCase() : "—" },
       { label: "Grad Year", value: athleteFormatter.formatGradYear(player.gradYear) },
       { label: "Height", value: athleteFormatter.formatHeight(player.physicalMetrics?.height) },
       { label: "Weight", value: athleteFormatter.formatWeight(player.physicalMetrics?.weight) },
@@ -204,7 +206,7 @@ export default function PlayerProfilePage() {
                     {player.name}
                   </h1>
                   <p className="mt-3 text-sm font-medium text-white/80 sm:text-base">
-                    {player.sport || "Basketball"} / {player.position || "Unlisted"} • {player.school || "School unavailable"}
+                    {player.sport || "Basketball"} / {player.position || "Unlisted"} • {player.school}{player.mascot ? ` ${player.mascot}` : ""}{player.state ? ` (${player.state.toUpperCase()})` : ""}
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     <Tag>{player.position || "Position TBD"}</Tag>
@@ -394,6 +396,8 @@ function buildStrengths(player: BasketballPlayerProfile): string[] {
 }
 
 function buildAutoSummary(player: BasketballPlayerProfile) {
+  if (player.scoutingReport) return player.scoutingReport;
+
   const { name, position, school, averages, physicalMetrics } = player;
   const ppg = averages?.ppg ?? 0;
   const apg = averages?.apg ?? 0;
@@ -401,7 +405,8 @@ function buildAutoSummary(player: BasketballPlayerProfile) {
   const spg = averages?.spg ?? 0;
   const bpg = averages?.bpg ?? 0;
   const posName = position || "prospect";
-  const intro = `${name} is a ${physicalMetrics?.height || ""} ${posName} competing for ${school || "the program"}, establishing a consistent presence on both ends of the floor.`;
+  const heightStr = athleteFormatter.formatHeight(physicalMetrics?.height).replace("—", "");
+  const intro = `${name} is a ${heightStr ? heightStr + " " : ""}${posName} competing for ${school || "the program"}, establishing a consistent presence on both ends of the floor.`;
 
   let analysis = "";
   if (ppg >= 18) {
