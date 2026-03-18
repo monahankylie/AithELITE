@@ -51,52 +51,52 @@ def merge_records(existing_records, new_records):
             
     return list(merged.values())
 
-def push_player_to_firestore(player: Player):
-    """Pipeline: Pydantic Obj -> Firestore (Auto-ID, Matched by MaxPreps ID)"""
+def push_player_to_firestore(player: Player, team: Team):
+    """Pipeline: Pydantic Obj -> Firestore (Stable ID, Matched by base_player_id)"""
     try:
-        mp_id = player.maxpreps_career_id
-        if not mp_id: return None
+        p_id = player.base_player_id
+        if not p_id: return None
 
-        # Query for existing player
-        query = db.collection("athletes").where("maxpreps_career_id", "==", mp_id).limit(1).get()
-        
         player_doc = player.model_dump(by_alias=True)
         
-        if query:
-            existing_ref = query[0].reference
-            existing_data = query[0].to_dict()
+        # Denormalize Team Info only inside each record (Historical Integrity)
+        if team:
+            for record in player_doc.get("records", []):
+                record["school_name"] = team.school_name
+                record["mascot"] = team.mascot
+                record["city"] = team.city
+                record["state"] = team.state
+                record["sport"] = team.sport
+                record["team_id"] = team.team_id
+
+        # Use stable base_player_id as Document ID
+        player_ref = db.collection("athletes").document(p_id)
+        existing = player_ref.get()
+        
+        if existing.exists:
+            existing_data = existing.to_dict()
             player_doc["records"] = merge_records(existing_data.get("records", []), player_doc.get("records", []))
-            existing_ref.set(player_doc, merge=True)
-            return existing_ref
-        else:
-            _, new_ref = db.collection("athletes").add(player_doc)
-            return new_ref
+            
+        player_ref.set(player_doc, merge=True)
+        return player_ref
     except Exception as e:
         print(f"[ERROR] Player push failed: {e}")
         return None
 
 def push_team_to_firestore(team: Team, player_ref):
-    """Pipeline: Team Obj -> Firestore (Auto-ID, Matched by MaxPreps Team ID)"""
+    """Pipeline: Team Obj -> Firestore (Stable ID, Matched by team_id)"""
     try:
-        mpt_id = team.maxpreps_team_id
-        
-        # 1. Lookup existing team
-        query = None
-        if mpt_id:
-            query = db.collection("teams").where("maxpreps_team_id", "==", mpt_id).limit(1).get()
+        t_id = team.team_id
+        if not t_id: return False
         
         team_doc = team.model_dump(by_alias=True)
-        team_doc.pop("team_id", None) # Clean up
         team_doc.pop("roster", None)
         
-        if query:
-            team_ref = query[0].reference
-            team_ref.set(team_doc, merge=True)
-        else:
-            # New Team: Create with Auto-ID
-            _, team_ref = db.collection("teams").add(team_doc)
+        # Use team_id as document ID to ensure aggregation
+        team_ref = db.collection("teams").document(t_id)
+        team_ref.set(team_doc, merge=True)
             
-        # 2. Update Roster
+        # Update Roster
         if player_ref:
             team_ref.update({"roster": firestore.ArrayUnion([player_ref])})
             
@@ -112,7 +112,7 @@ def process_file(filepath):
             blob = json.load(f)
         team_obj, player_obj = ATHLETE_PARSER.assemble_player(blob)
         if player_obj:
-            p_ref = push_player_to_firestore(player_obj)
+            p_ref = push_player_to_firestore(player_obj, team_obj)
             if p_ref and team_obj:
                 push_team_to_firestore(team_obj, p_ref)
             if p_ref:
@@ -125,7 +125,8 @@ def process_file(filepath):
 
 def push_all_pending():
     files = [f for f in os.listdir(PLAYER_STATS_DIR) if f.endswith(".json")]
-    print(f"[PUSH] Processing {len(files)} files...")
+    if files:
+        print(f"[PUSH] Processing {len(files)} files...")
     count = 0
     for f in files:
         if process_file(os.path.join(PLAYER_STATS_DIR, f)):
