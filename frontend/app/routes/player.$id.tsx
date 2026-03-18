@@ -56,7 +56,6 @@ export default function PlayerProfilePage() {
     const apg = player.averages?.apg;
     const spg = player.averages?.spg;
     const bpg = player.averages?.bpg;
-<<<<<<< HEAD
     const gp = player.totals?.gp;
     const pts = player.totals?.pts;
 
@@ -374,19 +373,7 @@ function MiniMetric({ label, value }: { label: string; value: string }) {
   );
 }
 
-<<<<<<< HEAD
-function formatNumber(value?: number) {
-  return typeof value === "number" ? value.toFixed(1) : "N/A";
-}
-
-function formatWeight(value?: number | string) {
-  if (value == null || value === "" || value === 0 || value === "0") return "—";
-  return typeof value === "number" ? `${value} lbs` : String(value);
-}
-
-=======
 // temporary function to auto summary a strengths list. would be interesting to replace with AI for future iteration 
->>>>>>> origin/main
 function buildStrengths(player: BasketballPlayerProfile): string[] {
   const strengths: string[] = [];
   const { averages, totals, position } = player;
