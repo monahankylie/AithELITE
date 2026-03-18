@@ -1,11 +1,11 @@
-import { Link, useParams } from "react-router";
+import {Link, useParams} from "react-router";
 import PageLayout from "../components/page-layout";
 
 export default function PlayerGamesPage() {
-  const { id } = useParams();
+  const {id} = useParams();
 
   return (
-    <PageLayout>
+    <PageLayout requireAuth>
       <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-5 flex items-center gap-3 text-sm font-semibold text-slate-500">
           <Link to="/discover" className="transition hover:text-[#00599c]">
@@ -30,12 +30,10 @@ export default function PlayerGamesPage() {
               <div className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-4 py-1 text-xs font-black uppercase tracking-[0.24em] text-white/85">
                 Games Profile
               </div>
-              <h1 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
-                Game-by-game view coming soon
-              </h1>
+              <h1 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">Game-by-game view coming soon</h1>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-white/80 sm:text-base">
-                This page is ready for a future game log, matchup breakdowns, and performance trends.
-                For now, you can keep using the stat-focused profile.
+                This page is ready for a future game log, matchup breakdowns, and performance trends. For now, you can keep using the
+                stat-focused profile.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link

@@ -1,7 +1,8 @@
 /**
  * PAGE LAYOUT COMPONENT
  */
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import Navbar from './navbar';
 import Footer from './footer';
 import { useAuth } from '../auth-context';
@@ -25,9 +26,16 @@ const PageLayout = ({
     variant = 'default',
     actions 
 }: PageLayoutProps) => {
-    const { loading } = useAuth();
+    const { user, loading } = useAuth();
+    const navigate = useNavigate();
 
-    if (loading) {
+    useEffect(() => {
+        if (!loading && requireAuth && !user) {
+            navigate('/login', { replace: true });
+        }
+    }, [loading, requireAuth, user, navigate]);
+
+    if (loading || (requireAuth && !user)) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="animate-pulse text-sm font-black uppercase tracking-widest text-[#00599c]/40">

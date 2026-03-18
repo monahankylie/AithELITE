@@ -1,24 +1,21 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router";
+import {useEffect, useMemo, useState} from "react";
+import {Link, useParams} from "react-router";
 import PageLayout from "../components/page-layout";
-import {
-  athleteService,
-  type BasketballPlayerProfile,
-} from "../lib/athlete-service";
-import { athleteFormatter } from "../lib/athlete-formatter";
+import {athleteService, type BasketballPlayerProfile} from "../lib/athlete-service";
+import {athleteFormatter} from "../lib/athlete-formatter";
 
 type DerivedProfile = {
   summary: string;
   strengths: string[];
-  profileDetails: Array<{ label: string; value: string }>;
-  spotlightStats: Array<{ label: string; value: string; accent: string }>;
-  productionStats: Array<{ label: string; value: string; context: string }>;
-  comparisonRows: Array<{ label: string; value: number | null; max: number }>;
-  metricStrip: Array<{ label: string; value: string }>;
+  profileDetails: Array<{label: string; value: string}>;
+  spotlightStats: Array<{label: string; value: string; accent: string}>;
+  productionStats: Array<{label: string; value: string; context: string}>;
+  comparisonRows: Array<{label: string; value: number | null; max: number}>;
+  metricStrip: Array<{label: string; value: string}>;
 };
 
 export default function PlayerStatsPage() {
-  const { id } = useParams();
+  const {id} = useParams();
   const [player, setPlayer] = useState<BasketballPlayerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -65,79 +62,67 @@ export default function PlayerStatsPage() {
     const bpg = player.averages?.bpg ?? null;
     const gp = player.totals?.gp ?? null;
     const pts = player.totals?.pts ?? null;
-    const turnovers = resolveMetricValue(player, [
-      "averages.turnovers",
-      "averages.turnovers_per_game",
-      "totals.turnovers",
-    ]);
+    const turnovers = resolveMetricValue(player, ["averages.turnovers", "averages.turnovers_per_game", "totals.turnovers"]);
     const fgPct = resolveMetricValue(player, ["averages.fg_pct", "totals.fg_pct"]);
     const ftPct = resolveMetricValue(player, ["averages.ft_pct", "totals.ft_pct"]);
     const fg3Pct = resolveMetricValue(player, ["averages.fg3_pct", "totals.fg3_pct"]);
-    const oreb = resolveMetricValue(player, [
-      "averages.off_rebounds_per_game",
-      "totals.off_rebounds",
-    ]);
-    const dreb = resolveMetricValue(player, [
-      "averages.def_rebounds_per_game",
-      "totals.def_rebounds",
-    ]);
+    const oreb = resolveMetricValue(player, ["averages.off_rebounds_per_game", "totals.off_rebounds"]);
+    const dreb = resolveMetricValue(player, ["averages.def_rebounds_per_game", "totals.def_rebounds"]);
 
     return {
       summary: buildAutoSummary(player),
       strengths: buildStrengths(player),
       profileDetails: [
-        { label: "Sport", value: player.sport || "Basketball" },
-        { label: "Position", value: player.position || "Unlisted" },
-        { label: "School", value: player.school || "School unavailable" },
-        { label: "Class", value: formatClassYear(player.gradYear) },
-        { label: "Height", value: athleteFormatter.formatHeight(player.physicalMetrics?.height) },
-        { label: "Weight", value: formatWeight(player.physicalMetrics?.weight) },
+        {label: "Sport", value: player.sport || "Basketball"},
+        {label: "Position", value: player.position || "Unlisted"},
+        {label: "School", value: player.school || "School unavailable"},
+        {label: "Class", value: formatClassYear(player.gradYear)},
+        {label: "Height", value: athleteFormatter.formatHeight(player.physicalMetrics?.height)},
+        {label: "Weight", value: formatWeight(player.physicalMetrics?.weight)},
       ],
       spotlightStats: [
-        { label: "PPG", value: formatStat(ppg), accent: "bg-[#00599c]" },
-        { label: "RPG", value: formatStat(rpg), accent: "bg-slate-900" },
-        { label: "APG", value: formatStat(apg), accent: "bg-[#4cb4ff]" },
-        { label: "Stocks", value: formatStat(sumStats(spg, bpg)), accent: "bg-emerald-500" },
+        {label: "PPG", value: formatStat(ppg), accent: "bg-[#00599c]"},
+        {label: "RPG", value: formatStat(rpg), accent: "bg-slate-900"},
+        {label: "APG", value: formatStat(apg), accent: "bg-[#4cb4ff]"},
+        {label: "Stocks", value: formatStat(sumStats(spg, bpg)), accent: "bg-emerald-500"},
       ],
       productionStats: [
-        { label: "Games Played", value: formatWholeNumber(gp), context: "sample size" },
-        { label: "Total Points", value: formatWholeNumber(pts), context: "season total" },
-        { label: "Steals / Game", value: formatStat(spg), context: "defensive activity" },
-        { label: "Blocks / Game", value: formatStat(bpg), context: "rim protection" },
+        {label: "Games Played", value: formatWholeNumber(gp), context: "sample size"},
+        {label: "Total Points", value: formatWholeNumber(pts), context: "season total"},
+        {label: "Steals / Game", value: formatStat(spg), context: "defensive activity"},
+        {label: "Blocks / Game", value: formatStat(bpg), context: "rim protection"},
       ],
       comparisonRows: [
-        { label: "Scoring Pressure", value: ppg, max: 30 },
-        { label: "Rebounding Impact", value: rpg, max: 15 },
-        { label: "Playmaking", value: apg, max: 10 },
-        { label: "Defensive Events", value: sumStats(spg, bpg), max: 6 },
+        {label: "Scoring Pressure", value: ppg, max: 30},
+        {label: "Rebounding Impact", value: rpg, max: 15},
+        {label: "Playmaking", value: apg, max: 10},
+        {label: "Defensive Events", value: sumStats(spg, bpg), max: 6},
       ],
       metricStrip: [
-        { label: "PPG", value: formatStat(ppg) },
-        { label: "RPG", value: formatStat(rpg) },
-        { label: "APG", value: formatStat(apg) },
-        { label: "STL", value: formatStat(spg) },
-        { label: "BLK", value: formatStat(bpg) },
-        { label: "Turnovers", value: formatStat(turnovers) },
-        { label: "FG %", value: formatPercent(fgPct) },
-        { label: "FT %", value: formatPercent(ftPct) },
-        { label: "3FG %", value: formatPercent(fg3Pct) },
-        { label: "Off Reb", value: formatStat(oreb) },
-        { label: "Def Reb", value: formatStat(dreb) },
-        { label: "Games Played", value: formatWholeNumber(gp) },
-        { label: "Total Points", value: formatWholeNumber(pts) },
+        {label: "PPG", value: formatStat(ppg)},
+        {label: "RPG", value: formatStat(rpg)},
+        {label: "APG", value: formatStat(apg)},
+        {label: "STL", value: formatStat(spg)},
+        {label: "BLK", value: formatStat(bpg)},
+        {label: "Turnovers", value: formatStat(turnovers)},
+        {label: "FG %", value: formatPercent(fgPct)},
+        {label: "FT %", value: formatPercent(ftPct)},
+        {label: "3FG %", value: formatPercent(fg3Pct)},
+        {label: "Off Reb", value: formatStat(oreb)},
+        {label: "Def Reb", value: formatStat(dreb)},
+        {label: "Games Played", value: formatWholeNumber(gp)},
+        {label: "Total Points", value: formatWholeNumber(pts)},
       ],
     };
   }, [player]);
 
   if (loading) {
     return (
-      <PageLayout>
+      <PageLayout requireAuth>
         <div className="mx-auto flex min-h-[70vh] max-w-7xl items-center justify-center px-6 py-16">
           <div className="flex flex-col items-center gap-4">
             <div className="h-12 w-12 animate-spin rounded-full border-4 border-slate-200 border-t-[#00599c]" />
-            <p className="text-sm font-black uppercase tracking-[0.22em] text-[#00599c]/50">
-              Loading athlete stats page
-            </p>
+            <p className="text-sm font-black uppercase tracking-[0.22em] text-[#00599c]/50">Loading athlete stats page</p>
           </div>
         </div>
       </PageLayout>
@@ -146,15 +131,11 @@ export default function PlayerStatsPage() {
 
   if (error || !player || !derived) {
     return (
-      <PageLayout>
+      <PageLayout requireAuth>
         <div className="mx-auto max-w-3xl px-6 py-20">
           <div className="rounded-[32px] border border-red-200 bg-white p-8 shadow-sm">
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-red-500">
-              Stats page unavailable
-            </p>
-            <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
-              We couldn&apos;t open this stat view.
-            </h1>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-red-500">Stats page unavailable</p>
+            <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950">We couldn&apos;t open this stat view.</h1>
             <p className="mt-4 text-sm leading-7 text-slate-600">
               {error ?? "This athlete record does not exist in your Firebase collection."}
             </p>
@@ -171,7 +152,7 @@ export default function PlayerStatsPage() {
   }
 
   return (
-    <PageLayout>
+    <PageLayout requireAuth>
       <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-5 flex items-center gap-3 text-sm font-semibold text-slate-500">
           <Link to="/discover" className="transition hover:text-[#00599c]">
@@ -212,9 +193,7 @@ export default function PlayerStatsPage() {
                   )}
 
                   <div className="min-w-0">
-                    <h1 className="text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
-                      {player.name}
-                    </h1>
+                    <h1 className="text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">{player.name}</h1>
                     <p className="mt-3 text-sm font-medium text-white/80 sm:text-base">
                       {player.school || "School unavailable"} · {player.sport || "Basketball"} ·{" "}
                       {player.position || "Position unlisted"}
@@ -227,24 +206,15 @@ export default function PlayerStatsPage() {
                   </div>
                 </div>
 
-                <p className="max-w-3xl text-sm leading-7 text-white/82 sm:text-[15px]">
-                  {derived.summary}
-                </p>
+                <p className="max-w-3xl text-sm leading-7 text-white/82 sm:text-[15px]">{derived.summary}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 {derived.spotlightStats.map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="rounded-[24px] border border-white/10 bg-white/10 p-4 backdrop-blur-sm"
-                  >
+                  <div key={stat.label} className="rounded-[24px] border border-white/10 bg-white/10 p-4 backdrop-blur-sm">
                     <div className={`h-1.5 w-10 rounded-full ${stat.accent}`} />
-                    <div className="mt-4 text-3xl font-black tracking-tight text-white">
-                      {stat.value}
-                    </div>
-                    <div className="mt-1 text-[11px] font-black uppercase tracking-[0.2em] text-white/60">
-                      {stat.label}
-                    </div>
+                    <div className="mt-4 text-3xl font-black tracking-tight text-white">{stat.value}</div>
+                    <div className="mt-1 text-[11px] font-black uppercase tracking-[0.2em] text-white/60">{stat.label}</div>
                   </div>
                 ))}
               </div>
@@ -254,12 +224,8 @@ export default function PlayerStatsPage() {
           <section className="border-t border-slate-200 bg-[#eef4fb] px-6 py-6 sm:px-8 lg:px-10">
             <div className="mb-4 flex items-center justify-between gap-4">
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00599c]">
-                  Metric Chart
-                </p>
-                <h2 className="mt-1 text-xl font-black tracking-tight text-slate-950">
-                  Scroll Through Full Stat Detail
-                </h2>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00599c]">Metric Chart</p>
+                <h2 className="mt-1 text-xl font-black tracking-tight text-slate-950">Scroll Through Full Stat Detail</h2>
               </div>
               <p className="hidden text-xs font-semibold uppercase tracking-[0.16em] text-slate-400 sm:block">
                 Swipe or scroll horizontally
@@ -280,12 +246,7 @@ export default function PlayerStatsPage() {
               <Panel eyebrow="Season Snapshot" title="Performance Breakdown">
                 <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                   {derived.productionStats.map((stat) => (
-                    <StatTile
-                      key={stat.label}
-                      label={stat.label}
-                      value={stat.value}
-                      context={stat.context}
-                    />
+                    <StatTile key={stat.label} label={stat.label} value={stat.value} context={stat.context} />
                   ))}
                 </div>
               </Panel>
@@ -293,12 +254,7 @@ export default function PlayerStatsPage() {
               <Panel eyebrow="Profile Lens" title="Production Profile">
                 <div className="space-y-5">
                   {derived.comparisonRows.map((row) => (
-                    <ProductionBar
-                      key={row.label}
-                      label={row.label}
-                      value={row.value}
-                      max={row.max}
-                    />
+                    <ProductionBar key={row.label} label={row.label} value={row.value} max={row.max} />
                   ))}
                 </div>
               </Panel>
@@ -343,15 +299,7 @@ export default function PlayerStatsPage() {
   );
 }
 
-function Panel({
-  eyebrow,
-  title,
-  children,
-}: {
-  eyebrow: string;
-  title: string;
-  children: React.ReactNode;
-}) {
+function Panel({eyebrow, title, children}: {eyebrow: string; title: string; children: React.ReactNode}) {
   return (
     <section className="rounded-[30px] border border-slate-200 bg-white p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.35)]">
       <div className="text-xs font-black uppercase tracking-[0.22em] text-[#00599c]">{eyebrow}</div>
@@ -361,7 +309,7 @@ function Panel({
   );
 }
 
-function Tag({ children }: { children: React.ReactNode }) {
+function Tag({children}: {children: React.ReactNode}) {
   return (
     <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold text-white/85 backdrop-blur-sm">
       {children}
@@ -369,50 +317,27 @@ function Tag({ children }: { children: React.ReactNode }) {
   );
 }
 
-function StatTile({
-  label,
-  value,
-  context,
-}: {
-  label: string;
-  value: string;
-  context: string;
-}) {
+function StatTile({label, value, context}: {label: string; value: string; context: string}) {
   return (
     <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-5">
       <div className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">{label}</div>
       <div className="mt-3 text-3xl font-black tracking-tight text-slate-950">{value}</div>
-      <div className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#00599c]/60">
-        {context}
-      </div>
+      <div className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#00599c]/60">{context}</div>
     </div>
   );
 }
 
-function ProductionBar({
-  label,
-  value,
-  max,
-}: {
-  label: string;
-  value: number | null;
-  max: number;
-}) {
+function ProductionBar({label, value, max}: {label: string; value: number | null; max: number}) {
   const width = value == null ? 0 : Math.min(100, Math.round((value / max) * 100));
 
   return (
     <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-5">
       <div className="flex items-center justify-between gap-4">
         <div className="text-sm font-black uppercase tracking-[0.16em] text-slate-700">{label}</div>
-        <div className="text-lg font-black tracking-tight text-slate-950">
-          {value == null ? "N/A" : value.toFixed(1)}
-        </div>
+        <div className="text-lg font-black tracking-tight text-slate-950">{value == null ? "N/A" : value.toFixed(1)}</div>
       </div>
       <div className="mt-4 h-3 overflow-hidden rounded-full bg-slate-200">
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-[#00599c] via-[#1d8be0] to-[#4cb4ff]"
-          style={{ width: `${width}%` }}
-        />
+        <div className="h-full rounded-full bg-gradient-to-r from-[#00599c] via-[#1d8be0] to-[#4cb4ff]" style={{width: `${width}%`}} />
       </div>
       <div className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
         Benchmarked against a {max.toFixed(0)}-point profile scale
@@ -421,7 +346,7 @@ function ProductionBar({
   );
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
+function InfoRow({label, value}: {label: string; value: string}) {
   return (
     <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-3 last:border-none last:pb-0">
       <span className="text-sm font-semibold text-slate-500">{label}</span>
@@ -430,15 +355,11 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function MetricChartCard({ label, value }: { label: string; value: string }) {
+function MetricChartCard({label, value}: {label: string; value: string}) {
   return (
     <div className="w-[160px] shrink-0 rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">
-        {label}
-      </div>
-      <div className="mt-6 text-3xl font-black tracking-tight text-slate-950">
-        {value}
-      </div>
+      <div className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">{label}</div>
+      <div className="mt-6 text-3xl font-black tracking-tight text-slate-950">{value}</div>
     </div>
   );
 }
@@ -496,7 +417,7 @@ function resolveMetricValue(player: BasketballPlayerProfile, paths: string[]) {
 
 function buildStrengths(player: BasketballPlayerProfile): string[] {
   const strengths: string[] = [];
-  const { averages, totals, position } = player;
+  const {averages, totals, position} = player;
 
   if ((averages?.ppg ?? 0) >= 20) {
     strengths.push("High-volume scorer with proven point production and primary-option upside.");
@@ -528,7 +449,7 @@ function buildStrengths(player: BasketballPlayerProfile): string[] {
 function buildAutoSummary(player: BasketballPlayerProfile) {
   if (player.scoutingReport) return player.scoutingReport;
 
-  const { name, position, school, averages, physicalMetrics } = player;
+  const {name, position, school, averages, physicalMetrics} = player;
   const ppg = averages?.ppg ?? 0;
   const apg = averages?.apg ?? 0;
   const rpg = averages?.rpg ?? 0;
