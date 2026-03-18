@@ -172,10 +172,16 @@ class Scraper_Task:
             
             full_url = self.site_url + url if not url.startswith('http') else url
             self.current_url = full_url
-            time.sleep(random.uniform(12, 20)) ##ADD PARAMETERS OR FUNCTION TO CHANGE INTERVALS
+            time.sleep(random.uniform(5, 10)) ##ADD PARAMETERS OR FUNCTION TO CHANGE INTERVALS
             self.current_html = self.get_html(full_url) 
             self.run_step(self.steps[next_step_idx])
-            self.current_html = anchor_html      
+            self.current_html = anchor_html     
+
+    def fork(self,step_config):
+        ##used after match usually, but will use current_url if current step does not incl match
+        ##parses each entry match
+        ##decides whether or not to overwrite list(defined in step_config)
+        pass 
     def store(self,step_config):
         step = self.which_step_am_i(step_config)
         store_config = step_config.get("store")
