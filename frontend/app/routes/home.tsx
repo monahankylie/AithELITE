@@ -81,16 +81,9 @@ export default function Home() {
               <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                 <Link
                   to={user ? "/home" : "/login"}
-                  className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-blue-700 shadow-md transition hover:bg-slate-100"
+                  className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-black shadow-md transition hover:bg-slate-100"
                 >
                   Get Started
-                </Link>
-
-                <Link
-                  to="/login"
-                  className="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10"
-                >
-                  View Discover
                 </Link>
               </div>
             </div>
