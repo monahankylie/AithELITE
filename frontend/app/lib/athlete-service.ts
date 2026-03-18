@@ -6,8 +6,10 @@ import {
   limit,
   query,
   startAfter,
+  where,
   QueryDocumentSnapshot,
   type DocumentData,
+  type QueryConstraint,
 } from "firebase/firestore";
 import { db } from "../../firebase-config";
 
@@ -90,6 +92,55 @@ export type BasketballPlayer = {
 
 export type BasketballPlayerProfile = BasketballPlayer;
 
+export type SortKey =
+  | "ppg" | "rpg" | "apg" | "spg" | "bpg"
+  | "fg_pct" | "fg3_pct" | "ft_pct"
+  | "gp" | "pts";
+
+export type AthleteFilters = {
+  search?: string;
+  position?: string;
+  gradYear?: string;
+  sortBy?: SortKey;
+};
+
+export function hasActiveFilters(f: AthleteFilters): boolean {
+  return !!(f.search || f.position || f.gradYear || f.sortBy);
+}
+
+export const SORT_OPTIONS: { value: SortKey; label: string; category: string }[] = [
+  { value: "ppg", label: "Points Per Game", category: "Scoring" },
+  { value: "pts", label: "Total Points", category: "Scoring" },
+  { value: "fg_pct", label: "Field Goal %", category: "Scoring" },
+  { value: "fg3_pct", label: "3-Point %", category: "Scoring" },
+  { value: "ft_pct", label: "Free Throw %", category: "Scoring" },
+  { value: "apg", label: "Assists Per Game", category: "Playmaking" },
+  { value: "rpg", label: "Rebounds Per Game", category: "Rebounding" },
+  { value: "spg", label: "Steals Per Game", category: "Defense" },
+  { value: "bpg", label: "Blocks Per Game", category: "Defense" },
+  { value: "gp", label: "Games Played", category: "General" },
+];
+
+function getStatValue(p: BasketballPlayer, key: SortKey): number {
+  const avg = p.averages;
+  const tot = p.totals;
+  switch (key) {
+    case "ppg": return avg?.ppg ?? 0;
+    case "rpg": return avg?.rpg ?? 0;
+    case "apg": return avg?.apg ?? 0;
+    case "spg": return avg?.spg ?? 0;
+    case "bpg": return avg?.bpg ?? 0;
+    case "fg_pct": return avg?.fg_pct ?? 0;
+    case "fg3_pct": return avg?.fg3_pct ?? 0;
+    case "ft_pct": return avg?.ft_pct ?? 0;
+    case "gp": return tot?.gp ?? 0;
+    case "pts": return tot?.pts ?? 0;
+    default: return 0;
+  }
+}
+
+export { getStatValue };
+
 export type FetchResult = {
   players: BasketballPlayer[];
   lastDoc: QueryDocumentSnapshot<DocumentData> | null;
@@ -162,7 +213,15 @@ class AthleteService {
         `Athlete ${id.slice(0, 5)}`
       ),
       sport: firstSeason?.sport || athleteData.sport || "Basketball",
-      position: athleteData.position || athleteData.primaryPosition || "Prospect",
+      position: (() => {
+        const records = athleteData.records || athleteData.seasons || [];
+        for (const rec of records) {
+            const pos = rec.positions || rec.position;
+            if (Array.isArray(pos) && pos.length > 0) return pos.join("/");
+            if (typeof pos === "string" && pos) return pos;
+        }
+        return athleteData.position || athleteData.primaryPosition || "—";
+      })(),
       school: firstSeason?.school_name || athleteData.school || athleteData.teamName || "Unlisted School",
       mascot: firstSeason?.mascot || athleteData.mascot || undefined,
       city: firstSeason?.city || athleteData.city || undefined,
@@ -209,6 +268,57 @@ class AthleteService {
       const data = athleteDoc.data();
       return this.mapAthleteData(athleteDoc.id, data);
     });
+
+    return {
+      players,
+      lastDoc: snap.docs[snap.docs.length - 1],
+      hasMore: snap.docs.length === pageSize,
+    };
+  }
+
+  async fetchFilteredPlayers(
+    filters: AthleteFilters,
+    pageSize: number = 200,
+    cursor: QueryDocumentSnapshot<DocumentData> | null = null
+  ): Promise<FetchResult> {
+    if (!db) throw new Error("Firestore not initialized");
+
+    const constraints: QueryConstraint[] = [];
+    if (cursor) constraints.push(startAfter(cursor));
+    constraints.push(limit(pageSize));
+
+    const q = query(collection(db, "athletes"), ...constraints);
+    const snap = await getDocs(q);
+
+    if (snap.empty) {
+      return { players: [], lastDoc: null, hasMore: false };
+    }
+
+    let players = snap.docs.map((d) => this.mapAthleteData(d.id, d.data()));
+
+    const searchLower = filters.search?.toLowerCase().trim();
+    if (searchLower) {
+      players = players.filter(
+        (p) =>
+          p.name.toLowerCase().includes(searchLower) ||
+          p.school.toLowerCase().includes(searchLower)
+      );
+    }
+
+    if (filters.position) {
+      const posLower = filters.position.toLowerCase();
+      players = players.filter((p) =>
+        p.position.toLowerCase().split("/").some((part) => part.trim() === posLower)
+      );
+    }
+
+    if (filters.gradYear) {
+      players = players.filter((p) => String(p.gradYear) === filters.gradYear);
+    }
+
+    if (filters.sortBy) {
+      players.sort((a, b) => getStatValue(b, filters.sortBy!) - getStatValue(a, filters.sortBy!));
+    }
 
     return {
       players,
