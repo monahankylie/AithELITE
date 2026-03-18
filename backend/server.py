@@ -6,7 +6,7 @@ from firebase_admin import credentials, firestore, auth
 import uvicorn  
 from fastapi import FastAPI, BackgroundTasks, HTTPException,Request
 from fastapi.middleware.cors import CORSMiddleware
-from specific_scripts import hardcodedparse_script
+from specific_scripts import hardcodedparse_script, push_athletes
 
 app = FastAPI()
 background_tasks = BackgroundTasks()
@@ -18,8 +18,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-cred = credentials.Certificate("fbACC.json")  
-firebase_admin.initialize_app(cred)
+# Initialize Firebase ONLY if not already initialized
+try:
+    firebase_admin.get_app()
+except ValueError:
+    cred = credentials.Certificate("fbACC.json")  
+    firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 @app.get("/scrape")
@@ -36,6 +40,13 @@ async def scrape(background_tasks: BackgroundTasks):
 async def parse(background_tasks: BackgroundTasks):
     hardcodedparse_script.test_parse()
     return {"it has started":"parse"}
+
+@app.get("/push")
+async def push(background_tasks: BackgroundTasks):
+    # This pushes all pending files in PlayerStats directly to Firestore
+    # We use background tasks so the client doesn't time out if there are many files
+    background_tasks.add_task(push_athletes.push_all_pending)
+    return {"status": "Push task added to queue"}
 
 @app.get("/test")
 def something():
