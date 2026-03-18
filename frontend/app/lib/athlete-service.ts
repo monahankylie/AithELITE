@@ -80,6 +80,12 @@ export type BasketballPlayer = {
   totals?: BasketballTotals;
   source?: string;
   seasons?: Season[];
+  scoutingReport?: string;
+  id247?: string;
+  mascot?: string;
+  city?: string;
+  state?: string;
+  teamId?: string;
 };
 
 export type BasketballPlayerProfile = BasketballPlayer;
@@ -155,9 +161,13 @@ class AthleteService {
         `${firstName} ${lastName}`.trim() || 
         `Athlete ${id.slice(0, 5)}`
       ),
-      sport: athleteData.sport ?? "Basketball",
+      sport: firstSeason?.sport || athleteData.sport || "Basketball",
       position: athleteData.position || athleteData.primaryPosition || "Prospect",
-      school: athleteData.school || athleteData.teamName || "Unlisted School",
+      school: firstSeason?.school_name || athleteData.school || athleteData.teamName || "Unlisted School",
+      mascot: firstSeason?.mascot || athleteData.mascot || undefined,
+      city: firstSeason?.city || athleteData.city || undefined,
+      state: firstSeason?.state || athleteData.state || undefined,
+      teamId: firstSeason?.team_id || athleteData.team_id || undefined,
       gradYear: athleteData.gradYear || athleteData.class || athleteData.graduatingClass || "—",
       averages,
       avatarUrl: athleteData.imageUrl || athleteData.image_link || athleteData.photoUrl || undefined,
@@ -168,6 +178,8 @@ class AthleteService {
       totals,
       source: athleteData.source ?? "firebase",
       seasons,
+      scoutingReport: athleteData.scouting_report || undefined,
+      id247: athleteData.id_247 || undefined,
     };
     
     console.debug(`[AthleteService] Final mapped player ${id}:`, player);
