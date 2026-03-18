@@ -39,6 +39,31 @@ export type BasketballTotals = {
   [key: string]: number | undefined;
 };
 
+export type Season = {
+  sport: string;
+  year: string;
+  team_level?: string;
+  class_year?: string;
+  // Stats
+  points_per_game?: number;
+  rebounds_per_game?: number;
+  assists_per_game?: number;
+  steals_per_game?: number;
+  blocks_per_game?: number;
+  turnovers_per_game?: number;
+  games_played?: number;
+  points?: number;
+  turnovers?: number;
+  fg_pct?: number;
+  ft_pct?: number;
+  fg3_pct?: number;
+  off_rebounds_per_game?: number;
+  def_rebounds_per_game?: number;
+  off_rebounds?: number;
+  def_rebounds?: number;
+  [key: string]: any;
+};
+
 export type BasketballPlayer = {
   id: string;
   name: string;
@@ -54,6 +79,7 @@ export type BasketballPlayer = {
   };
   totals?: BasketballTotals;
   source?: string;
+  seasons?: Season[];
 };
 
 export type BasketballPlayerProfile = BasketballPlayer;
@@ -70,23 +96,82 @@ class AthleteService {
 
   private mapAthleteData(
     id: string,
-    athleteData: DocumentData,
-    recordData?: DocumentData
+    athleteData: DocumentData
   ): BasketballPlayer {
+    console.debug(`[AthleteService] Mapping athlete ${id}. Document keys:`, Object.keys(athleteData));
+    
+    // Support variations in naming, including snake_case from disjoint backend
+    const rawSeasons = athleteData.seasons || athleteData.records || athleteData.stats?.seasons || [];
+    const seasons = (Array.isArray(rawSeasons) ? rawSeasons : []) as Season[];
+    const firstSeason = seasons.length > 0 ? seasons[0] : null;
+
+    if (!firstSeason) {
+      console.warn(`[AthleteService] No seasons/records found for athlete ${id}. Check Firestore.`, {
+        keys: Object.keys(athleteData)
+      });
+    } else {
+      console.debug(`[AthleteService] Using first season for display:`, firstSeason);
+    }
+
+    let averages: BasketballAverages | undefined = undefined;
+    let totals: BasketballTotals | undefined = undefined;
+
+    if (firstSeason) {
+      // Support both camelCase and snake_case for stats
+      averages = {
+        ppg: Number(firstSeason.points_per_game ?? firstSeason.ppg ?? firstSeason.PointsPerGame ?? 0),
+        rpg: Number(firstSeason.rebounds_per_game ?? firstSeason.rpg ?? firstSeason.ReboundsPerGame ?? 0),
+        apg: Number(firstSeason.assists_per_game ?? firstSeason.apg ?? firstSeason.AssistsPerGame ?? 0),
+        spg: firstSeason.steals_per_game ?? firstSeason.spg ?? firstSeason.StealsPerGame,
+        bpg: firstSeason.blocks_per_game ?? firstSeason.bpg ?? firstSeason.BlocksPerGame,
+        turnovers_per_game: firstSeason.turnovers_per_game ?? firstSeason.TurnoversPerGame,
+        fg_pct: firstSeason.fg_pct ?? firstSeason.FieldGoalPercentage,
+        ft_pct: firstSeason.ft_pct ?? firstSeason.FreeThrowPercentage,
+        fg3_pct: firstSeason.fg3_pct ?? firstSeason.ThreePointPercentage,
+        off_rebounds_per_game: firstSeason.off_rebounds_per_game ?? firstSeason.OffensiveReboundsPerGame,
+        def_rebounds_per_game: firstSeason.def_rebounds_per_game ?? firstSeason.DefensiveReboundsPerGame,
+      };
+
+      totals = {
+        gp: firstSeason.games_played ?? firstSeason.gp ?? firstSeason.GamesPlayed,
+        pts: firstSeason.points ?? firstSeason.pts ?? firstSeason.Points,
+        turnovers: firstSeason.turnovers ?? firstSeason.Turnovers,
+        fg_pct: firstSeason.fg_pct ?? firstSeason.FieldGoalPercentage,
+        ft_pct: firstSeason.ft_pct ?? firstSeason.FreeThrowPercentage,
+        fg3_pct: firstSeason.fg3_pct ?? firstSeason.ThreePointPercentage,
+        off_rebounds: firstSeason.off_rebounds ?? firstSeason.OffensiveRebounds,
+        def_rebounds: firstSeason.def_rebounds ?? firstSeason.DefensiveRebounds,
+      };
+    }
+
+    // Flexible mapping for top-level fields (snake_case fallbacks)
+    const firstName = athleteData.first_name || athleteData.firstName || "";
+    const lastName = athleteData.last_name || athleteData.lastName || "";
+    
     const player: BasketballPlayer = {
       id,
-      name: `${athleteData.firstName ?? ""} ${athleteData.lastName ?? ""}`.trim(),
+      name: (
+        athleteData.name || 
+        `${firstName} ${lastName}`.trim() || 
+        `Athlete ${id.slice(0, 5)}`
+      ),
       sport: athleteData.sport ?? "Basketball",
-      position: recordData?.position ?? "",
-      school: athleteData.school ?? "",
-      gradYear: athleteData.gradYear ?? "",
-      averages: recordData?.averages ?? undefined,
-      avatarUrl: athleteData.imageUrl || undefined,
-      physicalMetrics: athleteData.physicalMetrics ?? undefined,
-      totals: recordData?.totals ?? undefined,
+      position: athleteData.position || athleteData.primaryPosition || "Prospect",
+      school: athleteData.school || athleteData.teamName || "Unlisted School",
+      gradYear: athleteData.gradYear || athleteData.class || athleteData.graduatingClass || "—",
+      averages,
+      avatarUrl: athleteData.imageUrl || athleteData.image_link || athleteData.photoUrl || undefined,
+      physicalMetrics: {
+        height: athleteData.physicalMetrics?.height || athleteData.height || "—",
+        weight: athleteData.physicalMetrics?.weight || athleteData.weight || "—",
+      },
+      totals,
       source: athleteData.source ?? "firebase",
+      seasons,
     };
     
+    console.debug(`[AthleteService] Final mapped player ${id}:`, player);
+
     // Store in playerCache whenever we map data
     this.playerCache.set(id, player);
     return player;
@@ -108,24 +193,10 @@ class AthleteService {
       return { players: [], lastDoc: null, hasMore: false };
     }
 
-    const players = await Promise.all(
-      snap.docs.map(async (athleteDoc) => {
-        const data = athleteDoc.data();
-        try {
-          const recordSnap = await getDoc(
-            doc(db, "athletes", athleteDoc.id, "sports_records", "bball_record")
-          );
-          return this.mapAthleteData(
-            athleteDoc.id,
-            data,
-            recordSnap.exists() ? recordSnap.data() : undefined
-          );
-        } catch (error) {
-          console.error("Failed to fetch athlete record:", athleteDoc.id, error);
-          return this.mapAthleteData(athleteDoc.id, data);
-        }
-      })
-    );
+    const players = snap.docs.map((athleteDoc) => {
+      const data = athleteDoc.data();
+      return this.mapAthleteData(athleteDoc.id, data);
+    });
 
     return {
       players,
@@ -150,14 +221,7 @@ class AthleteService {
 
     const athlete = athleteSnap.data();
 
-    const recordRef = doc(db, "athletes", id, "sports_records", "bball_record");
-    const recordSnap = await getDoc(recordRef);
-
-    return this.mapAthleteData(
-      id,
-      athlete,
-      recordSnap.exists() ? recordSnap.data() : undefined
-    );
+    return this.mapAthleteData(id, athlete);
   }
 
   async fetchBasketballPlayersByIds(ids: string[]): Promise<BasketballPlayer[]> {

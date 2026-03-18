@@ -61,7 +61,6 @@ def push_player_to_firestore(player: Player):
         query = db.collection("athletes").where("maxpreps_career_id", "==", mp_id).limit(1).get()
         
         player_doc = player.model_dump(by_alias=True)
-        player_doc.pop("base_player_id", None) # Clean up
         
         if query:
             existing_ref = query[0].reference
