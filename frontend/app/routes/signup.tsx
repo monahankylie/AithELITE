@@ -1,8 +1,8 @@
 import {useState} from "react";
 import type {Route} from "./+types/signup";
 import {Link, useNavigate} from "react-router";
-import {createUserWithEmailAndPassword} from "firebase/auth";
-import {doc, setDoc} from "firebase/firestore";
+import {createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup} from "firebase/auth";
+import {doc, getDoc, setDoc} from "firebase/firestore";
 import {auth, db} from "../../firebase-config";
 import PageLayout from "../components/page-layout";
 
@@ -57,6 +57,37 @@ export default function Signup() {
       setError(err.message ?? "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleSignup = async () => {
+    setError("");
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        const nameParts = (user.displayName ?? "").trim().split(/\s+/);
+        const firstName = nameParts[0] ?? "";
+        const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+        await setDoc(userRef, {
+          firstName,
+          lastName,
+          email: user.email,
+          organization: "",
+          role: "recruiter",
+          createdAt: new Date(),
+        });
+      }
+
+      navigate("/dashboard");
+    } catch (err: any) {
+      setError(err.message ?? "Google sign-up failed. Please try again.");
     }
   };
 
@@ -180,6 +211,21 @@ export default function Signup() {
                     `}
                   >
                     {loading ? "Creating Account…" : "Create Account"}
+                  </button>
+
+                  <div className="flex items-center gap-3 pt-1">
+                    <div className="h-px flex-1 bg-black/10" />
+                    <span className="text-xs text-black/40">or</span>
+                    <div className="h-px flex-1 bg-black/10" />
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleGoogleSignup}
+                    className="flex h-11 w-full items-center justify-center gap-3 rounded-full bg-gray-100 text-sm font-medium text-black/70 transition hover:bg-gray-200 hover:text-black focus:outline-none focus:ring-2 focus:ring-black/10"
+                  >
+                    <img src="/images/google-icon.svg" alt="Google" className="h-5 w-5" />
+                    Sign up with Google
                   </button>
                 </form>
               </div>
