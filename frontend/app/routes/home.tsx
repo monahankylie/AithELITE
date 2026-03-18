@@ -15,9 +15,20 @@ function FeaturedCarousel() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="flex items-end justify-between gap-6">
           <div>
-            <h2 className="text-3xl font-extrabold tracking-tight text-black sm:text-4xl">Featured Athletes</h2>
-            <p className="mt-2 text-sm text-black/70">A quick glance at rising talent in your pipeline.</p>
+            <h2 className="text-3xl font-extrabold tracking-tight text-black sm:text-4xl">
+              Featured Athletes
+            </h2>
+            <p className="mt-2 text-sm text-black/70">
+              A quick glance at rising talent in your pipeline.
+            </p>
           </div>
+
+          <Link
+            to="/login"
+            className="rounded-full border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+          >
+            Browse More
+          </Link>
         </div>
       </div>
 
@@ -45,45 +56,57 @@ export default function Home() {
   const {user, profile} = useAuth();
   return (
     <PageLayout>
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-950" />
-        <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6">
-          <div className="grid items-center gap-12 lg:grid-cols-2">
-            <div className="relative z-10">
-              <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-6xl">
-                Smarter <br />
-                Recruiting, <br />
-                Smarter Teams
+      <section className="relative overflow-hidden bg-gradient-to-r from-[#081c33] via-[#0b3d66] to-[#0ea5e9] text-white">
+       
+        <div className="absolute inset-0 bg-black/20" />
+
+        <div className="relative mx-auto max-w-6xl px-4 pb-20 pt-16 sm:px-6 lg:px-8">
+          <div className="grid items-center gap-10 lg:grid-cols-2">
+            
+            {/* LEFT SIDE (text + CTAs) */}
+            <div className="max-w-xl">
+              <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">
+                Smart Recruiting for Smarter Teams
+              </p>
+
+              <h1 className="mt-4 text-5xl font-black leading-[0.95] tracking-tight sm:text-6xl">
+                Find the right athletes faster.
               </h1>
-              <p className="mt-6 max-w-xl text-base text-white/80">Competitive athlete discovery for collegiate recruiters.</p>
-              <div className="mt-8">
+
+              <p className="mt-6 text-base leading-7 text-white/80">
+                Discover high school prospects, compare player athletic profiles, and
+                organize prospects in one clean workflow.
+              </p>
+
+              <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                 <Link
-                  to= {user ? "/home" : "/login"}
-                  className="
-                      relative inline-block overflow-hidden
-                      rounded-full px-8 py-3 text-base font-medium text-white
-                      bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700
-                      bg-[length:200%_200%] bg-left
-                      transition-all duration-500 ease-in-out
-                      hover:bg-right
-                      shadow-lg hover:shadow-xl
-                      focus:outline-none focus:ring-2 focus:ring-blue-400/40
-                    "
+                  to={user ? "/home" : "/login"}
+                  className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-blue-700 shadow-md transition hover:bg-slate-100"
                 >
-                  Explore Athletes
+                  Get Started
+                </Link>
+
+                <Link
+                  to="/login"
+                  className="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10"
+                >
+                  View Discover
                 </Link>
               </div>
             </div>
-            <div className="relative z-10 flex justify-center lg:justify-end">
-              <div className="relative w-full max-w-xl overflow-hidden rounded-3xl shadow-2xl sm:h-80 lg:h-[420px]">
+
+            {/* RIGHT SIDE (image + overlay card) */}
+            <div className="relative">
+              <div className="overflow-hidden rounded-[24px] bg-white/10 p-3 backdrop-blur-sm">
                 <img
                   src="/images/hero-basketball.png"
                   alt="High school basketball player driving to the hoop"
-                  className="h-full w-full object-cover"
+                  className="h-[380px] w-full rounded-[16px] object-cover"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-black/10" />
               </div>
+
+             
             </div>
           </div>
         </div>
@@ -92,3 +115,4 @@ export default function Home() {
     </PageLayout>
   );
 }
+
