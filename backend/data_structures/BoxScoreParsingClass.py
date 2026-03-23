@@ -152,9 +152,8 @@ class BoxScoreParsingClass(BaseModel):
             raw_team_name = clean_html_text(team_link.text)
             team_url = team_link['href']
             
-            # Stable Team ID: Clean canonical URL
-            team_id = re.sub(r'https?://(www\.)?maxpreps\.com', '', team_url)
-            team_id = team_id.split('?')[0].split('#')[0].strip('/')
+            # TEAM ID is TBD, will be redone later from a canonical source
+            team_id = "TBD"
             
             # Extract year like (25-26) and clean the name
             year_match = re.search(r'\((\d{2}-\d{2})\)$', raw_team_name)
