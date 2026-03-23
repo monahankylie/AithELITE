@@ -34,9 +34,9 @@ def push_single_game(game: Game):
 
         game_ref = db.collection("games").document(game_id)
         
-        # Keep team totals, exclude per-player stats lists
+        # Keep team totals, exclude per-player stats and TBD team_id
         main_game_doc = game.model_dump(
-            exclude={"home_team": {"player_stats"}, "away_team": {"player_stats"}}
+            exclude={"home_team": {"player_stats", "team_id"}, "away_team": {"player_stats", "team_id"}, "winner_team_id": True}
         )
         game_ref.set(main_game_doc, merge=True)
         
@@ -45,7 +45,6 @@ def push_single_game(game: Game):
             for p_stat in team.player_stats:
                 if not p_stat.player_name: continue
                 
-                # ID format: {playername}{gameid}
                 clean_player_name = re.sub(r'[^a-zA-Z0-9]', '', p_stat.player_name)
                 stat_doc_id = f"{clean_player_name}{game_id}"
                 stat_ref = db.collection("game_stats").document(stat_doc_id)
@@ -54,7 +53,7 @@ def push_single_game(game: Game):
                 stat_doc["game_id"] = game_id # Add reference back to game
                 stat_doc["team_name"] = team.team_name
                 
-                batch.set(stat_ref, stat_doc, merge=True) # Use merge=True for safety
+                batch.set(stat_ref, stat_doc, merge=True)
         
         batch.commit()
         return True
@@ -69,12 +68,12 @@ def push_all_pending():
         print(f"[WARN] Directory not found: {CONTEXT_DIR} or {DOM_DIR}")
         return 0
 
-    # Sort files chronologically (using modification time)
+    # Sort files strictly by modification time
     context_files = [f for f in os.listdir(CONTEXT_DIR) if f.endswith(".txt")]
-    context_files.sort(key=lambda x: (os.path.getmtime(os.path.join(CONTEXT_DIR, x)), x))
+    context_files.sort(key=lambda x: os.path.getmtime(os.path.join(CONTEXT_DIR, x)))
     
     dom_files = [f for f in os.listdir(DOM_DIR) if f.endswith(".txt")]
-    dom_files.sort(key=lambda x: (os.path.getmtime(os.path.join(DOM_DIR, x)), x))
+    dom_files.sort(key=lambda x: os.path.getmtime(os.path.join(DOM_DIR, x)))
     
     dom_queue = list(dom_files)
 
@@ -102,25 +101,11 @@ def push_all_pending():
                     with open(dom_file_path, 'r') as f:
                         dom_html = f.read()
                     
-                    # assemble_game handles missing stats/identity
                     game = parser.assemble_game(summary, dom_html)
                 else:
                     # Fallback for when we run out of DOM files
-                    game = Game(
-                        maxpreps_game_id=summary['maxpreps_game_id'],
-                        date=summary['date'],
-                        level=summary.get('level', 'Varsity'),
-                        final_score=summary['score'] or "0-0",
-                        maxpreps_url=summary['url'],
-                        away_team=TeamGameBoxScore(team_id="unknown", team_name=summary['away_slug']),
-                        home_team=TeamGameBoxScore(team_id="unknown", team_name=summary['home_slug'], is_home=True)
-                    )
-                    if summary['result'] == 'W':
-                        game.winner_team_id = game.away_team.team_id
-                        game.winner_team_name = game.away_team.team_name
-                    elif summary['result'] == 'L':
-                        game.winner_team_id = game.home_team.team_id
-                        game.winner_team_name = game.home_team.team_name
+                    dom_html = "NONEFOUND"
+                    game = parser.assemble_game(summary, dom_html)
                 
                 if game and push_single_game(game):
                     count += 1

@@ -71,12 +71,12 @@ class BoxScoreParsingClass(BaseModel):
         if dom_html == "NONEFOUND": return True # Sequential matching bypass
         
         soup = BeautifulSoup(dom_html, 'html.parser')
-        team_headers = soup.find_all('div', class_='team-list--team-header')
-        if not team_headers: return False
+        team_name_elements = soup.find_all('h3', class_='team-list__team-name')
+        if not team_name_elements: return False
             
         dom_team_names = []
-        for header in team_headers:
-            team_link = header.find('h3', class_='team-list__team-name').find('a')
+        for element in team_name_elements:
+            team_link = element.find('a')
             if team_link:
                 name = re.sub(r'[^a-z0-9]', '', team_link.text.lower())
                 dom_team_names.append(name)
@@ -136,21 +136,36 @@ class BoxScoreParsingClass(BaseModel):
     def parse_dom_stats(self, dom_html: str) -> Tuple[Optional[TeamGameBoxScore], Optional[TeamGameBoxScore]]:
         """
         Parses the detailed BoxScoresDOM file using a three-pass strategy.
+        Supports both single-team-per-header and combined header structures.
         """
         if dom_html == "NONEFOUND": return None, None
         
         soup = BeautifulSoup(dom_html, 'html.parser')
-        team_headers = soup.find_all('div', class_='team-list--team-header')
-        if not team_headers: return None, None
-            
+        
         # Pass 1: Identify All Teams and create buckets
+        # MaxPreps sometimes puts each team in its own 'team-list--team-header' div,
+        # and sometimes puts both in one 'team-list--team-header' div with 'team-list__team' children.
         team_buckets = {}
-        for header in team_headers:
-            team_link = header.find('h3', class_='team-list__team-name').find('a')
+        team_elements = [] # Store (team_el, container_el)
+        
+        raw_header_divs = soup.find_all('div', class_='team-list--team-header')
+        for rh in raw_header_divs:
+            inner_teams = rh.find_all('div', class_='team-list__team')
+            if inner_teams:
+                for it in inner_teams:
+                    team_elements.append((it, rh))
+            else:
+                team_elements.append((rh, rh))
+        
+        if not team_elements: return None, None
+
+        for header_el, container_el in team_elements:
+            team_link_h3 = header_el.find('h3', class_='team-list__team-name')
+            if not team_link_h3: continue
+            team_link = team_link_h3.find('a')
             if not team_link: continue
             
             raw_team_name = clean_html_text(team_link.text)
-            team_url = team_link['href']
             
             # TEAM ID is TBD, will be redone later from a canonical source
             team_id = "TBD"
@@ -160,9 +175,9 @@ class BoxScoreParsingClass(BaseModel):
             team_year = year_match.group(1) if year_match else None
             team_name = re.sub(r'\s*\(\d{2}-\d{2}\)$', '', raw_team_name).strip()
             
-            # Robust Check for no-data: Search all siblings until the next team header
+            # Robust Check for no-data: Search all siblings of the container until the next team header
             has_no_data = False
-            curr = header.find_next_sibling()
+            curr = container_el.find_next_sibling()
             while curr and 'team-list--team-header' not in curr.get('class', []):
                 if 'no-data' in curr.get('class', []):
                     has_no_data = True
@@ -181,44 +196,52 @@ class BoxScoreParsingClass(BaseModel):
         # Pass 2: Assign All Stats Tables
         stat_categories = soup.find_all('div', class_='stat-category')
         for category in stat_categories:
-            school_span = category.find('span', class_='school')
-            if not school_span: continue
-            
-            target_raw_name = clean_html_text(school_span.text)
-            # Find the best bucket match: case-insensitive partial match
-            best_match = None
-            target_norm = re.sub(r'[^a-z0-9]', '', target_raw_name.lower())
-            
-            for raw_name in team_buckets.keys():
-                bucket_norm = re.sub(r'[^a-z0-9]', '', raw_name.lower())
-                if target_norm in bucket_norm or bucket_norm in target_norm:
-                    best_match = raw_name
-                    break
-            
-            if not best_match: continue
-            
-            table = category.find('table')
-            if not table: continue
-            
-            headers = [clean_html_text(th.text) for th in table.find('thead').find_all('th')]
-            self._parse_single_table(
-                table, 
-                headers, 
-                team_buckets[best_match]["player_data_dict"], 
-                team_buckets[best_match]["totals_dict"]
-            )
+            # Each stat category might contain multiple teams (usually 2)
+            team_sections = category.find_all('div', class_='team-list__team')
+            if not team_sections:
+                team_sections = [category] # Fallback for flat structures
+                
+            for section in team_sections:
+                school_span = section.find('span', class_='school')
+                if not school_span: continue
+                
+                target_raw_name = clean_html_text(school_span.text)
+                # Find the best bucket match: case-insensitive partial match
+                best_match = None
+                target_norm = re.sub(r'[^a-z0-9]', '', target_raw_name.lower())
+                
+                for raw_name in team_buckets.keys():
+                    bucket_norm = re.sub(r'[^a-z0-9]', '', raw_name.lower())
+                    if target_norm in bucket_norm or bucket_norm in target_norm:
+                        best_match = raw_name
+                        break
+                
+                if not best_match: continue
+                
+                table = section.find('table')
+                if not table: continue
+                
+                headers = [clean_html_text(th.text) for th in table.find('thead').find_all('th')]
+                self._parse_single_table(
+                    table, 
+                    headers, 
+                    team_buckets[best_match]["player_data_dict"], 
+                    team_buckets[best_match]["totals_dict"]
+                )
 
         # Pass 3: Assemble Models
         team_boxscores = []
-        for i, header in enumerate(team_headers):
-            team_link = header.find('h3', class_='team-list__team-name').find('a')
+        for i, (header_el, _) in enumerate(team_elements):
+            team_link_h3 = header_el.find('h3', class_='team-list__team-name')
+            if not team_link_h3: continue
+            team_link = team_link_h3.find('a')
             if not team_link: continue
             
             raw_name = clean_html_text(team_link.text)
             if raw_name not in team_buckets: continue
             
             bucket = team_buckets[raw_name]
-            is_home = (i == 1)
+            is_home = (i == 1) # Default MaxPreps order is Away, then Home
             
             if bucket["has_no_data"] or not bucket["player_data_dict"]:
                 team_boxscores.append(TeamGameBoxScore(
@@ -239,7 +262,7 @@ class BoxScoreParsingClass(BaseModel):
                     team_totals=team_totals
                 ))
 
-        if len(team_boxscores) == 2: return team_boxscores[0], team_boxscores[1]
+        if len(team_boxscores) >= 2: return team_boxscores[0], team_boxscores[1]
         elif len(team_boxscores) == 1: return team_boxscores[0], None
         return None, None
 
