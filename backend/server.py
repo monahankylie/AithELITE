@@ -1,12 +1,12 @@
 import requests
 from data_structures.Scraper import Scraper_Task
-from data_structures.AthleticsParsingInfo import AthleticsParsingInfo
+from data_structures.AthleteParsingClass import AthletesParsingClass
 import firebase_admin
 from firebase_admin import credentials, firestore, auth
 import uvicorn  
 from fastapi import FastAPI, BackgroundTasks, HTTPException,Request
 from fastapi.middleware.cors import CORSMiddleware
-from specific_scripts import hardcodedparse_script, push_athletes
+from specific_scripts import parse_script, push_athletes
 
 app = FastAPI()
 background_tasks = BackgroundTasks()
@@ -36,9 +36,20 @@ async def scrape(background_tasks: BackgroundTasks):
     background_tasks.add_task(scrapeCA.start_scrape)
     return {"Scrape": "started"}
 
+@app.get("/scrape_games") #move to post soon, just testing with get for now
+async def scrape(background_tasks: BackgroundTasks):
+    ##TODO: add a way to stop the scraper once it is started. maybe add a status field to the scraper class and have a separate endpoint to change it to stop. then, within the scraper, check for this status field and if it is stop, break out of the loop and end the scraper.
+    Scraper_Task.load_structure("Resources/SiteInfo.json") #<-- load the structure file that has a scraper presets.
+    scrapeCA = Scraper_Task('maxpreps_games')# <-- an instance of scraper given maxpreps preset(i will change name later). look in SiteInfo.json for what it does.
+    scrapeCA.seed({"state":"ca","sport":"basketball"})
+    background_tasks.add_task(scrapeCA.start_scrape)
+    return {"Scrape": "started",
+            "Target:":scrapeCA.site_url,
+            "Config:":scrapeCA.site_cfg}
+
 @app.get("/parse")
 async def parse(background_tasks: BackgroundTasks):
-    hardcodedparse_script.test_parse()
+    parse_script.test_parse()
     return {"it has started":"parse"}
 
 @app.get("/push")

@@ -6,7 +6,7 @@ import os
 from typing import Optional, Callable, Dict, Any, ClassVar, Tuple, List, Type
 from pydantic import BaseModel, Field, field_validator, model_validator, AliasChoices
 
-class AthleticsParsingInfo(BaseModel):
+class AthletesParsingClass(BaseModel):
 
     rec_func_dict: ClassVar[Dict[Optional[str], Type[BaseModel]]] = { # Changed to store types
         None : Record,

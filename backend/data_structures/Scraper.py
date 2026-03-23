@@ -112,10 +112,10 @@ class Scraper_Task:
         temp_dict = dictionary_builder(temp_key_list,[r'[^/]+' for val in temp_key_list])
         pattern = string_builder(temp_pattern,temp_dict|self.seed_dict)
 
-        #detect optional regex to add on
+        #choice for optional regex that can be found anywhere in string
         optional_regex = match_info.get("regex_pattern","")
         if optional_regex:
-            pattern = f"(?=.*{optional_regex}){pattern}"
+            pattern = f"(?=.*{optional_regex}).*?{pattern}"
 
         regex = re.compile(pattern)
 
@@ -183,21 +183,42 @@ class Scraper_Task:
         ##decides whether or not to overwrite list(defined in step_config)
         pass 
     def store(self,step_config):
+        writers = { 
+            ".json": lambda data, f: json.dump(data, f, indent=4),
+            ".txt": lambda data, f: f.write(str(data))
+        }
+
         step = self.which_step_am_i(step_config)
         store_config = step_config.get("store")
-        base_path = store_config.get("path", "output")
-        
-        if not os.path.exists(base_path):
-            os.makedirs(base_path) #make path if nonexistent
+        base_path = store_config.get("path", "output")  
+        os.makedirs(base_path, exist_ok=True) #make path if nonexistent
+        processed_stuff = self.step_dict.get(step, [])
             
         method = store_config.get("method","each")
+        extension = store_config.get("ext",".json").lower().strip()
+        write_method = writers.get(extension,writers[".json"]) ##ait if the user doesnt give us one, then itll  be json
+
+        ##can probs shove all these conditionals within a lambda
+        ##lets make a write function in utils another time. rewriting serial is tedious.
         if method == "each":
-            ##we only doing json for now. when trying to store links, etc, then we can store in txt files or csv for other data
-            for data in self.step_dict.get(step, []):
-                serial = uuid.uuid1()
-                file_path = os.path.join(base_path, f"{serial}.json")
+            for data in processed_stuff:
+                while True:
+                    serial = uuid.uuid1()
+                    file_path = os.path.join(base_path, f"{serial}{extension}")
+                    if not os.path.exists(file_path):
+                        break
                 with open(file_path, 'w') as f:
-                    json.dump(data, f, indent=4)        
+                    write_method(str(data), f)
+        else:
+            serial = uuid.uuid1()
+            file_path = os.path.join(base_path, f"{serial}{extension}")
+            if method == "page":
+                with open(file_path, 'w') as f:
+                    write_method(str(self.current_soup),f)
+            elif method == "all":
+                with open(file_path, 'w') as f:
+                    write_method("\n".join([str(p) for p in processed_stuff]),f)
+
     def append(self, step_config):
         step = self.which_step_am_i(step_config)
         append_cfg = step_config.get("append", {})

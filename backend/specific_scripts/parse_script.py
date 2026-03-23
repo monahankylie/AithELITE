@@ -1,9 +1,9 @@
 import json
 import os
-from data_structures.AthleticsParsingInfo import AthleticsParsingInfo
+from data_structures.AthleteParsingClass import AthletesParsingClass
 from utils.IO import save_json
 
-def run_parse(root_path: str, Athletics: AthleticsParsingInfo, PARSE_ALL=True):
+def run_parse(root_path: str, Athletics: AthletesParsingClass, PARSE_ALL=True):
     unique_teams = {}
     player_records = []
     errors = 0
@@ -38,7 +38,7 @@ def run_parse(root_path: str, Athletics: AthleticsParsingInfo, PARSE_ALL=True):
 
 def test_parse():
     # Use separate bio and stats mappings
-    athlete_parse_struct = AthleticsParsingInfo(
+    athlete_parse_struct = AthletesParsingClass(
         sport_type="Basketball",
         player_mapping="Resources/player_bio.json",
         record_mapping="Resources/bball_record.json", # This now points to all season stats
