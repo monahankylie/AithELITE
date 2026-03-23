@@ -69,19 +69,21 @@ def push_all_pending():
         print(f"[WARN] Directory not found: {CONTEXT_DIR} or {DOM_DIR}")
         return 0
 
+    # Sort files chronologically (using modification time)
     context_files = [f for f in os.listdir(CONTEXT_DIR) if f.endswith(".txt")]
-    context_files.sort(key=lambda x: os.path.getmtime(os.path.join(CONTEXT_DIR, x)))
+    context_files.sort(key=lambda x: (os.path.getmtime(os.path.join(CONTEXT_DIR, x)), x))
     
     dom_files = [f for f in os.listdir(DOM_DIR) if f.endswith(".txt")]
-    dom_files.sort(key=lambda x: os.path.getmtime(os.path.join(DOM_DIR, x)))
+    dom_files.sort(key=lambda x: (os.path.getmtime(os.path.join(DOM_DIR, x)), x))
+    
+    dom_queue = list(dom_files)
 
     if not context_files:
         print("[PUSH] No pending context files to process.")
         return 0
         
-    print(f"[PUSH] Processing {len(context_files)} context files...")
+    print(f"[PUSH] Processing {len(context_files)} context files against {len(dom_queue)} DOM files...")
     count = 0
-    dom_index = 0
     
     for ctx_file in context_files:
         filepath = os.path.join(CONTEXT_DIR, ctx_file)
@@ -93,37 +95,32 @@ def push_all_pending():
         for summary in summaries:
             game = None
             try:
-                has_stats = False
-                dom_html = None
-                
-                if dom_index < len(dom_files):
-                    dom_file_path = os.path.join(DOM_DIR, dom_files[dom_index])
+                if dom_queue:
+                    # STRICT 1-TO-1 SEQUENTIAL MAPPING
+                    dom_filename = dom_queue.pop(0)
+                    dom_file_path = os.path.join(DOM_DIR, dom_filename)
                     with open(dom_file_path, 'r') as f:
-                        temp_html = f.read()
+                        dom_html = f.read()
                     
-                    if parser.teams_match(summary, temp_html):
-                        dom_html = temp_html
-                        has_stats = True
-                        dom_index += 1
-                
-                if has_stats and dom_html:
+                    # assemble_game handles missing stats/identity
                     game = parser.assemble_game(summary, dom_html)
                 else:
+                    # Fallback for when we run out of DOM files
                     game = Game(
                         maxpreps_game_id=summary['maxpreps_game_id'],
                         date=summary['date'],
                         level=summary.get('level', 'Varsity'),
                         final_score=summary['score'] or "0-0",
                         maxpreps_url=summary['url'],
-                        home_team=TeamGameBoxScore(team_id="unknown", team_name=summary['primary_slug']),
-                        away_team=TeamGameBoxScore(team_id="unknown", team_name=summary['opponent_slug'])
+                        away_team=TeamGameBoxScore(team_id="unknown", team_name=summary['away_slug']),
+                        home_team=TeamGameBoxScore(team_id="unknown", team_name=summary['home_slug'], is_home=True)
                     )
                     if summary['result'] == 'W':
-                        game.winner_team_id = game.home_team.team_id
-                        game.winner_team_name = game.home_team.team_name
-                    elif summary['result'] == 'L':
                         game.winner_team_id = game.away_team.team_id
                         game.winner_team_name = game.away_team.team_name
+                    elif summary['result'] == 'L':
+                        game.winner_team_id = game.home_team.team_id
+                        game.winner_team_name = game.home_team.team_name
                 
                 if game and push_single_game(game):
                     count += 1

@@ -31,10 +31,10 @@ class BoxScoreParsingClass(BaseModel):
             result = clean_html_text(result_span.text) if result_span else None
             score = clean_html_text(score_span.text) if score_span else None
             
-            # Extract teams from URL: .../acalanes-vs-santa-cruz.htm
+            # MaxPreps URL Structure: .../away-vs-home.htm
             match = re.search(r'/([^/]+)-vs-([^/]+)\.htm', url)
-            primary_team_slug = match.group(1) if match else "unknown"
-            opponent_team_slug = match.group(2) if match else "unknown"
+            away_slug = match.group(1) if match else "unknown"
+            home_slug = match.group(2) if match else "unknown"
             
             # Extract MaxPreps Game ID (query param 'c' or part of path)
             game_id_match = re.search(r'[?&]c=([^&]+)', url)
@@ -55,8 +55,8 @@ class BoxScoreParsingClass(BaseModel):
                 "url": url,
                 "result": result,
                 "score": score,
-                "primary_slug": primary_team_slug,
-                "opponent_slug": opponent_team_slug,
+                "away_slug": away_slug,
+                "home_slug": home_slug,
                 "date": game_date,
                 "level": level,
                 "maxpreps_game_id": maxpreps_game_id
@@ -68,35 +68,34 @@ class BoxScoreParsingClass(BaseModel):
         """
         Validates if the DOM file matches the team slugs in the game summary.
         """
+        if dom_html == "NONEFOUND": return True # Sequential matching bypass
+        
         soup = BeautifulSoup(dom_html, 'html.parser')
         team_headers = soup.find_all('div', class_='team-list--team-header')
-        if not team_headers:
-            return False
+        if not team_headers: return False
             
         dom_team_names = []
         for header in team_headers:
             team_link = header.find('h3', class_='team-list__team-name').find('a')
             if team_link:
-                # Normalize name: lowercase, remove special chars and extra spaces
                 name = re.sub(r'[^a-z0-9]', '', team_link.text.lower())
                 dom_team_names.append(name)
         
-        # Normalize summary slugs
-        primary = re.sub(r'[^a-z0-9]', '', summary['primary_slug'].lower())
-        opponent = re.sub(r'[^a-z0-9]', '', summary['opponent_slug'].lower())
+        away = re.sub(r'[^a-z0-9]', '', summary['away_slug'].lower())
+        home = re.sub(r'[^a-z0-9]', '', summary['home_slug'].lower())
         
-        # Check if BOTH teams from the summary appear in the DOM
-        # (Slugs are usually just the school name, e.g. 'acalanes')
-        matches = 0
         for dom_name in dom_team_names:
-            if primary in dom_name or opponent in dom_name:
-                matches += 1
+            if away in dom_name or home in dom_name:
+                return True
                 
-        return matches >= 1 # Usually one team is the anchor
+        return False
 
     def _parse_single_table(self, table, headers, player_data_dict, totals_dict):
         """Helper to parse a single stats table (Shooting, Totals, etc.)."""
-        for tr in table.find('tbody').find_all('tr'):
+        tbody = table.find('tbody')
+        if not tbody: return
+        
+        for tr in tbody.find_all('tr'):
             tds = tr.find_all('td')
             if not tds: continue
 
@@ -117,6 +116,7 @@ class BoxScoreParsingClass(BaseModel):
                         player_data_dict[player_name]["player_id"] = athlete_id_match.group(1)
             
             for i, td in enumerate(tds):
+                if i >= len(headers): continue
                 header_title = headers[i]
                 val = td.text.strip()
                 player_data_dict[player_name][header_title] = val
@@ -128,6 +128,7 @@ class BoxScoreParsingClass(BaseModel):
             if tr:
                 tds = tr.find_all('td')
                 for i, td in enumerate(tds):
+                    if i >= len(headers): continue
                     header_title = headers[i]
                     val = td.text.strip()
                     totals_dict[header_title] = val
@@ -136,6 +137,8 @@ class BoxScoreParsingClass(BaseModel):
         """
         Parses the detailed BoxScoresDOM file using a three-pass strategy.
         """
+        if dom_html == "NONEFOUND": return None, None
+        
         soup = BeautifulSoup(dom_html, 'html.parser')
         team_headers = soup.find_all('div', class_='team-list--team-header')
         if not team_headers: return None, None
@@ -150,8 +153,6 @@ class BoxScoreParsingClass(BaseModel):
             team_url = team_link['href']
             
             # Stable Team ID: Clean canonical URL
-            # Example: .../high-school/acalanes-dons-(lafayette,ca)/basketball/default.htm
-            # We'll extract the part that uniquely identifies the school/sport
             team_id = re.sub(r'https?://(www\.)?maxpreps\.com', '', team_url)
             team_id = team_id.split('?')[0].split('#')[0].strip('/')
             
@@ -160,13 +161,22 @@ class BoxScoreParsingClass(BaseModel):
             team_year = year_match.group(1) if year_match else None
             team_name = re.sub(r'\s*\(\d{2}-\d{2}\)$', '', raw_team_name).strip()
             
+            # Robust Check for no-data: Search all siblings until the next team header
+            has_no_data = False
+            curr = header.find_next_sibling()
+            while curr and 'team-list--team-header' not in curr.get('class', []):
+                if 'no-data' in curr.get('class', []):
+                    has_no_data = True
+                    break
+                curr = curr.find_next_sibling()
+
             team_buckets[raw_team_name] = {
                 "team_id": team_id,
                 "team_name": team_name,
                 "team_year": team_year,
                 "player_data_dict": {},
                 "totals_dict": {},
-                "has_no_data": bool(header.find_next_sibling('div', class_='no-data'))
+                "has_no_data": has_no_data
             }
 
         # Pass 2: Assign All Stats Tables
@@ -175,11 +185,14 @@ class BoxScoreParsingClass(BaseModel):
             school_span = category.find('span', class_='school')
             if not school_span: continue
             
-            target_raw_name = school_span.text.strip()
-            # Find the best bucket match (some spans might be slightly different than header)
+            target_raw_name = clean_html_text(school_span.text)
+            # Find the best bucket match: case-insensitive partial match
             best_match = None
+            target_norm = re.sub(r'[^a-z0-9]', '', target_raw_name.lower())
+            
             for raw_name in team_buckets.keys():
-                if target_raw_name in raw_name or raw_name in target_raw_name:
+                bucket_norm = re.sub(r'[^a-z0-9]', '', raw_name.lower())
+                if target_norm in bucket_norm or bucket_norm in target_norm:
                     best_match = raw_name
                     break
             
@@ -198,14 +211,15 @@ class BoxScoreParsingClass(BaseModel):
 
         # Pass 3: Assemble Models
         team_boxscores = []
-        # Sort by raw name to keep order consistent with DOM headers (Away, then Home)
-        headers = [h for h in team_headers]
-        for i, header in enumerate(headers):
-            raw_name = clean_html_text(header.find('h3').text)
+        for i, header in enumerate(team_headers):
+            team_link = header.find('h3', class_='team-list__team-name').find('a')
+            if not team_link: continue
+            
+            raw_name = clean_html_text(team_link.text)
             if raw_name not in team_buckets: continue
             
             bucket = team_buckets[raw_name]
-            is_home = (i == 1) # Second team is usually home
+            is_home = (i == 1)
             
             if bucket["has_no_data"] or not bucket["player_data_dict"]:
                 team_boxscores.append(TeamGameBoxScore(
@@ -231,17 +245,53 @@ class BoxScoreParsingClass(BaseModel):
         return None, None
 
     def assemble_game(self, context_summary: Dict[str, Any], dom_html: str) -> Game:
-        """Combines summary and detailed stats into a Game object."""
-        away_box, home_box = self.parse_dom_stats(dom_html)
+        """
+        Combines summary and detailed stats into a Game object.
+        Uses name-based matching to align DOM boxes with summary slugs.
+        """
+        box1, box2 = self.parse_dom_stats(dom_html)
+        boxes = [b for b in [box1, box2] if b is not None]
+        
+        away_slug_norm = re.sub(r'[^a-z0-9]', '', context_summary['away_slug'].lower())
+        home_slug_norm = re.sub(r'[^a-z0-9]', '', context_summary['home_slug'].lower())
+        
+        final_away_box = None
+        final_home_box = None
+        
+        # Match boxes to slugs by name
+        for box in boxes:
+            box_name_norm = re.sub(r'[^a-z0-9]', '', box.team_name.lower())
+            if away_slug_norm in box_name_norm or box_name_norm in away_slug_norm:
+                final_away_box = box
+                final_away_box.is_home = False
+            elif home_slug_norm in box_name_norm or box_name_norm in home_slug_norm:
+                final_home_box = box
+                final_home_box.is_home = True
+        
+        # Fallback placeholders for missing boxes
+        if not final_away_box:
+            final_away_box = TeamGameBoxScore(
+                team_id="unknown", 
+                team_name=context_summary['away_slug'].replace('-', ' ').title(),
+                is_home=False
+            )
+        if not final_home_box:
+            final_home_box = TeamGameBoxScore(
+                team_id="unknown", 
+                team_name=context_summary['home_slug'].replace('-', ' ').title(),
+                is_home=True
+            )
+            
         game = Game(
             maxpreps_game_id=context_summary['maxpreps_game_id'],
             date=context_summary['date'],
             level=context_summary.get('level', 'Varsity'),
             final_score=context_summary['score'] or "0-0",
             maxpreps_url=context_summary['url'],
-            away_team=away_box or TeamGameBoxScore(team_id="unknown", team_name=context_summary['primary_slug']),
-            home_team=home_box or TeamGameBoxScore(team_id="unknown", team_name=context_summary['opponent_slug'], is_home=True)
+            away_team=final_away_box,
+            home_team=final_home_box
         )
+        
         if context_summary['result'] == 'W':
             game.winner_team_name = game.away_team.team_name
             game.winner_team_id = game.away_team.team_id
@@ -250,4 +300,3 @@ class BoxScoreParsingClass(BaseModel):
             game.winner_team_id = game.home_team.team_id
             
         return game
-

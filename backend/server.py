@@ -56,7 +56,6 @@ async def parse_boxscores_endpoint(background_tasks: BackgroundTasks):
     OUTPUT_DIR = "ParsedGames"
     
     def run_full_parse():
-        parse_boxscores.cleanup_context_files(CONTEXT_DIR)
         parse_boxscores.run_boxscore_parse(CONTEXT_DIR, DOM_DIR, OUTPUT_DIR)
 
     background_tasks.add_task(run_full_parse)
