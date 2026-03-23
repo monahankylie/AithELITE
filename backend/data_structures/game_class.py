@@ -25,6 +25,7 @@ class BasketballGameStats(GameRecord):
     player_id: Optional[str] = None
     player_name: Optional[str] = Field(None, validation_alias=AliasChoices("Athlete Name", "player_name"))
     jersey: Optional[str] = Field(None, validation_alias=AliasChoices("#", "jersey"))
+    class_year: Optional[str] = None
     
     # --- FROM DOM COLUMNS ONLY ---
     minutes_played: int = Field(0, validation_alias=AliasChoices("Min", "minutes_played"))
@@ -117,10 +118,13 @@ class Game(BaseModel):
         if self.base_game_id: 
             return self
         
-        home = re.sub(r'[^a-z0-9]', '', self.home_team.team_name.lower())
-        away = re.sub(r'[^a-z0-9]', '', self.away_team.team_name.lower())
+        # Alphabetically sort team names for stable ID
+        names = sorted([self.home_team.team_name, self.away_team.team_name])
+        t1 = re.sub(r'[^a-z0-9]', '', names[0].lower())
+        t2 = re.sub(r'[^a-z0-9]', '', names[1].lower())
+        
         dt = self.date.strftime("%Y%m%d")
         mpid = self.maxpreps_game_id or "unknown"
         
-        self.base_game_id = f"{home}vs{away}{dt}{mpid}".lower()
+        self.base_game_id = f"{t1}vs{t2}{dt}{mpid}".lower()
         return self

@@ -134,56 +134,97 @@ class BoxScoreParsingClass(BaseModel):
 
     def parse_dom_stats(self, dom_html: str) -> Tuple[Optional[TeamGameBoxScore], Optional[TeamGameBoxScore]]:
         """
-        Parses the detailed BoxScoresDOM file.
-        Returns TeamGameBoxScore objects for both teams if available.
+        Parses the detailed BoxScoresDOM file using a three-pass strategy.
         """
         soup = BeautifulSoup(dom_html, 'html.parser')
         team_headers = soup.find_all('div', class_='team-list--team-header')
         if not team_headers: return None, None
             
-        team_boxscores = []
+        # Pass 1: Identify All Teams and create buckets
+        team_buckets = {}
         for header in team_headers:
             team_link = header.find('h3', class_='team-list__team-name').find('a')
-            raw_team_name = clean_html_text(team_link.text) if team_link else "Unknown"
+            if not team_link: continue
+            
+            raw_team_name = clean_html_text(team_link.text)
+            team_url = team_link['href']
+            
+            # Stable Team ID: Clean canonical URL
+            # Example: .../high-school/acalanes-dons-(lafayette,ca)/basketball/default.htm
+            # We'll extract the part that uniquely identifies the school/sport
+            team_id = re.sub(r'https?://(www\.)?maxpreps\.com', '', team_url)
+            team_id = team_id.split('?')[0].split('#')[0].strip('/')
             
             # Extract year like (25-26) and clean the name
             year_match = re.search(r'\((\d{2}-\d{2})\)$', raw_team_name)
             team_year = year_match.group(1) if year_match else None
             team_name = re.sub(r'\s*\(\d{2}-\d{2}\)$', '', raw_team_name).strip()
             
-            no_data = header.find_next_sibling('div', class_='no-data')
-            if no_data:
-                team_boxscores.append(TeamGameBoxScore(team_id="unknown", team_name=team_name, team_year=team_year))
-                continue
-            
-            player_data_dict = {}
-            totals_dict = {}
-            
-            stat_categories = soup.find_all('div', class_='stat-category')
-            for category in stat_categories:
-                school_span = category.find('span', class_='school')
-                # Use raw name for matching, as it's what's in the span
-                if not school_span or school_span.text.strip() not in raw_team_name:
-                    continue
-                
-                table = category.find('table')
-                if not table: continue
-                
-                headers = [clean_html_text(th.text) for th in table.find('thead').find_all('th')]
-                self._parse_single_table(table, headers, player_data_dict, totals_dict)
+            team_buckets[raw_team_name] = {
+                "team_id": team_id,
+                "team_name": team_name,
+                "team_year": team_year,
+                "player_data_dict": {},
+                "totals_dict": {},
+                "has_no_data": bool(header.find_next_sibling('div', class_='no-data'))
+            }
 
-            if player_data_dict:
-                player_stats = [BasketballGameStats(**s) for s in player_data_dict.values()]
-                team_totals = TeamTotalsStats(**totals_dict) if totals_dict else None
+        # Pass 2: Assign All Stats Tables
+        stat_categories = soup.find_all('div', class_='stat-category')
+        for category in stat_categories:
+            school_span = category.find('span', class_='school')
+            if not school_span: continue
+            
+            target_raw_name = school_span.text.strip()
+            # Find the best bucket match (some spans might be slightly different than header)
+            best_match = None
+            for raw_name in team_buckets.keys():
+                if target_raw_name in raw_name or raw_name in target_raw_name:
+                    best_match = raw_name
+                    break
+            
+            if not best_match: continue
+            
+            table = category.find('table')
+            if not table: continue
+            
+            headers = [clean_html_text(th.text) for th in table.find('thead').find_all('th')]
+            self._parse_single_table(
+                table, 
+                headers, 
+                team_buckets[best_match]["player_data_dict"], 
+                team_buckets[best_match]["totals_dict"]
+            )
+
+        # Pass 3: Assemble Models
+        team_boxscores = []
+        # Sort by raw name to keep order consistent with DOM headers (Away, then Home)
+        headers = [h for h in team_headers]
+        for i, header in enumerate(headers):
+            raw_name = clean_html_text(header.find('h3').text)
+            if raw_name not in team_buckets: continue
+            
+            bucket = team_buckets[raw_name]
+            is_home = (i == 1) # Second team is usually home
+            
+            if bucket["has_no_data"] or not bucket["player_data_dict"]:
                 team_boxscores.append(TeamGameBoxScore(
-                    team_id=str(uuid.uuid4()), 
-                    team_name=team_name,
-                    team_year=team_year,
+                    team_id=bucket["team_id"], 
+                    team_name=bucket["team_name"], 
+                    team_year=bucket["team_year"],
+                    is_home=is_home
+                ))
+            else:
+                player_stats = [BasketballGameStats(**s) for s in bucket["player_data_dict"].values()]
+                team_totals = TeamTotalsStats(**bucket["totals_dict"]) if bucket["totals_dict"] else None
+                team_boxscores.append(TeamGameBoxScore(
+                    team_id=bucket["team_id"], 
+                    team_name=bucket["team_name"],
+                    team_year=bucket["team_year"],
+                    is_home=is_home,
                     player_stats=player_stats,
                     team_totals=team_totals
                 ))
-            else:
-                team_boxscores.append(TeamGameBoxScore(team_id="unknown", team_name=team_name, team_year=team_year))
 
         if len(team_boxscores) == 2: return team_boxscores[0], team_boxscores[1]
         elif len(team_boxscores) == 1: return team_boxscores[0], None
@@ -191,21 +232,22 @@ class BoxScoreParsingClass(BaseModel):
 
     def assemble_game(self, context_summary: Dict[str, Any], dom_html: str) -> Game:
         """Combines summary and detailed stats into a Game object."""
-        home_box, away_box = self.parse_dom_stats(dom_html)
+        away_box, home_box = self.parse_dom_stats(dom_html)
         game = Game(
             maxpreps_game_id=context_summary['maxpreps_game_id'],
             date=context_summary['date'],
             level=context_summary.get('level', 'Varsity'),
             final_score=context_summary['score'] or "0-0",
             maxpreps_url=context_summary['url'],
-            home_team=home_box or TeamGameBoxScore(team_id="unknown", team_name=context_summary['primary_slug']),
-            away_team=away_box or TeamGameBoxScore(team_id="unknown", team_name=context_summary['opponent_slug'])
+            away_team=away_box or TeamGameBoxScore(team_id="unknown", team_name=context_summary['primary_slug']),
+            home_team=home_box or TeamGameBoxScore(team_id="unknown", team_name=context_summary['opponent_slug'], is_home=True)
         )
         if context_summary['result'] == 'W':
-            game.winner_team_id = game.home_team.team_id
-            game.winner_team_name = game.home_team.team_name
-        elif context_summary['result'] == 'L':
-            game.winner_team_id = game.away_team.team_id
             game.winner_team_name = game.away_team.team_name
+            game.winner_team_id = game.away_team.team_id
+        elif context_summary['result'] == 'L':
+            game.winner_team_name = game.home_team.team_name
+            game.winner_team_id = game.home_team.team_id
+            
         return game
 
