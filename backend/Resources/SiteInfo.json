@@ -176,7 +176,7 @@
             "description": "Individual athlete profile page",
             "scrape_method": ["match","store"],
             "match": {
-              "pattern": "ctl00_ContentBottom_ctl03_ContestStatsContentPanel",
+              "pattern": "ContestStatsContentPanel",
               "tag": "div",
               "attr": "id"
             },

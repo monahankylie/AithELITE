@@ -4,10 +4,11 @@ from datetime import datetime
 from utils.parsing_functions import traverse_paths
 import re
 
-class Record(BaseModel):
+class SeasonRecord(BaseModel):
     sport: Optional[str] = None
     year: Optional[str] = None
-
+    player_level: Optional[str] = Field("Varsity", validation_alias=AliasChoices("teamLevel", "team"))
+    athlete_id: Optional[str] = Field(None,validation_alias=AliasChoices("AthleteID"))
     @model_validator(mode='before')
     @classmethod
     def filter_none_values(cls, data: Any) -> Any:
@@ -27,7 +28,7 @@ class Record(BaseModel):
             return 0
         return v
 
-class BasketballRecord(Record):
+class BasketballSeasonRecord(SeasonRecord):
     sport: str = "basketball"
     positions: Optional[list] = None
     jersey: Optional[str] = None
@@ -109,7 +110,7 @@ class Player(BaseModel):
     maxpreps_link: Optional[str] = Field(None)
     records: list[Any] = Field(default_factory=list)
 
-    def add_record(self, record: Record):
+    def add_record(self, record: SeasonRecord):
         """Adds a sport record to the player's records list."""
         self.records.append(record)
 
