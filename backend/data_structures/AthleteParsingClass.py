@@ -59,10 +59,12 @@ class AthletesParsingClass(BaseModel):
             
             for season_data in seasons_list:
                 year = season_data.get("year")
+                level = season_data.get("teamLevel")
                 if not year: continue
 
                 if year not in yearly_stats:
-                    yearly_stats[year] = {"year": year}
+                    yearly_stats[year] = {"year": year} | {"teamLevel": level}
+
                 
                 stats_list = season_data.get("stats", [])
                 for stat_item in stats_list:
@@ -71,6 +73,7 @@ class AthletesParsingClass(BaseModel):
                     
                     if field_name:
                        yearly_stats[year][field_name] = stat_item.get("value")
+
 
         return yearly_stats
 
