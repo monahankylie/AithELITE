@@ -131,6 +131,10 @@ class Scraper_Task:
         if(len(matches) == 0):
             print(f"NO MATCH FOUND FOR STEP {i}")
             print(f"when looking for {regex} in {self.current_url}")
+            backup = match_info.get("must_store",False)
+            if(backup):
+                matches.append(backup)
+                
         self.step_dict[i] = matches
         
     #given parameters from json, we extract things of that type. otherwise, if the user so desires to get the whole link/element, they can
