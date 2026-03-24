@@ -4,6 +4,9 @@ import PageLayout from "../components/page-layout";
 import {athleteService, type BasketballPlayerProfile} from "../lib/athlete-service";
 import {athleteFormatter} from "../lib/athlete-formatter";
 import WatchlistPopup from "../components/watchlist-popup";
+import { RadarChart } from '@mui/x-charts/RadarChart';
+
+
 
 export default function PlayerProfilePage() {
   const {id} = useParams();
