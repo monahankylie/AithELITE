@@ -11,4 +11,5 @@ export default [
   route("/players/:id", "routes/player.$id.tsx"),
   route("/players/:id/stats", "routes/player.$id.stats.tsx"),
   route("/players/:id/games", "routes/player.$id.games.tsx"),
+  route("/test", "routes/test.tsx"),
 ] satisfies RouteConfig;
