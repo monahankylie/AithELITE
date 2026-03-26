@@ -189,6 +189,51 @@
           }
         ]
       }
+  },
+  "single_url":{
+    "site_url": "https://www.maxpreps.com",
+      "scraping": {
+        "steps": [
+          {
+            "description": "State-level directory of teams",
+            "scrape_method":["entry","access_each"],
+            "pattern": "/ca/los-gatos/los-gatos-wildcats/basketball/schedule/"
+          },
+          {
+            "description": "All games of school",
+            "scrape_method": ["match","store","extract","access_each"],
+            "match": {
+              "regex_pattern": "https",
+              "pattern": "/games/{date}/{sport_year}/{game_id}",
+              "tag": "a",
+              "attr": "href"
+            },
+            "extract": {
+              "type": "href"
+            },
+            "store": {
+              "path": "BoxScoresContext2/",
+              "method": "all",
+              "ext": ".txt"
+            }
+          },
+          {
+            "description": "Individual athlete profile page",
+            "scrape_method": ["match","store"],
+            "match": {
+              "must_store": "NONEFOUND",
+              "pattern": "ContestStatsContentPanel",
+              "tag": "div",
+              "attr": "id"
+            },
+            "store": {
+              "path": "BoxScoresDOM2/",
+              "method": "all",
+              "ext": ".txt"
+            }
+          }
+        ]
+      }
   }
   }
 }

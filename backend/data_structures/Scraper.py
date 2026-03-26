@@ -77,6 +77,7 @@ class Scraper_Task:
                 method(step_config)
             else:
                 print(f"Warning: Method '{process_name}' not found in Scraper class.")
+        
     #when automation occurs, we seed via each line from a markup file
     def seed(self, dictionary):
         self.seed_dict = dictionary
