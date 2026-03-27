@@ -4,6 +4,13 @@ import re
 from bs4 import BeautifulSoup
 import requests
 
+def generic_regex_gen(pattern,dict = {}, known_dict = {}):
+    temp_key_list = extract_keys(pattern)
+    dict = dict | dictionary_builder(temp_key_list,[r'[^/]+' for val in temp_key_list])
+    pattern = string_builder(pattern, dict | known_dict)
+    generic_pattern = re.compile(pattern)
+    return generic_pattern
+
 def string_builder(str_template, dict_of_args): #use this to go to diff pages. teams -> roster -> individual player
     try:
         return str_template.format(**dict_of_args)
@@ -19,6 +26,17 @@ def extract_keys(str_template):
     key = re.compile(r'{(\w+)}')
     list_of_keys = re.findall(key,str_template)
     return list_of_keys
+
+def extract_values(pattern,string):
+    delimiters = re.split(r"\{[^}]*\}", pattern) ##looks at pattern, extracts the expected delimiters
+    delimiters = [d for d in delimiters if d] 
+    list_of_values = [string] 
+    for d in delimiters: #shift everything to the right
+        split_string = list_of_values[-1].split(d,1)
+        if len(split_string) > 1:
+            list_of_values[-1] = split_string[0]
+            list_of_values.append(split_string[1])
+    return [l for l in list_of_values if l] #one last filter to get rid of empty strings
 
 def get_html(URL): #gets html in text
     header = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}

@@ -5,7 +5,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 
 # Official data structures
-from data_structures.AthleticsParsingInfo import AthleticsParsingInfo
+from data_structures.AthleteParsingClass import AthletesParsingClass
 from data_structures.player_class import Player
 from data_structures.team_class import Team
 
@@ -29,7 +29,7 @@ except ValueError:
 db = firestore.client()
 
 # Official Parser Setup
-ATHLETE_PARSER = AthleticsParsingInfo(
+ATHLETE_PARSER = AthletesParsingClass(
     sport_type="Basketball",
     player_mapping=os.path.join(BASE_DIR, "Resources/player_bio.json"),
     record_mapping=os.path.join(BASE_DIR, "Resources/bball_record.json"),

@@ -1,4 +1,4 @@
-from .player_class import Player, Record, BasketballRecord
+from .player_class import Player, SeasonRecord, BasketballSeasonRecord
 from .team_class import Team
 from utils.parsing_functions import traverse_paths
 import json 
@@ -6,11 +6,11 @@ import os
 from typing import Optional, Callable, Dict, Any, ClassVar, Tuple, List, Type
 from pydantic import BaseModel, Field, field_validator, model_validator, AliasChoices
 
-class AthleticsParsingInfo(BaseModel):
+class AthletesParsingClass(BaseModel):
 
     rec_func_dict: ClassVar[Dict[Optional[str], Type[BaseModel]]] = { # Changed to store types
-        None : Record,
-        "basketball": BasketballRecord,
+        None : SeasonRecord,
+        "basketball": BasketballSeasonRecord,
     }
     sport_type : Optional[str] = Field(alias = "sport",validation_alias = AliasChoices("stype","sport_type"))
     player_mapping : dict = Field(validation_alias = AliasChoices("player_mapping"))
@@ -40,9 +40,10 @@ class AthleticsParsingInfo(BaseModel):
         except: pass
         return matches[0]
 
+    #given the root from json, go on to grab data from all years-- note: only one set per year per root
     def _process_stats_by_year(self, stat_roots: Dict) -> Dict[str, Dict]:
         yearly_stats = {}
-        
+
         # Create a reverse map from alias -> field_name
         record_model_class = self.sport_record_class # Use the class directly
         alias_map = {}
@@ -56,13 +57,19 @@ class AthleticsParsingInfo(BaseModel):
         
         for root_key, seasons_list in stat_roots.items():
             if not isinstance(seasons_list, list): continue
-            
             for season_data in seasons_list:
+                
                 year = season_data.get("year")
+                level = season_data.get("teamLevel")
+                athlete_id = season_data.get("athleteId")
                 if not year: continue
 
                 if year not in yearly_stats:
-                    yearly_stats[year] = {"year": year}
+                    yearly_stats[year] = {"year": year} | {"teamLevel": level}
+                
+                if athlete_id:
+                    yearly_stats[year]["AthleteID"] = athlete_id
+
                 
                 stats_list = season_data.get("stats", [])
                 for stat_item in stats_list:
@@ -71,6 +78,7 @@ class AthleticsParsingInfo(BaseModel):
                     
                     if field_name:
                        yearly_stats[year][field_name] = stat_item.get("value")
+
 
         return yearly_stats
 
