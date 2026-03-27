@@ -146,6 +146,7 @@
               "string": "/schedule/"
             },
             "fork":{
+              "replace":true,
               "current_pattern":"/{state}/{county}/{team_name}/{sport}",
               "requested_patterns":["/{state}/{county}/{team_name}/{sport}/24-25/schedule",
               "/{state}/{county}/{team_name}/{sport}/23-24/schedule",
@@ -175,7 +176,8 @@
             "store": {
               "path": "BoxScoresContext/",
               "method": "all",
-              "ext": ".txt"
+              "ext": ".txt",
+              "name_scheme":"number"
             }
           },
           {
@@ -190,7 +192,8 @@
             "store": {
               "path": "BoxScoresDOM/",
               "method": "all",
-              "ext": ".txt"
+              "ext": ".txt",
+              "name_scheme":"number"
             }
           }
         ]

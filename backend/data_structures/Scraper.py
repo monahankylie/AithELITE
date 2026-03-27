@@ -3,9 +3,11 @@ import os
 import uuid
 import time
 import random
-from utils.scraper_functions import extract_keys, string_builder, dictionary_builder
+from utils.scraper_functions import extract_keys, string_builder, dictionary_builder, generic_regex_gen, extract_values
 import re
 from bs4 import BeautifulSoup
+from fake_useragent import UserAgent
+from itertools import count
 import requests
 ##ADD ERROR HANDLING
 ##ADD FORK FUNCTION 
@@ -30,9 +32,12 @@ class Scraper_Task:
         self.current_html = "" #REFACTOR TO SOUP
 
         self.session = requests.Session()
+        ua = UserAgent()
+        # This provides the required key-value pair
         self.session.headers.update({
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            "User-Agent": ua.chrome
         })
+        self.counter = count(0)
 #this funcion here defines how a json file shold be structured 
     def validation_and_setup(self, scrape_preset):
         cfg = Scraper_Task.structure_file.get("scrape_presets", {}).get(scrape_preset)
@@ -132,6 +137,9 @@ class Scraper_Task:
         if(len(matches) == 0):
             print(f"NO MATCH FOUND FOR STEP {i}")
             print(f"when looking for {regex} in {self.current_url}")
+            filename = "debug_output.html"
+            with open(filename, "w", encoding="utf-8") as f:
+                f.write(self.current_html)
             backup = match_info.get("must_store",False)
             if(backup):
                 matches.append(backup)
@@ -183,15 +191,70 @@ class Scraper_Task:
             self.current_html = anchor_html     
 
     def fork(self,step_config):
+        fork_config = step_config.get("fork",{}) 
+        current_pattern = fork_config.get("current_pattern",None)
+        requested_patterns = fork_config.get("requested_patterns",None) ##should be list
+        if not fork_config or not requested_patterns: 
+            print("no requested patterns found...")
+            return
+        generic_pattern = generic_regex_gen(current_pattern)#get generic pattern in case 
+        keys = extract_keys(current_pattern)
+        step = self.which_step_am_i(step_config)
+        processed_stuff = self.step_dict.get(step, [])
+        new_path_buffer = []
+
+        if processed_stuff: ##if we have stuff inside this 
+            for target in processed_stuff:
+                match = re.search(generic_pattern, target) #check if current item has that pattern within 
+                if not match:
+                    continue
+                start,end = match.span() #if pattern match, we will grab the substring for a better match
+                substring = target[start:end]
+                values = extract_values(current_pattern,substring)
+                fork_dict = dictionary_builder(keys,values)
+                for r_pattern in requested_patterns:
+                    new_path = string_builder(r_pattern,fork_dict)
+                    new_path = target[:start] + new_path + target[end:]
+                    new_path_buffer.append(new_path)
+        
+        else: #should the user not have this after a match + extract, it will use the current html
+            target = self.current_url
+            match = re.search(generic_pattern, target)
+            if match:
+                start,end = match.span() #if pattern match, we will grab the substring for a better match
+                substring = target[start:end]
+                values = extract_values(current_pattern,substring)
+                fork_dict = dictionary_builder(keys,values)
+                for r_pattern in requested_patterns:
+                    new_path = string_builder(r_pattern,fork_dict)
+                    new_path = target[:start] + new_path + target[end:]
+                    new_path_buffer.append(new_path)
+
+        if fork_config.get("replace",False):
+            self.step_dict[step] = new_path_buffer
+        else:
+            processed_stuff.extend(new_path_buffer)
+
+
+
+
+
+
         ##used after match usually, but will use current_url if current step does not incl match
         ##parses each entry match
         ##decides whether or not to overwrite list(defined in step_config)
 
         pass 
+    
     def store(self,step_config):
         writers = { 
             ".json": lambda data, f: json.dump(data, f, indent=4),
             ".txt": lambda data, f: f.write(str(data))
+        }
+        namers = {
+            "uuid1": lambda: uuid.uuid1,
+            "uuid4": lambda: uuid.uuid4,
+            "number":lambda: next(self.counter)
         }
 
         step = self.which_step_am_i(step_config)
@@ -203,20 +266,20 @@ class Scraper_Task:
         method = store_config.get("method","each")
         extension = store_config.get("ext",".json").lower().strip()
         write_method = writers.get(extension,writers[".json"]) ##ait if the user doesnt give us one, then itll  be json
-
+        name_method = namers.get(store_config.get("name_scheme"))
         ##can probs shove all these conditionals within a lambda
         ##lets make a write function in utils another time. rewriting serial is tedious.
         if method == "each":
             for data in processed_stuff:
                 while True:
-                    serial = uuid.uuid1()
+                    serial = name_method()
                     file_path = os.path.join(base_path, f"{serial}{extension}")
                     if not os.path.exists(file_path):
                         break
                 with open(file_path, 'w') as f:
                     write_method(str(data), f)
         else:
-            serial = uuid.uuid1()
+            serial = name_method()
             file_path = os.path.join(base_path, f"{serial}{extension}")
             if method == "page":
                 with open(file_path, 'w') as f:
