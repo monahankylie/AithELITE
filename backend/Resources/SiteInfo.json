@@ -141,9 +141,16 @@
           },
           {
             "description": "Main landing page for a specific team",
-            "scrape_method": ["match","extract","append","access_each"],
+            "scrape_method": ["match","extract","fork","access_each"],
             "append": {
               "string": "/schedule/"
+            },
+            "fork":{
+              "replace":true,
+              "current_pattern":"/{state}/{county}/{team_name}/{sport}",
+              "requested_patterns":["/{state}/{county}/{team_name}/{sport}/24-25/schedule",
+              "/{state}/{county}/{team_name}/{sport}/23-24/schedule",
+              "/{state}/{county}/{team_name}/{sport}/22-23/schedule"]
             },
             "match": {
               "pattern": "/{state}/{county}/{team_name}/{sport}",
@@ -169,7 +176,8 @@
             "store": {
               "path": "BoxScoresContext/",
               "method": "all",
-              "ext": ".txt"
+              "ext": ".txt",
+              "name_scheme":"number"
             }
           },
           {
@@ -183,6 +191,52 @@
             },
             "store": {
               "path": "BoxScoresDOM/",
+              "method": "all",
+              "ext": ".txt",
+              "name_scheme":"number"
+            }
+          }
+        ]
+      }
+  },
+  "single_url":{
+    "site_url": "https://www.maxpreps.com",
+      "scraping": {
+        "steps": [
+          {
+            "description": "State-level directory of teams",
+            "scrape_method":["entry","access_each"],
+            "pattern": "/ca/los-gatos/los-gatos-wildcats/basketball/schedule/"
+          },
+          {
+            "description": "All games of school",
+            "scrape_method": ["match","store","extract","access_each"],
+            "match": {
+              "regex_pattern": "https",
+              "pattern": "/games/{date}/{sport_year}/{game_id}",
+              "tag": "a",
+              "attr": "href"
+            },
+            "extract": {
+              "type": "href"
+            },
+            "store": {
+              "path": "BoxScoresContext2/",
+              "method": "all",
+              "ext": ".txt"
+            }
+          },
+          {
+            "description": "Individual athlete profile page",
+            "scrape_method": ["match","store"],
+            "match": {
+              "must_store": "NONEFOUND",
+              "pattern": "ContestStatsContentPanel",
+              "tag": "div",
+              "attr": "id"
+            },
+            "store": {
+              "path": "BoxScoresDOM2/",
               "method": "all",
               "ext": ".txt"
             }

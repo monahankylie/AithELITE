@@ -7,9 +7,10 @@ import uvicorn
 from fastapi import FastAPI, BackgroundTasks, HTTPException,Request
 from fastapi.middleware.cors import CORSMiddleware
 from specific_scripts import parse_script, push_athletes, parse_boxscores, push_games
+from fake_useragent import UserAgent
+
 
 app = FastAPI()
-background_tasks = BackgroundTasks()
 
 app.add_middleware(
     CORSMiddleware,
@@ -50,16 +51,21 @@ async def parse(background_tasks: BackgroundTasks):
     return {"it has started":"parse"}
 
 @app.post("/json_dump_scores")
-async def parse_boxscores_endpoint(background_tasks: BackgroundTasks):
+async def parse_boxscores_endpoint(request: Request, background_tasks: BackgroundTasks):
     CONTEXT_DIR = "BoxScoresContext"
     DOM_DIR = "BoxScoresDOM"
     OUTPUT_DIR = "ParsedGames"
     
-    def run_full_parse():
-        parse_boxscores.run_boxscore_parse(CONTEXT_DIR, DOM_DIR, OUTPUT_DIR)
+    start_letter = None
+    try:
+        data = await request.json()
+        start_letter = data.get("start_letter")
+    except Exception:
+        # No body or invalid JSON, proceed without start_letter
+        pass
 
-    background_tasks.add_task(run_full_parse)
-    return {"status": "Box score parsing started"}
+    background_tasks.add_task(parse_boxscores.run_boxscore_parse, CONTEXT_DIR, DOM_DIR, OUTPUT_DIR, start_letter)
+    return {"status": "Box score parsing started", "start_letter": start_letter}
 
 @app.post("/push_athletes")
 async def push(background_tasks: BackgroundTasks):
@@ -67,13 +73,24 @@ async def push(background_tasks: BackgroundTasks):
     return {"status": "Push task added to queue"}
 
 @app.post("/push_games")
-async def push_games_endpoint(background_tasks: BackgroundTasks):
-    background_tasks.add_task(push_games.push_all_pending)
-    return {"status": "Game push task added to queue"}
+async def push_games_endpoint(request: Request, background_tasks: BackgroundTasks):
+    start_letter = None
+    try:
+        data = await request.json()
+        start_letter = data.get("start_letter")
+    except Exception:
+        # No body or invalid JSON, proceed without start_letter
+        pass
+        
+    background_tasks.add_task(push_games.push_all_pending, start_letter)
+    return {"status": "Game push task added to queue", "start_letter": start_letter}
 
-@app.get("/test")
-def something():
-    pass
+@app.post("/test_scrape")
+async def scrape(background_tasks: BackgroundTasks):
+    Scraper_Task.load_structure("Resources/SiteInfo.json")
+    scrapeCA = Scraper_Task('single_url')
+    background_tasks.add_task(scrapeCA.start_scrape)
+    return {"Scrape": "started"}
 
 @app.get("/")
 def health_check():
