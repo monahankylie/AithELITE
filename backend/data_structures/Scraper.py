@@ -186,6 +186,7 @@ class Scraper_Task:
         ##used after match usually, but will use current_url if current step does not incl match
         ##parses each entry match
         ##decides whether or not to overwrite list(defined in step_config)
+
         pass 
     def store(self,step_config):
         writers = { 

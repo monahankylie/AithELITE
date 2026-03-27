@@ -7,6 +7,8 @@ import uvicorn
 from fastapi import FastAPI, BackgroundTasks, HTTPException,Request
 from fastapi.middleware.cors import CORSMiddleware
 from specific_scripts import parse_script, push_athletes, parse_boxscores, push_games
+from fake_useragent import UserAgent
+
 
 app = FastAPI()
 
