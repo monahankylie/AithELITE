@@ -32,11 +32,14 @@ class Scraper_Task:
         self.current_html = "" #REFACTOR TO SOUP
 
         self.session = requests.Session()
-        ua = UserAgent(browsers=['chrome'], os=['windows', 'macos', 'linux'])
+        ua = UserAgent(platforms='desktop',browsers=['Chrome'], os=['Windows', 'Mac OS X'],fallback = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
         # This provides the required key-value pair
+        selected_ua = ua.random
         self.session.headers.update({
-            "User-Agent": ua.chrome
-        })
+        "User-Agent": selected_ua,
+        "sec-ch-ua-mobile": "?0",  # Explicitly tell server "Not Mobile"
+        "sec-ch-ua-platform": '"Windows"' if "Windows" in selected_ua else '"macOS"'
+    })
         self.counter = count(0)
 #this funcion here defines how a json file shold be structured 
     def validation_and_setup(self, scrape_preset):
