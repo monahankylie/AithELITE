@@ -187,6 +187,8 @@ class Scraper_Task:
             self.current_url = full_url
             time.sleep(random.uniform(5, 10)) ##ADD PARAMETERS OR FUNCTION TO CHANGE INTERVALS
             self.current_html = self.get_html(full_url) 
+            if self.current_html is None:
+                continue
             self.run_step(self.steps[next_step_idx])
             self.current_html = anchor_html     
 
@@ -310,9 +312,18 @@ class Scraper_Task:
     def get_scrape_config(self):
         return self.scrape_cfg
     def get_html(self, URL):
-        page = self.session.get(URL, timeout=15)
-        page.raise_for_status() 
-        return BeautifulSoup(page.text, 'html.parser')
+        try:
+            page = self.session.get(URL, timeout=15)
+            page.raise_for_status() 
+            return BeautifulSoup(page.text, 'html.parser')
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 404:
+                print(f"404 Not Found: {URL}")
+                return None  # Return None so we can skip it
+            raise e # Still crash on 500s or other critical errors
+        except Exception as e:
+            print(f"Connection Error at {URL}: {e}")
+            return None
     def print_step_desc(self,step_config):
         print(step_config.get("description"))
     def which_step_am_i(self,step_config):
