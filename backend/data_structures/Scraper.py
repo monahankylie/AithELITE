@@ -137,6 +137,7 @@ class Scraper_Task:
         if(len(matches) == 0):
             print(f"NO MATCH FOUND FOR STEP {i}")
             print(f"when looking for {regex} in {self.current_url}")
+            print(f"\n{str(self.current_html)}")
             backup = match_info.get("must_store",False)
             if(backup):
                 matches.append(backup)
