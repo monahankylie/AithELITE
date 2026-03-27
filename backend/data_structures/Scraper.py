@@ -138,7 +138,7 @@ class Scraper_Task:
             os.makedirs("Debug", exist_ok=True)
             file_path = os.path.join("Debug", f"{uuid.uuid1()}.txt")
             with open(file_path,"w") as f:
-                f.write(f"NO MATCH FOUND FOR STEP {i} \n when looking for {regex} in {self.current_url} \n {str(self.current_html)})")
+                f.write(f"AS {self.session.headers.get("User-Agent")}, \nNO MATCH FOUND FOR STEP {i} \n when looking for {regex} in {self.current_url} \n {str(self.current_html)})")
             backup = match_info.get("must_store",False)
             if(backup):
                 matches.append(backup)
