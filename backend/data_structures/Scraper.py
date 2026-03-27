@@ -32,7 +32,7 @@ class Scraper_Task:
         self.current_html = "" #REFACTOR TO SOUP
 
         self.session = requests.Session()
-        ua = UserAgent()
+        ua = UserAgent(browsers=['chrome'], os=['windows', 'macos', 'linux'])
         # This provides the required key-value pair
         self.session.headers.update({
             "User-Agent": ua.chrome
