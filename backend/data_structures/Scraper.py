@@ -314,10 +314,11 @@ class Scraper_Task:
             page.raise_for_status() 
             return BeautifulSoup(page.text, 'html.parser')
         except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 404:
-                print(f"404 Not Found: {URL}")
+            if e.response.status_code in (404,500):
+                server_info = e.response.headers.get('Server', 'Unknown')
+                print(f"{e.response.status_code} at {URL} | Server: {server_info}")
                 return None  # Return None so we can skip it
-            raise e # Still crash on 500s or other critical errors
+            raise e # Still crash on other critical errors
         except Exception as e:
             print(f"Connection Error at {URL}: {e}")
             return None
