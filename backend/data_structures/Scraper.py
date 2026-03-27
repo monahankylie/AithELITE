@@ -136,7 +136,7 @@ class Scraper_Task:
         i = self.which_step_am_i(step_config)
         if(len(matches) == 0):
             os.makedirs("Debug", exist_ok=True)
-            file_path = os.path.join("Debug", f"{str(uuid.uuid1())}.txt")
+            file_path = os.path.join("Debug", f"{uuid.uuid1()}.txt")
             with open(file_path,"w") as f:
                 f.write(f"NO MATCH FOUND FOR STEP {i} \n when looking for {regex} in {self.current_url} \n {str(self.current_html)})")
             backup = match_info.get("must_store",False)
