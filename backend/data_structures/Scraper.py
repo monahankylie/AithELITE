@@ -270,7 +270,7 @@ class Scraper_Task:
         method = store_config.get("method","each")
         extension = store_config.get("ext",".json").lower().strip()
         write_method = writers.get(extension,writers[".json"]) ##ait if the user doesnt give us one, then itll  be json
-        name_method = namers.get(store_config.get("name_scheme"))
+        name_method = namers.get(store_config.get("name_scheme"),namers["uuid1"])
         ##can probs shove all these conditionals within a lambda
         ##lets make a write function in utils another time. rewriting serial is tedious.
         if method == "each":
