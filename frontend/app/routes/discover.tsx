@@ -136,43 +136,47 @@ export default function DiscoverPage() {
           : `Browse the top performing ${currentSport.toLowerCase()} talent.`
       }
       variant="hero"
-      actions={
-        <div className="flex items-center gap-4">
-          {selectedIds.size > 0 && isSelectMode && (
-            <>
-              <button
-                onClick={handleAnalyze}
-                className="rounded-2xl bg-amber-500 px-8 py-4 text-xs font-black uppercase tracking-widest text-white shadow-2xl hover:bg-amber-600 transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
-              >
-                Analyze ({selectedIds.size})
-              </button>
-              <button
-                onClick={() => setShowWatchlistPopup(true)}
-                className="rounded-2xl bg-[#00599c] px-8 py-4 text-xs font-black uppercase tracking-widest text-white shadow-2xl hover:bg-[#004a82] transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
-              >
-                Save ({selectedIds.size})
-              </button>
-            </>
-          )}
-          <button
-            onClick={() => {
-              setIsSelectMode(!isSelectMode);
-              if (isSelectMode) setSelectedIds(new Set());
-            }}
-            className={`rounded-2xl px-8 py-4 text-xs font-black uppercase tracking-widest transition-all shadow-sm border-2 whitespace-nowrap ${
-              isSelectMode
-                ? "bg-white text-[#00599c] border-[#00599c] shadow-md"
-                : "bg-white text-slate-900 border-slate-200 hover:border-slate-900 hover:bg-slate-50"
-            }`}
-          >
-            {isSelectMode ? "Cancel Selection" : "Select Players"}
-          </button>
-        </div>
-      }
     >
       <div className="pb-20 px-4 sm:px-6 md:px-12 lg:px-24">
-        {/* ── Sticky Search + Filters ── */}
-        <div className="sticky top-0 z-30 mb-6 bg-white/95 pt-2 pb-4 backdrop-blur-sm">
+        {/* ── Sticky Actions & Filters ── */}
+        <div className="sticky top-0 z-30 mb-6 bg-white/95 pt-2 pb-4 backdrop-blur-sm space-y-4">
+          
+          {/* ── Selection Actions Row (Sticky) ── */}
+          <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div className="flex items-center gap-3">
+              {selectedIds.size > 0 && isSelectMode && (
+                <>
+                  <button
+                    onClick={handleAnalyze}
+                    className="rounded-xl bg-amber-500 px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-lg hover:bg-amber-600 transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
+                  >
+                    Analyze ({selectedIds.size})
+                  </button>
+                  <button
+                    onClick={() => setShowWatchlistPopup(true)}
+                    className="rounded-xl bg-[#00599c] px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-lg hover:bg-[#004a82] transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
+                  >
+                    Save ({selectedIds.size})
+                  </button>
+                </>
+              )}
+            </div>
+            
+            <button
+              onClick={() => {
+                setIsSelectMode(!isSelectMode);
+                if (isSelectMode) setSelectedIds(new Set());
+              }}
+              className={`rounded-xl px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm border-2 whitespace-nowrap ${
+                isSelectMode
+                  ? "bg-white text-[#00599c] border-[#00599c] shadow-md"
+                  : "bg-white text-slate-900 border-slate-200 hover:border-slate-900 hover:bg-slate-50"
+              }`}
+            >
+              {isSelectMode ? "Cancel Selection" : "Select Players"}
+            </button>
+          </div>
+
           {/* ── Search Bar ── */}
           <div className="mb-4">
             <div className="flex gap-3">

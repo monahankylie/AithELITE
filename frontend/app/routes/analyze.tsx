@@ -1,14 +1,20 @@
 import * as React from "react";
 import { useSearchParams, Link } from "react-router";
 import PageLayout from "../components/page-layout";
-import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import Stack from '@mui/material/Stack';
-import Checkbox from '@mui/material/Checkbox';
-import ListItemText from '@mui/material/ListItemText';
+import { 
+  Box, 
+  InputLabel, 
+  MenuItem, 
+  FormControl, 
+  Select, 
+  Stack, 
+  Checkbox, 
+  ListItemText, 
+  FormControlLabel, 
+  Typography,
+  CircularProgress
+} from '@mui/material';
+import type { SelectChangeEvent } from '@mui/material/Select';
 import { graphService, type RadarSeriesData, type TrendData } from "../lib/graph-service";
 import { gameService, type HydratedGameStat } from "../lib/game-service";
 import { athleteService } from "../lib/athlete-service";
@@ -16,7 +22,7 @@ import type { Athlete, BasketballStatRecord } from "../lib/athlete-types";
 import { POSITION_METRICS, DEFAULT_METRICS } from "../lib/relevant-metrics";
 import RadarVisualisation from "../components/radar-visualisation";
 import TrendLineChart from "../components/trend-line-chart";
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 
 const STAT_OPTIONS = [
   { value: 'points', label: 'Points' },
@@ -53,6 +59,8 @@ const GRID_COLUMNS: GridColDef[] = [
   { field: 'gp', headerName: 'GP', type: 'number', width: 100 },
 ];
 
+const CHART_COLORS = ['#02B2AF', '#2E96FF', '#B800D8', '#60009B', '#2731C8', '#03008D'];
+
 export default function AnalyzePage() {
   const [searchParams] = useSearchParams();
   const idsParam = searchParams.get("ids");
@@ -61,11 +69,24 @@ export default function AnalyzePage() {
   const [players, setPlayers] = React.useState<Athlete[]>([]);
   const [radarData, setRadarData] = React.useState<RadarSeriesData[]>([]);
   const [gameTrendData, setGameTrendData] = React.useState<TrendData[]>([]);
+  
+  const [gridYear, setGridYear] = React.useState('25-26');
   const [selectedStat, setSelectedStat] = React.useState('points');
   const [selectedYears, setSelectedYears] = React.useState<string[]>(['25-26']);
   const [gameLimit, setGameLimit] = React.useState(30);
+  const [hiddenIds, setHiddenIds] = React.useState<string[]>([]);
+  
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+
+  // Derive stable colors for players based on their index in the original playerIds list
+  const playerColors = React.useMemo(() => {
+    const map: Record<string, string> = {};
+    playerIds.forEach((id, idx) => {
+      map[id] = CHART_COLORS[idx % CHART_COLORS.length];
+    });
+    return map;
+  }, [playerIds]);
 
   const handleStatChange = (event: SelectChangeEvent) => {
     setSelectedStat(event.target.value as string);
@@ -78,6 +99,16 @@ export default function AnalyzePage() {
 
   const handleLimitChange = (event: SelectChangeEvent<number>) => {
     setGameLimit(Number(event.target.value));
+  };
+
+  const handleGridYearChange = (event: SelectChangeEvent) => {
+    setGridYear(event.target.value as string);
+  };
+
+  const togglePlayerVisibility = (id: string) => {
+    setHiddenIds(prev => 
+      prev.includes(id) ? prev.filter(hid => hid !== id) : [...prev, id]
+    );
   };
 
   React.useEffect(() => {
@@ -106,37 +137,47 @@ export default function AnalyzePage() {
         const metrics = POSITION_METRICS[primaryPos] || DEFAULT_METRICS;
 
         const radar = await graphService.getRadarData(playerIds, metrics);
-        setRadarData(radar);
+        
+        // Inject stable colors into radar data
+        const coloredRadar = radar.map(s => {
+            const player = fetchedPlayers.find(p => p.name === s.label);
+            return { ...s, color: player ? playerColors[player.id] : undefined };
+        });
+
+        setRadarData(coloredRadar);
       } catch (err: any) {
         console.error("[Analyze] Critical load failure:", err);
-        setError(err.message || "An unexpected error occurred while loading analysis data.");
+        setError(err.message || "An unexpected error occurred.");
       } finally {
         setLoading(false);
       }
     }
     loadInitialData();
-  }, [playerIds]);
+  }, [playerIds, playerColors]);
 
   React.useEffect(() => {
     if (playerIds.length === 0 || loading || error) return;
     async function loadGameTrend() {
       try {
         const data = await graphService.getGameTrendData(playerIds, selectedStat, gameLimit, selectedYears);
-        setGameTrendData(data);
+        
+        // Inject stable colors into trend data
+        const coloredTrend = data.map(s => ({
+            ...s,
+            color: playerColors[s.id]
+        }));
+
+        setGameTrendData(coloredTrend);
       } catch (err) {
         console.error("[Analyze] Game trend load failure:", err);
       }
     }
     loadGameTrend();
-  }, [playerIds, selectedStat, selectedYears, gameLimit, loading, error]);
+  }, [playerIds, selectedStat, selectedYears, gameLimit, loading, error, playerColors]);
 
   const gridRows = React.useMemo(() => {
     return players.map(p => {
-      // For the grid, we'll show the stats for the MOST RECENT year selected
-      const sortedSelectedYears = [...selectedYears].sort((a, b) => b.localeCompare(a));
-      const latestYear = sortedSelectedYears[0] || '25-26';
-      const record = p.records.find(r => r.year === latestYear) as BasketballStatRecord;
-      
+      const record = p.records.find(r => r.year === gridYear) as BasketballStatRecord;
       return {
         id: p.id,
         name: p.name,
@@ -149,36 +190,36 @@ export default function AnalyzePage() {
         gp: record?.games_played ?? 0,
       };
     });
-  }, [players, selectedYears]);
+  }, [players, gridYear]);
 
   if (playerIds.length === 0) {
     return (
       <PageLayout requireAuth title="Deep Analysis" description="No players selected for analysis.">
-        <div className="mx-auto max-w-3xl px-6 py-20 text-center">
-          <div className="rounded-[32px] border border-slate-200 bg-white p-12 shadow-sm">
-            <h2 className="text-2xl font-black text-slate-900">No Athletes Selected</h2>
-            <p className="mt-4 text-slate-500">Go to the Discover page and select athletes to compare their performance profiles.</p>
-            <Link to="/discover" className="mt-8 inline-flex rounded-full bg-[#00599c] px-8 py-4 text-xs font-black uppercase tracking-widest text-white shadow-lg transition hover:-translate-y-0.5">
+        <Box sx={{ mx: 'auto', maxWidth: '48rem', px: 3, py: 10, textAlign: 'center' }}>
+          <Box sx={{ borderRadius: '32px', border: '1px solid', borderColor: 'divider', bg: 'white', p: 6, boxShadow: 1 }}>
+            <Typography variant="h5" sx={{ fontWeight: 900, color: '#0f172a' }}>No Athletes Selected</Typography>
+            <Typography sx={{ mt: 2, color: '#64748b' }}>Go to the Discover page and select athletes to compare their performance profiles.</Typography>
+            <Link to="/discover" style={{ marginTop: '32px', display: 'inline-flex', borderRadius: '9999px', backgroundColor: '#00599c', padding: '16px 32px', fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'white', textDecoration: 'none' }}>
               Back to Discover
             </Link>
-          </div>
-        </div>
+          </Box>
+        </Box>
       </PageLayout>
     );
   }
 
   if (error) {
     return (
-      <PageLayout requireAuth title="Analysis Error" description="Something went wrong during data retrieval.">
-        <div className="mx-auto max-w-3xl px-6 py-20 text-center">
-          <div className="rounded-[32px] border border-red-100 bg-white p-12 shadow-sm">
-            <h2 className="text-2xl font-black text-red-600">Failed to Load Analysis</h2>
-            <p className="mt-4 text-slate-500">{error}</p>
-            <Link to="/discover" className="mt-8 inline-flex rounded-full bg-slate-900 px-8 py-4 text-xs font-black uppercase tracking-widest text-white shadow-lg transition hover:-translate-y-0.5">
+      <PageLayout requireAuth title="Analysis Error" description="Something went wrong.">
+        <Box sx={{ mx: 'auto', maxWidth: '48rem', px: 3, py: 10, textAlign: 'center' }}>
+          <Box sx={{ borderRadius: '32px', border: '1px solid', borderColor: '#fee2e2', bg: 'white', p: 6, boxShadow: 1 }}>
+            <Typography variant="h5" sx={{ fontWeight: 900, color: '#dc2626' }}>Failed to Load Analysis</Typography>
+            <Typography sx={{ mt: 2, color: '#64748b' }}>{error}</Typography>
+            <Link to="/discover" style={{ marginTop: '32px', display: 'inline-flex', borderRadius: '9999px', backgroundColor: '#0f172a', padding: '16px 32px', fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'white', textDecoration: 'none' }}>
               Return to Discover
             </Link>
-          </div>
-        </div>
+          </Box>
+        </Box>
       </PageLayout>
     );
   }
@@ -195,20 +236,44 @@ export default function AnalyzePage() {
     >
       <div className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 md:px-12 lg:px-24 space-y-12">
         {loading ? (
-          <div className="flex flex-col items-center justify-center p-20 gap-4">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#00599c] border-t-transparent" />
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-[#00599c]/50">Crunching production data</p>
-          </div>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 10, gap: 2 }}>
+            <CircularProgress size={48} sx={{ color: '#00599c' }} />
+            <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#00599c80' }}>
+              Crunching production data
+            </Typography>
+          </Box>
         ) : (
           <>
-            {/* 0. Stats Comparison Grid */}
             <section className="rounded-[40px] border border-slate-200 bg-white p-8 shadow-sm">
               <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div>
-                  <span className="text-xs font-black uppercase tracking-[0.25em] text-[#00599c]">Production Summary</span>
-                  <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-900">Stats Overview</h2>
-                  <p className="mt-1 text-sm font-medium text-slate-400">Comparing profile campaign averages</p>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.25em', color: '#00599c' }}>Production Summary</Typography>
+                  <Typography variant="h4" sx={{ mt: 1, fontWeight: 900, letterSpacing: '-0.02em', color: '#0f172a' }}>Stats Overview</Typography>
+                  <Typography sx={{ mt: 0.5, fontSize: '0.875rem', fontWeight: 500, color: '#64748b' }}>Comparing profile campaign averages</Typography>
                 </div>
+
+                <Box sx={{ minWidth: 180 }}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel sx={{ color: 'black', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase' }}>Filter Year</InputLabel>
+                    <Select
+                      value={gridYear}
+                      label="Filter Year"
+                      onChange={handleGridYearChange}
+                      sx={{
+                        borderRadius: '16px',
+                        backgroundColor: '#f8fafc',
+                        '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                        '& .MuiSelect-select': { fontWeight: 'bold', color: 'black' }
+                      }}
+                    >
+                      {YEAR_OPTIONS.map(opt => (
+                        <MenuItem key={opt.value} value={opt.value} sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
+                          {opt.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
               </div>
               <Box sx={{ height: 400, width: '100%' }}>
                 <DataGrid
@@ -241,34 +306,37 @@ export default function AnalyzePage() {
               </Box>
             </section>
 
-            {/* 1. Radar Comparison */}
             <section className="rounded-[40px] border border-slate-200 bg-white p-8 shadow-sm">
               <div className="mb-8 text-center">
-                <span className="text-xs font-black uppercase tracking-[0.25em] text-[#00599c]">Production Radar</span>
-                <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-900">Profile Comparison</h2>
+                <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.25em', color: '#00599c' }}>Production Radar</Typography>
+                <Typography variant="h4" sx={{ mt: 1, fontWeight: 900, letterSpacing: '-0.02em', color: '#0f172a' }}>Profile Comparison</Typography>
               </div>
               <div className="flex justify-center">
                 <div className="w-full max-w-4xl">
                   {radarData.length > 0 ? (
                     <RadarVisualisation 
-                      metrics={POSITION_METRICS["PG"] || DEFAULT_METRICS} 
-                      series={radarData} 
+                      metrics={POSITION_METRICS[((players[0]?.currentStats as BasketballStatRecord)?.positions?.[0] || "PG").toUpperCase()] || DEFAULT_METRICS} 
+                      series={radarData.filter(s => {
+                        const pid = players.find(p => p.name === s.label)?.id;
+                        return pid ? !hiddenIds.includes(pid) : true;
+                      })} 
                       height={400} 
                     />
                   ) : (
-                    <p className="text-center text-slate-400 py-10 font-bold uppercase tracking-widest text-xs">Radar data unavailable for this selection</p>
+                    <Typography sx={{ textAlign: 'center', color: '#94a3b8', py: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.75rem' }}>
+                      Radar data unavailable for this selection
+                    </Typography>
                   )}
                 </div>
               </div>
             </section>
 
-            {/* 2. Game Performance Trend */}
             <section className="rounded-[40px] border border-slate-200 bg-slate-50 p-8 shadow-sm">
               <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
                 <div>
-                  <span className="text-xs font-black uppercase tracking-[0.25em] text-[#00599c]">Production Trend</span>
-                  <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-900">Game-by-Game Catalyst</h2>
-                  <p className="mt-2 text-sm font-medium text-slate-400">Visualizing {selectedStatLabel} across selected campaigns</p>
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.25em', color: '#00599c' }}>Production Trend</Typography>
+                  <Typography variant="h4" sx={{ mt: 1, fontWeight: 900, letterSpacing: '-0.02em', color: '#0f172a' }}>Game-by-Game Catalyst</Typography>
+                  <Typography sx={{ mt: 1, fontSize: '0.875rem', fontWeight: 500, color: '#94a3b8' }}>Visualizing {selectedStatLabel} across selected campaigns</Typography>
                 </div>
                 
                 <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 2 }}>
@@ -348,6 +416,32 @@ export default function AnalyzePage() {
                 </Stack>
               </div>
 
+              {/* Custom Legend with Checkboxes */}
+              <Box sx={{ mb: 4, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 3 }}>
+                {players.map((player) => (
+                  <FormControlLabel
+                    key={player.id}
+                    control={
+                      <Checkbox
+                        checked={!hiddenIds.includes(player.id)}
+                        onChange={() => togglePlayerVisibility(player.id)}
+                        sx={{
+                          color: playerColors[player.id],
+                          '&.Mui-checked': {
+                            color: playerColors[player.id],
+                          },
+                        }}
+                      />
+                    }
+                    label={
+                      <Typography sx={{ fontWeight: '900', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#0f172a' }}>
+                        {player.name}
+                      </Typography>
+                    }
+                  />
+                ))}
+              </Box>
+
               {gameTrendData.length > 0 ? (
                 <TrendLineChart 
                   key={`${selectedStat}-${selectedYears.join('-')}-${gameLimit}`}
@@ -356,9 +450,12 @@ export default function AnalyzePage() {
                   yAxisLabel={selectedStatLabel}
                   height={450}
                   hideXAxisLabels
+                  hiddenIds={hiddenIds}
                 />
               ) : (
-                <p className="text-center text-slate-400 py-20 font-bold uppercase tracking-widest text-xs">Insufficient game data for the selected filters</p>
+                <Typography sx={{ textAlign: 'center', color: '#94a3b8', py: 20, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.75rem' }}>
+                  Insufficient game data for the selected filters
+                </Typography>
               )}
             </section>
           </>

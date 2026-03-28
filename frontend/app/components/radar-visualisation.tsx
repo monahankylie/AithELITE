@@ -25,6 +25,7 @@ const RadarVisualisation: React.FC<RadarVisualisationProps> = ({
   const processedSeries = React.useMemo(() => 
     series.map(s => ({
       ...s,
+      color: s.color, // Explicitly pass the color
       hideMark: s.hideMark ?? hideMark,
       fillArea: s.fillArea ?? fillArea
     })), 

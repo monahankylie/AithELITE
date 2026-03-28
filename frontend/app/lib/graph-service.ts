@@ -17,8 +17,10 @@ export interface RadarSeriesData {
  * Data structure for trend line charts (e.g., points over seasons or games).
  */
 export interface TrendData {
+  id: string;
   label: string;
   data: number[];
+  color?: string;
   xAxisData?: string[];
 }
 
@@ -81,6 +83,7 @@ class GraphService {
       });
 
       return {
+        id: player.id,
         label: player.name,
         data: data as number[],
         xAxisData: sortedYears,
@@ -117,13 +120,14 @@ class GraphService {
         const recentGames = allGames.slice(-gameLimit);
 
         return {
+          id: player.id,
           name: player.name,
           gameData: recentGames.map(game => Number(game[metricName.toLowerCase()] ?? 0))
         };
       })
     );
 
-    const validResults = playerGamesResults.filter((r): r is { name: string; gameData: number[] } => r !== null);
+    const validResults = playerGamesResults.filter((r): r is { id: string; name: string; gameData: number[] } => r !== null);
     const xAxisSize = gameLimit;
     
     return validResults.map(res => {
@@ -131,6 +135,7 @@ class GraphService {
       const padding = Array(paddingSize).fill(null);
       
       return {
+        id: res.id,
         label: res.name,
         data: [...padding, ...res.gameData],
       };
