@@ -256,8 +256,8 @@ class Scraper_Task:
             ".txt": lambda data, f: f.write(str(data))
         }
         namers = {
-            "uuid1": lambda: uuid.uuid1,
-            "uuid4": lambda: uuid.uuid4,
+            "uuid1": uuid.uuid1,
+            "uuid4": uuid.uuid4,
             "number":lambda: next(self.counter)
         }
 
