@@ -1,10 +1,10 @@
 import React from "react";
 import { Link } from "react-router";
-import BasketballDashboardCard from "./dashboard-card";
-import { type BasketballPlayer } from "../lib/athlete-service";
+import PlayerCard from "./playercard"; 
+import type { Athlete } from "../lib/athlete-types"; // Keep Athlete type
 
 interface AthleteListProps {
-  players: BasketballPlayer[];
+  players: Athlete[]; // Keep Athlete type
   loading?: boolean;
   isSelectMode?: boolean;
   selectedIds?: Set<string>;
@@ -25,6 +25,8 @@ const AthleteList = ({
   emptyMessage = "No prospects found.",
   loadingMessage = "Scanning Database...",
 }: AthleteListProps) => {
+  
+  // Restored Old Loading Spinner Style (Aesthetic change)
   if (loading && players.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center space-y-4 py-40">
@@ -36,6 +38,7 @@ const AthleteList = ({
     );
   }
 
+  // Restored Old Empty State Style (Aesthetic change)
   if (players.length === 0) {
     return (
       <div className="px-8 py-40 text-center">
@@ -48,22 +51,26 @@ const AthleteList = ({
 
   return (
     <div className="w-full">
-      <div className="space-y-1">
+      {/* Removed the "Table Header" to restore the clean look */}
+      <div className="space-y-1 mx-auto max-w-[95vw] w-full"> 
         {players.map((player) => {
           const card = (
-            <BasketballDashboardCard
+            <PlayerCard
               key={player.id}
-              {...player}
-              selectable={isSelectMode}
-              checked={selectedIds.has(player.id)}
+              player={player} // Keep player={player} for consistency with current PlayerCard
+              variant="flat" // Explicitly set to flat variant
+              isSelectMode={isSelectMode}
+              isSelected={selectedIds.has(player.id)}
               onToggle={onToggle}
             />
           );
 
+          // Restored Selection Mode logic (Structural change, QOL feature)
           if (isSelectMode) {
             return card;
           }
 
+          // Restored Link Wrapper with original transitions and hover effects (Aesthetic/Structural change)
           return (
             <Link
               key={player.id}

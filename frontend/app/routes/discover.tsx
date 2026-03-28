@@ -1,26 +1,23 @@
-/**
- * DISCOVER PAGE
- * A place for recruiters to find new athletes.
- */
-import React, {useEffect, useState, useCallback, useMemo} from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router";
 import PageLayout from "../components/page-layout";
 import AthleteList from "../components/athlete-list";
-import {
-  athleteService,
-  hasActiveFilters,
-  SORT_OPTIONS,
-  type BasketballPlayer,
-  type AthleteFilters,
-  type SortKey,
-} from "../lib/athlete-service";
-import type {QueryDocumentSnapshot, DocumentData} from "firebase/firestore";
+
+// Import values/logic
+import { athleteService, hasActiveFilters, SORT_OPTIONS } from "../lib/athlete-service";
+
+// Import types only
+import type { Athlete, AthleteFilters, SortKey } from "../lib/athlete-types";
+import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
+
 import WatchlistPopup from "../components/watchlist-popup";
 
 const POSITIONS = ["PG", "SG", "SF", "PF", "C", "G", "F", "MB", "OH", "S", "L"];
 const GRAD_YEARS = ["2025", "2026", "2027", "2028"];
 
-const DiscoverPage = () => {
-  const [players, setPlayers] = useState<BasketballPlayer[]>([]);
+export default function DiscoverPage() {
+  const navigate = useNavigate();
+  const [players, setPlayers] = useState<Athlete[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -60,15 +57,6 @@ const DiscoverPage = () => {
     setSearchInput("");
   }, []);
 
-  const togglePlayerSelection = useCallback((id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
-
   const fetchPage = useCallback(
     async (isLoadMore = false) => {
       if (isLoadMore) setLoadingMore(true);
@@ -76,8 +64,9 @@ const DiscoverPage = () => {
 
       try {
         const result = filtersActive
-          ? await athleteService.fetchFilteredPlayers(filters, 200, isLoadMore ? lastDoc : null)
-          : await athleteService.fetchBasketballPlayers(20, isLoadMore ? lastDoc : null);
+          ? await athleteService.fetchFilteredAthletes(filters, 200, isLoadMore ? lastDoc : null)
+          : await athleteService.fetchAthletes(20, isLoadMore ? lastDoc : null);
+        
         setPlayers((prev) => (isLoadMore ? [...prev, ...result.players] : result.players));
         setLastDoc(result.lastDoc);
         setHasMore(result.hasMore);
@@ -113,39 +102,7 @@ const DiscoverPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterVersion]);
 
-  const currentSport = players.length > 0 ? players[0].sport : "Basketball";
-
-  const handleWatchlistSuccess = () => {
-    setShowWatchlistPopup(false);
-    setSelectedIds(new Set());
-    setIsSelectMode(false);
-  };
-
-  const headerActions = (
-    <div className="flex items-center gap-4">
-      {selectedIds.size > 0 && isSelectMode && (
-        <button
-          onClick={() => setShowWatchlistPopup(true)}
-          className="rounded-2xl bg-[#00599c] px-8 py-4 text-xs font-black uppercase tracking-widest text-white shadow-2xl hover:bg-[#004a82] transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
-        >
-          Add to Watchlist ({selectedIds.size})
-        </button>
-      )}
-      <button
-        onClick={() => {
-          setIsSelectMode(!isSelectMode);
-          if (isSelectMode) setSelectedIds(new Set());
-        }}
-        className={`rounded-2xl px-8 py-4 text-xs font-black uppercase tracking-widest transition-all shadow-sm border-2 whitespace-nowrap ${
-          isSelectMode
-            ? "bg-white text-[#00599c] border-[#00599c] shadow-md"
-            : "bg-white text-slate-900 border-slate-200 hover:border-slate-900 hover:bg-slate-50"
-        }`}
-      >
-        {isSelectMode ? "Cancel Selection" : "Select Players"}
-      </button>
-    </div>
-  );
+  const currentSport = players.length > 0 ? (players[0].currentStats?.sport || "Basketball") : "Basketball";
 
   const sortCategories = useMemo(() => {
     const cats: Record<string, typeof SORT_OPTIONS> = {};
@@ -156,6 +113,18 @@ const DiscoverPage = () => {
     return cats;
   }, []);
 
+  const handleWatchlistSuccess = () => {
+    setShowWatchlistPopup(false);
+    setSelectedIds(new Set());
+    setIsSelectMode(false);
+  };
+
+  const handleAnalyze = () => {
+    if (selectedIds.size === 0) return;
+    const idsString = Array.from(selectedIds).join(",");
+    navigate(`/analyze?ids=${idsString}`);
+  };
+
   return (
     <PageLayout
       requireAuth
@@ -163,11 +132,43 @@ const DiscoverPage = () => {
       subtitle="Prospects"
       description={
         isSelectMode
-          ? `${selectedIds.size} Athletes Selected for Watchlist`
+          ? `${selectedIds.size} Athletes Selected for Review`
           : `Browse the top performing ${currentSport.toLowerCase()} talent.`
       }
       variant="hero"
-      actions={headerActions}
+      actions={
+        <div className="flex items-center gap-4">
+          {selectedIds.size > 0 && isSelectMode && (
+            <>
+              <button
+                onClick={handleAnalyze}
+                className="rounded-2xl bg-amber-500 px-8 py-4 text-xs font-black uppercase tracking-widest text-white shadow-2xl hover:bg-amber-600 transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
+              >
+                Analyze ({selectedIds.size})
+              </button>
+              <button
+                onClick={() => setShowWatchlistPopup(true)}
+                className="rounded-2xl bg-[#00599c] px-8 py-4 text-xs font-black uppercase tracking-widest text-white shadow-2xl hover:bg-[#004a82] transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
+              >
+                Save ({selectedIds.size})
+              </button>
+            </>
+          )}
+          <button
+            onClick={() => {
+              setIsSelectMode(!isSelectMode);
+              if (isSelectMode) setSelectedIds(new Set());
+            }}
+            className={`rounded-2xl px-8 py-4 text-xs font-black uppercase tracking-widest transition-all shadow-sm border-2 whitespace-nowrap ${
+              isSelectMode
+                ? "bg-white text-[#00599c] border-[#00599c] shadow-md"
+                : "bg-white text-slate-900 border-slate-200 hover:border-slate-900 hover:bg-slate-50"
+            }`}
+          >
+            {isSelectMode ? "Cancel Selection" : "Select Players"}
+          </button>
+        </div>
+      }
     >
       <div className="pb-20 px-4 sm:px-6 md:px-12 lg:px-24">
         {/* ── Sticky Search + Filters ── */}
@@ -311,7 +312,14 @@ const DiscoverPage = () => {
           loading={loading}
           isSelectMode={isSelectMode}
           selectedIds={selectedIds}
-          onToggle={togglePlayerSelection}
+          onToggle={(id) =>
+            setSelectedIds((prev) => {
+              const next = new Set(prev);
+              if (next.has(id)) next.delete(id);
+              else next.add(id);
+              return next;
+            })
+          }
           emptyMessage={filtersActive ? "No prospects match your filters." : "No prospects found."}
         />
 
@@ -337,6 +345,4 @@ const DiscoverPage = () => {
       )}
     </PageLayout>
   );
-};
-
-export default DiscoverPage;
+}

@@ -72,16 +72,14 @@ class WatchlistService {
       createdAt: serverTimestamp(),
     });
 
-    // Sync metadata to user profile for efficient indexing
+    // Sync metadata to user profile for efficient indexing using dot notation to avoid overwriting the whole map
     const userRef = doc(db, "users", userId);
-    await setDoc(userRef, {
-      watchlistIndex: {
-        [docRef.id]: {
-          name,
-          count: playerIds.length
-        }
+    await updateDoc(userRef, {
+      [`watchlistIndex.${docRef.id}`]: {
+        name,
+        count: playerIds.length
       }
-    }, { merge: true });
+    });
 
     return { id: docRef.id, addedCount: playerIds.length };
   }

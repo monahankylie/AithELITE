@@ -43,7 +43,7 @@ function FeaturedCarousel() {
         >
           {FEATURED_ATHLETES.map((p) => (
             <div key={p.id} className="snap-start">
-              <PlayerCard {...p} />
+              <PlayerCard player={p} />
             </div>
           ))}
         </div>

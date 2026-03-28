@@ -35,6 +35,23 @@ export const athleteFormatter = {
     return h;
   },
 
+  formatStat: (val: number | null | undefined): string => {
+    if (val === null || val === undefined || val === 0) return "0.0";
+    // Returns 1 decimal place (e.g., 18.5)
+    return val.toLocaleString(undefined, {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+    });
+  },
+
+  /**
+   * For percentage-based stats (FG%, 3P%).
+   */
+  formatPercent: (val: number | null | undefined): string => {
+    if (!val) return "0%";
+    return `${Math.round(val)}%`;
+  },
+
   /**
    * Formats weight string or number.
    * Returns "—" for 0 or missing values.
@@ -48,24 +65,38 @@ export const athleteFormatter = {
    * Formats a numeric stat (PPG, RPG, etc.) to one decimal place.
    * Returns "N/A" or a custom placeholder if missing.
    */
-  formatStat(value?: number | null, placeholder: string = "N/A"): string {
+  /**
+   * Formats a numeric average (PPG, RPG, etc.) to one decimal place.
+   * Input: 1.823 -> Output: "1.8"
+   */
+  formatAvg(value?: number | null, placeholder: string = "N/A"): string {
     if (value == null || isNaN(value)) return placeholder;
     return value.toFixed(1);
   },
 
   /**
-   * Formats the graduation year.
+   * Formats percentages or whole number totals.
+   * Input: 52 -> Output: "52%" 
+   * Input: 31 -> Output: "31"
    */
-  formatGradYear(year?: number | string): string {
+  formatWhole(value?: number | null, suffix: string = "", placeholder: string = "0"): string {
+    if (value == null || isNaN(value)) return placeholder;
+    return `${Math.round(value)}${suffix}`;
+  },
+
+  /**
+   * Formats the class year.
+   */
+  formatClassYear(year?: number | string): string {
     if (!year) return "—";
     return String(year);
   },
 
   /**
-   * Formats the graduation year for a short display (e.g., '26).
+   * Formats the class year for a short display (e.g., '26).
    */
-  formatShortGradYear(year?: number | string): string {
-    const y = this.formatGradYear(year);
+  formatShortClassYear(year?: number | string): string {
+    const y = this.formatClassYear(year);
     if (y === "—") return "—";
     return `'${y.slice(-2)}`;
   }
