@@ -32,11 +32,14 @@ class Scraper_Task:
         self.current_html = "" #REFACTOR TO SOUP
 
         self.session = requests.Session()
-        ua = UserAgent()
+        ua = UserAgent(platforms='desktop',browsers=['Chrome'], os=['Windows', 'Mac OS X'],fallback = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
         # This provides the required key-value pair
+        selected_ua = ua.random
         self.session.headers.update({
-            "User-Agent": ua.chrome
-        })
+        "User-Agent": selected_ua,
+        "sec-ch-ua-mobile": "?0",  # Explicitly tell server "Not Mobile"
+        "sec-ch-ua-platform": '"Windows"' if "Windows" in selected_ua else '"macOS"'
+    })
         self.counter = count(0)
 #this funcion here defines how a json file shold be structured 
     def validation_and_setup(self, scrape_preset):
@@ -135,8 +138,10 @@ class Scraper_Task:
         
         i = self.which_step_am_i(step_config)
         if(len(matches) == 0):
-            print(f"NO MATCH FOUND FOR STEP {i}")
-            print(f"when looking for {regex} in {self.current_url}")
+            os.makedirs("Debug", exist_ok=True)
+            file_path = os.path.join("Debug", f"{uuid.uuid1()}.txt")
+            with open(file_path,"w") as f:
+                f.write(f"AS {self.session.headers.get("User-Agent")}, \nNO MATCH FOUND FOR STEP {i} \n when looking for {regex} in {self.current_url} \n {str(self.current_html)})")
             backup = match_info.get("must_store",False)
             if(backup):
                 matches.append(backup)
@@ -314,10 +319,11 @@ class Scraper_Task:
             page.raise_for_status() 
             return BeautifulSoup(page.text, 'html.parser')
         except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 404:
-                print(f"404 Not Found: {URL}")
+            if e.response.status_code in (404,500):
+                server_info = e.response.headers.get('Server', 'Unknown')
+                print(f"{e.response.status_code} at {URL} | Server: {server_info}")
                 return None  # Return None so we can skip it
-            raise e # Still crash on 500s or other critical errors
+            raise e # Still crash on other critical errors
         except Exception as e:
             print(f"Connection Error at {URL}: {e}")
             return None

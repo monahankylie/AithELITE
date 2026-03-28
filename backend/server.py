@@ -36,11 +36,34 @@ async def scrape(background_tasks: BackgroundTasks):
     return {"Scrape": "started"}
 
 @app.post("/scrape_games")
-async def scrape_games_endpoint(background_tasks: BackgroundTasks):
+async def scrape_games_endpoint(request: Request, background_tasks: BackgroundTasks):
     Scraper_Task.load_structure("Resources/SiteInfo.json")
-    scrapeCA = Scraper_Task('maxpreps_games')
-    scrapeCA.seed({"state":"ca","sport":"basketball"})
+    scrapeCA = Scraper_Task('get_game_links')
+    scrapeCA.seed({"state": "ca", "sport": "basketball"})
+
+    scrapeCA.start_scrape()
+
+    start_index = 0
+    try:
+        # 3. Load file only when needed
+        with open("Links/0.txt", "r") as f:
+            link_list = f.read().splitlines()
+        
+        data = await request.json()
+        start_link = data.get("start_link")
+        
+        if start_link in link_list:
+            start_index = link_list.index(start_link)
+    except (FileNotFoundError, ValueError, Exception) as e:
+        # Log specific error or proceed with start_index = 0
+        pass
+
+    link_list = link_list[start_index:]
+    scrapeCA = Scraper_Task('scrape_game_links')
+    scrapeCA.step_dict[0] = link_list
+    
     background_tasks.add_task(scrapeCA.start_scrape)
+
     return {"Scrape": "started",
             "Target:":scrapeCA.site_url,
             "Config:":scrapeCA.site_cfg}
