@@ -1,26 +1,23 @@
-/**
- * DISCOVER PAGE
- * A place for recruiters to find new athletes.
- */
-import React, {useEffect, useState, useCallback, useMemo} from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router";
 import PageLayout from "../components/page-layout";
 import AthleteList from "../components/athlete-list";
-import {
-  athleteService,
-  hasActiveFilters,
-  SORT_OPTIONS,
-  type BasketballPlayer,
-  type AthleteFilters,
-  type SortKey,
-} from "../lib/athlete-service";
-import type {QueryDocumentSnapshot, DocumentData} from "firebase/firestore";
+
+// Import values/logic
+import { athleteService, hasActiveFilters, SORT_OPTIONS } from "../lib/athlete-service";
+
+// Import types only
+import type { Athlete, AthleteFilters, SortKey } from "../lib/athlete-types";
+import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
+
 import WatchlistPopup from "../components/watchlist-popup";
 
 const POSITIONS = ["PG", "SG", "SF", "PF", "C", "G", "F", "MB", "OH", "S", "L"];
 const GRAD_YEARS = ["2025", "2026", "2027", "2028"];
 
-const DiscoverPage = () => {
-  const [players, setPlayers] = useState<BasketballPlayer[]>([]);
+export default function DiscoverPage() {
+  const navigate = useNavigate();
+  const [players, setPlayers] = useState<Athlete[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -60,15 +57,6 @@ const DiscoverPage = () => {
     setSearchInput("");
   }, []);
 
-  const togglePlayerSelection = useCallback((id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
-
   const fetchPage = useCallback(
     async (isLoadMore = false) => {
       if (isLoadMore) setLoadingMore(true);
@@ -76,8 +64,9 @@ const DiscoverPage = () => {
 
       try {
         const result = filtersActive
-          ? await athleteService.fetchFilteredPlayers(filters, 200, isLoadMore ? lastDoc : null)
-          : await athleteService.fetchBasketballPlayers(20, isLoadMore ? lastDoc : null);
+          ? await athleteService.fetchFilteredAthletes(filters, 200, isLoadMore ? lastDoc : null)
+          : await athleteService.fetchAthletes(20, isLoadMore ? lastDoc : null);
+        
         setPlayers((prev) => (isLoadMore ? [...prev, ...result.players] : result.players));
         setLastDoc(result.lastDoc);
         setHasMore(result.hasMore);
@@ -113,39 +102,7 @@ const DiscoverPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterVersion]);
 
-  const currentSport = players.length > 0 ? players[0].sport : "Basketball";
-
-  const handleWatchlistSuccess = () => {
-    setShowWatchlistPopup(false);
-    setSelectedIds(new Set());
-    setIsSelectMode(false);
-  };
-
-  const headerActions = (
-    <div className="flex items-center gap-4">
-      {selectedIds.size > 0 && isSelectMode && (
-        <button
-          onClick={() => setShowWatchlistPopup(true)}
-          className="rounded-2xl bg-[#00599c] px-8 py-4 text-xs font-black uppercase tracking-widest text-white shadow-2xl hover:bg-[#004a82] transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
-        >
-          Add to Watchlist ({selectedIds.size})
-        </button>
-      )}
-      <button
-        onClick={() => {
-          setIsSelectMode(!isSelectMode);
-          if (isSelectMode) setSelectedIds(new Set());
-        }}
-        className={`rounded-2xl px-8 py-4 text-xs font-black uppercase tracking-widest transition-all shadow-sm border-2 whitespace-nowrap ${
-          isSelectMode
-            ? "bg-white text-[#00599c] border-[#00599c] shadow-md"
-            : "bg-white text-slate-900 border-slate-200 hover:border-slate-900 hover:bg-slate-50"
-        }`}
-      >
-        {isSelectMode ? "Cancel Selection" : "Select Players"}
-      </button>
-    </div>
-  );
+  const currentSport = players.length > 0 ? (players[0].currentStats?.sport || "Basketball") : "Basketball";
 
   const sortCategories = useMemo(() => {
     const cats: Record<string, typeof SORT_OPTIONS> = {};
@@ -156,127 +113,176 @@ const DiscoverPage = () => {
     return cats;
   }, []);
 
+  const handleWatchlistSuccess = () => {
+    setShowWatchlistPopup(false);
+    setSelectedIds(new Set());
+    setIsSelectMode(false);
+  };
+
+  const handleAnalyze = () => {
+    if (selectedIds.size === 0) return;
+    const idsString = Array.from(selectedIds).join(",");
+    navigate(`/analyze?ids=${idsString}`);
+  };
+
   return (
-    <PageLayout requireAuth
+    <PageLayout
+      requireAuth
       title={`Discover ${currentSport}`}
       subtitle="Prospects"
       description={
         isSelectMode
-          ? `${selectedIds.size} Athletes Selected for Watchlist`
+          ? `${selectedIds.size} Athletes Selected for Review`
           : `Browse the top performing ${currentSport.toLowerCase()} talent.`
       }
       variant="hero"
-      actions={headerActions}
+      actions={
+        <div className="flex items-center gap-4">
+          {selectedIds.size > 0 && isSelectMode && (
+            <>
+              <button
+                onClick={handleAnalyze}
+                className="rounded-2xl bg-amber-500 px-8 py-4 text-xs font-black uppercase tracking-widest text-white shadow-2xl hover:bg-amber-600 transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
+              >
+                Analyze ({selectedIds.size})
+              </button>
+              <button
+                onClick={() => setShowWatchlistPopup(true)}
+                className="rounded-2xl bg-[#00599c] px-8 py-4 text-xs font-black uppercase tracking-widest text-white shadow-2xl hover:bg-[#004a82] transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
+              >
+                Save ({selectedIds.size})
+              </button>
+            </>
+          )}
+          <button
+            onClick={() => {
+              setIsSelectMode(!isSelectMode);
+              if (isSelectMode) setSelectedIds(new Set());
+            }}
+            className={`rounded-2xl px-8 py-4 text-xs font-black uppercase tracking-widest transition-all shadow-sm border-2 whitespace-nowrap ${
+              isSelectMode
+                ? "bg-white text-[#00599c] border-[#00599c] shadow-md"
+                : "bg-white text-slate-900 border-slate-200 hover:border-slate-900 hover:bg-slate-50"
+            }`}
+          >
+            {isSelectMode ? "Cancel Selection" : "Select Players"}
+          </button>
+        </div>
+      }
     >
       <div className="pb-20 px-4 sm:px-6 md:px-12 lg:px-24">
-        {/* ── Search Bar ── */}
-        <div className="mb-4">
-          <div className="flex gap-3">
-            <div className="relative flex-1">
-              <svg
-                className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
+        {/* ── Sticky Search + Filters ── */}
+        <div className="sticky top-0 z-30 mb-6 bg-white/95 pt-2 pb-4 backdrop-blur-sm">
+          {/* ── Search Bar ── */}
+          <div className="mb-4">
+            <div className="flex gap-3">
+              <div className="relative flex-1">
+                <svg
+                  className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search by name or school..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && applySearch()}
+                  className="w-full rounded-2xl border-2 border-slate-200 bg-white py-4 pl-12 pr-4 text-sm font-medium text-slate-900 placeholder:text-slate-400 transition-all focus:border-[#00599c] focus:outline-none"
+                />
+              </div>
+              <button
+                onClick={applySearch}
+                className="rounded-2xl bg-[#00599c] px-8 py-4 text-xs font-black uppercase tracking-widest text-white transition-all hover:bg-[#004a82] active:scale-95"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search by name or school..."
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && applySearch()}
-                className="w-full rounded-2xl border-2 border-slate-200 bg-white py-4 pl-12 pr-4 text-sm font-medium text-slate-900 placeholder:text-slate-400 transition-all focus:border-[#00599c] focus:outline-none"
-              />
+                Search
+              </button>
             </div>
-            <button
-              onClick={applySearch}
-              className="rounded-2xl bg-[#00599c] px-8 py-4 text-xs font-black uppercase tracking-widest text-white transition-all hover:bg-[#004a82] active:scale-95"
-            >
-              Search
-            </button>
           </div>
-        </div>
 
-        {/* ── Filter Row: Position · Grad Year · Sort By ── */}
-        <div className="mb-6 flex flex-wrap gap-3">
-          {/* Position */}
-          <select
-            value={filters.position || ""}
-            onChange={(e) =>
-              setFilters((f) => {
-                const next = {...f};
-                if (e.target.value) next.position = e.target.value;
-                else delete next.position;
-                return next;
-              })
-            }
-            className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
-          >
-            <option value="">All Positions</option>
-            {POSITIONS.map((p) => (
-              <option key={p} value={p}>
-                {p}
-              </option>
-            ))}
-          </select>
-
-          {/* Grad Year */}
-          <select
-            value={filters.gradYear || ""}
-            onChange={(e) =>
-              setFilters((f) => {
-                const next = {...f};
-                if (e.target.value) next.gradYear = e.target.value;
-                else delete next.gradYear;
-                return next;
-              })
-            }
-            className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
-          >
-            <option value="">All Classes</option>
-            {GRAD_YEARS.map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
-          </select>
-
-          {/* Sort By Stat — grouped by category */}
-          <select
-            value={filters.sortBy || ""}
-            onChange={(e) =>
-              setFilters((f) => {
-                const next = {...f};
-                if (e.target.value) next.sortBy = e.target.value as SortKey;
-                else delete next.sortBy;
-                return next;
-              })
-            }
-            className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
-          >
-            <option value="">Sort by Stat</option>
-            {Object.entries(sortCategories).map(([cat, opts]) => (
-              <optgroup key={cat} label={cat}>
-                {opts.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
-
-          {filtersActive && (
-            <button
-              onClick={clearAllFilters}
-              className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 hover:border-slate-400 transition-colors"
+          {/* ── Filter Row: Position · Grad Year · Sort By ── */}
+          <div className="flex flex-wrap gap-3">
+            <select
+              value={filters.position || ""}
+              onChange={(e) =>
+                setFilters((f) => {
+                  const next = {...f};
+                  if (e.target.value) next.position = e.target.value;
+                  else delete next.position;
+                  return next;
+                })
+              }
+              className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
             >
-              Clear All
-            </button>
-          )}
+              <option value="">All Positions</option>
+              {POSITIONS.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={filters.gradYear || ""}
+              onChange={(e) =>
+                setFilters((f) => {
+                  const next = {...f};
+                  if (e.target.value) next.gradYear = e.target.value;
+                  else delete next.gradYear;
+                  return next;
+                })
+              }
+              className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
+            >
+              <option value="">All Classes</option>
+              {GRAD_YEARS.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={filters.sortBy || ""}
+              onChange={(e) =>
+                setFilters((f) => {
+                  const next = {...f};
+                  if (e.target.value) next.sortBy = e.target.value as SortKey;
+                  else delete next.sortBy;
+                  return next;
+                })
+              }
+              className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
+            >
+              <option value="">Sort by Stat</option>
+              {Object.entries(sortCategories).map(([cat, opts]) => (
+                <optgroup key={cat} label={cat}>
+                  {opts.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+
+            {filtersActive && (
+              <button
+                onClick={clearAllFilters}
+                className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 hover:border-slate-400 transition-colors"
+              >
+                Clear All
+              </button>
+            )}
+          </div>
         </div>
 
         {/* ── Active Filter Chips ── */}
@@ -306,7 +312,14 @@ const DiscoverPage = () => {
           loading={loading}
           isSelectMode={isSelectMode}
           selectedIds={selectedIds}
-          onToggle={togglePlayerSelection}
+          onToggle={(id) =>
+            setSelectedIds((prev) => {
+              const next = new Set(prev);
+              if (next.has(id)) next.delete(id);
+              else next.add(id);
+              return next;
+            })
+          }
           emptyMessage={filtersActive ? "No prospects match your filters." : "No prospects found."}
         />
 
@@ -332,6 +345,4 @@ const DiscoverPage = () => {
       )}
     </PageLayout>
   );
-};
-
-export default DiscoverPage;
+}
