@@ -3,6 +3,7 @@ from .team_class import Team
 from utils.parsing_functions import traverse_paths
 import json 
 import os
+import ast
 from typing import Optional, Callable, Dict, Any, ClassVar, Tuple, List, Type
 from pydantic import BaseModel, Field, field_validator, model_validator, AliasChoices
 
@@ -82,7 +83,18 @@ class AthletesParsingClass(BaseModel):
 
         return yearly_stats
 
-    def assemble_player(self, json_blob: dict) -> Tuple[Optional[Team], Optional[Player]]:
+    def assemble_player(self, json_blob: Any) -> Tuple[Optional[Team], Optional[Player]]:
+        # Handle "stringified" JSON blobs from scraper
+        if isinstance(json_blob, str):
+            try:
+                json_blob = ast.literal_eval(json_blob)
+            except Exception as e:
+                print(f"[ERROR] literal_eval failed for input: {e}")
+                return None, None
+        
+        if not isinstance(json_blob, dict):
+            return None, None
+
         # Step 1: Team Parsing
         team_list_raw = traverse_paths(json_blob, self.team_mapping)
         teams_list = team_list_raw.get("team_root", []) if isinstance(team_list_raw, dict) else team_list_raw

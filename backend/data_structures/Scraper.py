@@ -205,6 +205,7 @@ class Scraper_Task:
         keys = extract_keys(current_pattern)
         step = self.which_step_am_i(step_config)
         processed_stuff = self.step_dict.get(step, [])
+        fork_dict = self.seed_dict
         new_path_buffer = []
 
         if processed_stuff: ##if we have stuff inside this 
@@ -215,7 +216,7 @@ class Scraper_Task:
                 start,end = match.span() #if pattern match, we will grab the substring for a better match
                 substring = target[start:end]
                 values = extract_values(current_pattern,substring)
-                fork_dict = dictionary_builder(keys,values)
+                fork_dict = fork_dict| dictionary_builder(keys,values)
                 for r_pattern in requested_patterns:
                     new_path = string_builder(r_pattern,fork_dict)
                     new_path = target[:start] + new_path + target[end:]
@@ -228,7 +229,7 @@ class Scraper_Task:
                 start,end = match.span() #if pattern match, we will grab the substring for a better match
                 substring = target[start:end]
                 values = extract_values(current_pattern,substring)
-                fork_dict = dictionary_builder(keys,values)
+                fork_dict = fork_dict |dictionary_builder(keys,values)
                 for r_pattern in requested_patterns:
                     new_path = string_builder(r_pattern,fork_dict)
                     new_path = target[:start] + new_path + target[end:]
@@ -256,8 +257,8 @@ class Scraper_Task:
             ".txt": lambda data, f: f.write(str(data))
         }
         namers = {
-            "uuid1": lambda: uuid.uuid1,
-            "uuid4": lambda: uuid.uuid4,
+            "uuid1": uuid.uuid1,
+            "uuid4": uuid.uuid4,
             "number":lambda: next(self.counter)
         }
 
@@ -270,7 +271,7 @@ class Scraper_Task:
         method = store_config.get("method","each")
         extension = store_config.get("ext",".json").lower().strip()
         write_method = writers.get(extension,writers[".json"]) ##ait if the user doesnt give us one, then itll  be json
-        name_method = namers.get(store_config.get("name_scheme"))
+        name_method = namers.get(store_config.get("name_scheme"),namers["uuid1"])
         ##can probs shove all these conditionals within a lambda
         ##lets make a write function in utils another time. rewriting serial is tedious.
         if method == "each":
