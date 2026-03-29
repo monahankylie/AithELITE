@@ -37,7 +37,7 @@ export default function PlayerCard({
   // --- FLAT VARIANT (AESTHETICS REDEFINED FOR COMPACT ROW, SLIGHTLY TALLER/WIDER) ---
   if (variant === "flat") {
     return (
-      <article className={`w-full max-h-[100px] shrink-0 rounded-[28px] bg-white/95 p-4 pr-8 shadow-sm flex items-center gap-4 transition-all duration-300 border ${sharedClasses} hover:shadow-md`}>
+      <article className={`w-full min-h-[90px] shrink-0 rounded-[28px] bg-white/95 p-3 pr-6 shadow-sm flex items-center gap-4 transition-all duration-300 border ${sharedClasses} hover:shadow-md`}>
         {isSelectMode && (
           <button onClick={(e) => { e.preventDefault(); onToggle?.(player.id); }} className={`absolute right-3 top-1/2 -translate-y-1/2 z-10 h-6 w-6 rounded-full border-2 transition-all ${isSelected ? "bg-[#00599c] border-[#00599c]" : "bg-white border-slate-200"}`}>
             {isSelected && <div className="m-auto h-2 w-2 rounded-full bg-white" />}
@@ -45,52 +45,64 @@ export default function PlayerCard({
         )}
 
         {/* Compact Avatar */}
-        <div className="relative shrink-0">
+        <div className="relative shrink-0 ml-1">
           {player.image_link ? (
-            <img src={player.image_link} alt={player.name} className="h-16 w-16 rounded-full object-cover ring-1 ring-slate-100" />
+            <img src={player.image_link} alt={player.name} className="h-14 w-14 rounded-full object-cover ring-1 ring-slate-100" />
           ) : (
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-xl font-black text-slate-400">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-lg font-black text-slate-400">
               {player.name.charAt(0)}
             </div>
           )}
         </div>
 
-        {/* Compact Info & Stats Section */}
-        <div className="flex-1 min-w-0 flex items-center justify-between">
-          <div className="flex-1 min-w-0 flex items-center gap-4">
-            <h3 className="truncate text-xl font-black text-slate-900 leading-none">{player.name}</h3>
-            <p className="hidden sm:block text-base font-medium text-slate-500 truncate">
-              ({player.currentStats?.sport || "Basketball"} / {primaryPos})
+        {/* Compact Info Section */}
+        <div className="flex-1 min-w-0 flex flex-col justify-center">
+          <h3 className="truncate text-xl font-black text-slate-900 leading-tight uppercase mb-0.5">{player.name}</h3>
+          <div className="flex items-center gap-2 overflow-hidden">
+            <p className="text-[10px] font-bold text-[#00599c]/70 uppercase tracking-tight whitespace-nowrap">
+              {player.currentStats?.sport || "Basketball"} • {primaryPos}
+            </p>
+            {stats?.school_name && (
+              <>
+                <span className="text-[#00599c]/30 text-[10px]">•</span>
+                <p className="truncate text-[10px] font-medium text-[#00599c]/60 uppercase">
+                  {stats.school_name} {stats.state ? `(${stats.state})` : ""}
+                </p>
+              </>
+            )}
+            <span className="text-[#00599c]/30 text-[10px]">•</span>
+            <p className="text-[10px] font-bold text-[#00599c]/40 uppercase tracking-tight whitespace-nowrap">
+              {player.classYear}
             </p>
           </div>
+        </div>
 
-          {/* Dynamic Stats Row - adapted for compact display */}
-          <div className="flex items-center gap-4 text-slate-400">
-            {!stats ? ( // If no stats, show "Stats Pending"
-              <span className="text-sm font-black uppercase tracking-[0.2em] text-slate-300 hidden sm:block">
-                Stats Pending
-              </span>
-            ) : (
-              <>
-                {metrics.slice(0, 3).map((m) => {
-                  const val = athleteService.getStatValue(player, m.key);
-                  return (
-                    <div key={m.name} className="flex flex-col items-end">
-                      <span className="text-xs font-black uppercase tracking-widest text-slate-300">
+        {/* Dynamic Stats Row - adapted for compact display */}
+        <div className="hidden md:flex items-center gap-6 text-slate-400 px-6 py-2.5 rounded-2xl bg-[#00599c]/[0.02] border border-[#00599c]/10">
+          {!stats ? ( // If no stats, show "Stats Pending"
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-300">
+              Stats Pending
+            </span>
+          ) : (
+            <div className="flex items-center gap-6">
+              {metrics.slice(0, 3).map((m, idx) => {
+                const val = athleteService.getStatValue(player, m.key);
+                return (
+                  <div key={m.name} className="flex items-center gap-6">
+                    {idx > 0 && <div className="h-8 w-px bg-[#00599c]/10" />}
+                    <div className="flex flex-col items-center min-w-[40px]">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-[#00599c]/40 mb-0.5">
                         {m.name}
                       </span>
-                      <span className="text-base font-black text-slate-900">
+                      <span className="text-sm font-black text-slate-900 tabular-nums">
                         {athleteFormatter.formatStat(val)}
                       </span>
                     </div>
-                  );
-                })}
-              </>
-            )}
-            <span className="shrink-0 rounded-full border border-sky-100 bg-sky-50 px-4 py-2 text-xs font-black uppercase text-sky-700">
-              {athleteFormatter.formatShortClassYear(player.classYear)}
-            </span>
-          </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </article>
     );
@@ -118,7 +130,9 @@ export default function PlayerCard({
           <p className="mt-2 text-sm font-semibold text-slate-600">
             {player.currentStats?.sport || "Basketball"} {primaryPos ? `/ ${primaryPos}` : ""}
           </p>
-          <p className="mt-1 text-sm text-slate-500 truncate">{stats?.school_name}</p>
+          <p className="mt-1 text-sm text-slate-500 truncate">
+            {stats?.school_name} {stats?.state ? `(${stats.state})` : ""}
+          </p>
         </div>
       </div>
 

@@ -139,46 +139,10 @@ export default function DiscoverPage() {
     >
       <div className="pb-20 px-4 sm:px-6 md:px-12 lg:px-24">
         {/* ── Sticky Actions & Filters ── */}
-        <div className="sticky top-0 z-30 mb-6 bg-white/95 pt-2 pb-4 backdrop-blur-sm space-y-4">
+        <div className="sticky top-0 z-30 mb-6 bg-gray-50/95 pt-2 pb-4 backdrop-blur-sm space-y-4">
           
-          {/* ── Selection Actions Row (Sticky) ── */}
-          <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-4">
-            <div className="flex items-center gap-3">
-              {selectedIds.size > 0 && isSelectMode && (
-                <>
-                  <button
-                    onClick={handleAnalyze}
-                    className="rounded-xl bg-amber-500 px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-lg hover:bg-amber-600 transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
-                  >
-                    Analyze ({selectedIds.size})
-                  </button>
-                  <button
-                    onClick={() => setShowWatchlistPopup(true)}
-                    className="rounded-xl bg-[#00599c] px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-lg hover:bg-[#004a82] transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
-                  >
-                    Save ({selectedIds.size})
-                  </button>
-                </>
-              )}
-            </div>
-            
-            <button
-              onClick={() => {
-                setIsSelectMode(!isSelectMode);
-                if (isSelectMode) setSelectedIds(new Set());
-              }}
-              className={`rounded-xl px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm border-2 whitespace-nowrap ${
-                isSelectMode
-                  ? "bg-white text-[#00599c] border-[#00599c] shadow-md"
-                  : "bg-white text-slate-900 border-slate-200 hover:border-slate-900 hover:bg-slate-50"
-              }`}
-            >
-              {isSelectMode ? "Cancel Selection" : "Select Players"}
-            </button>
-          </div>
-
           {/* ── Search Bar ── */}
-          <div className="mb-4">
+          <div className="">
             <div className="flex gap-3">
               <div className="relative flex-1">
                 <svg
@@ -200,7 +164,7 @@ export default function DiscoverPage() {
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && applySearch()}
-                  className="w-full rounded-2xl border-2 border-slate-200 bg-white py-4 pl-12 pr-4 text-sm font-medium text-slate-900 placeholder:text-slate-400 transition-all focus:border-[#00599c] focus:outline-none"
+                  className="w-full rounded-2xl border-2 border-slate-200 bg-slate-50 py-4 pl-12 pr-4 text-sm font-medium text-slate-900 placeholder:text-slate-400 transition-all focus:border-[#00599c] focus:outline-none"
                 />
               </div>
               <button
@@ -212,8 +176,8 @@ export default function DiscoverPage() {
             </div>
           </div>
 
-          {/* ── Filter Row: Position · Grad Year · Sort By ── */}
-          <div className="flex flex-wrap gap-3">
+          {/* ── Filter Row: Position · Grad Year · Sort By · Selection ── */}
+          <div className="flex flex-wrap items-center gap-3">
             <select
               value={filters.position || ""}
               onChange={(e) =>
@@ -224,7 +188,7 @@ export default function DiscoverPage() {
                   return next;
                 })
               }
-              className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
+              className="rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
             >
               <option value="">All Positions</option>
               {POSITIONS.map((p) => (
@@ -244,7 +208,7 @@ export default function DiscoverPage() {
                   return next;
                 })
               }
-              className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
+              className="rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
             >
               <option value="">All Classes</option>
               {GRAD_YEARS.map((y) => (
@@ -264,7 +228,7 @@ export default function DiscoverPage() {
                   return next;
                 })
               }
-              className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
+              className="rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
             >
               <option value="">Sort by Stat</option>
               {Object.entries(sortCategories).map(([cat, opts]) => (
@@ -281,11 +245,44 @@ export default function DiscoverPage() {
             {filtersActive && (
               <button
                 onClick={clearAllFilters}
-                className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 hover:border-slate-400 transition-colors"
+                className="rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 hover:border-slate-400 transition-colors"
               >
                 Clear All
               </button>
             )}
+
+            <div className="ml-auto flex items-center gap-2">
+              {selectedIds.size > 0 && isSelectMode && (
+                <>
+                  <button
+                    onClick={handleAnalyze}
+                    className="rounded-xl bg-amber-500 px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm hover:bg-amber-600 transition-all active:scale-95 whitespace-nowrap"
+                  >
+                    Analyze ({selectedIds.size})
+                  </button>
+                  <button
+                    onClick={() => setShowWatchlistPopup(true)}
+                    className="rounded-xl bg-[#00599c] px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm hover:bg-[#004a82] transition-all active:scale-95 whitespace-nowrap"
+                  >
+                    Save ({selectedIds.size})
+                  </button>
+                </>
+              )}
+              
+              <button
+                onClick={() => {
+                  setIsSelectMode(!isSelectMode);
+                  if (isSelectMode) setSelectedIds(new Set());
+                }}
+                className={`rounded-xl px-5 py-3 text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm border-2 whitespace-nowrap ${
+                  isSelectMode
+                    ? "bg-white text-[#00599c] border-[#00599c]"
+                    : "bg-white text-slate-900 border-slate-200 hover:border-slate-900 hover:bg-slate-50"
+                }`}
+              >
+                {isSelectMode ? "Cancel Selection" : "Select Players"}
+              </button>
+            </div>
           </div>
         </div>
 
