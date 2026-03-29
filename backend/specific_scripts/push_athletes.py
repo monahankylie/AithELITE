@@ -110,6 +110,7 @@ def process_file(filepath):
     try:
         with open(filepath, "r", encoding="utf-8") as f:
             blob = json.load(f)
+        
         team_obj, player_obj = ATHLETE_PARSER.assemble_player(blob)
         if player_obj:
             p_ref = push_player_to_firestore(player_obj, team_obj)
@@ -131,6 +132,14 @@ def push_all_pending():
     for f in files:
         if process_file(os.path.join(PLAYER_STATS_DIR, f)):
             count += 1
+    
+    if count > 0:
+        print(f"\n" + "="*40)
+        print(f"PUSH COMPLETE: {count} players pushed to Firestore")
+        print("="*40 + "\n")
+    else:
+        print("[PUSH] No new players were pushed.")
+        
     return count
 
 if __name__ == "__main__":
