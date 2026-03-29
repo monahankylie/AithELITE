@@ -80,7 +80,7 @@ export default function Home() {
 
               <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                 <Link
-                  to={user ? "/home" : "/login"}
+                  to={user ? "/dashboard" : "/login"}
                   className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-black shadow-md transition hover:bg-slate-100"
                 >
                   Get Started
