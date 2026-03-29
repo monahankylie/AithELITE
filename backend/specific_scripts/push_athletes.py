@@ -110,6 +110,7 @@ def process_file(filepath):
     try:
         with open(filepath, "r", encoding="utf-8") as f:
             blob = json.load(f)
+        
         team_obj, player_obj = ATHLETE_PARSER.assemble_player(blob)
         if player_obj:
             p_ref = push_player_to_firestore(player_obj, team_obj)
