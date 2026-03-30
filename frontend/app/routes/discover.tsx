@@ -2,6 +2,8 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import PageLayout from "../components/page-layout";
 import AthleteList from "../components/athlete-list";
+import AppDropdown from "../components/app-dropdown";
+import type { SelectChangeEvent } from "@mui/material";
 
 // Import values/logic
 import { athleteService, hasActiveFilters, SORT_OPTIONS } from "../lib/athlete-service";
@@ -107,14 +109,21 @@ export default function DiscoverPage() {
 
   const currentSport = players.length > 0 ? (players[0].currentStats?.sport || "Basketball") : "Basketball";
 
-  const sortCategories = useMemo(() => {
-    const cats: Record<string, typeof SORT_OPTIONS> = {};
-    for (const opt of SORT_OPTIONS) {
-      if (!cats[opt.category]) cats[opt.category] = [];
-      cats[opt.category].push(opt);
-    }
-    return cats;
-  }, []);
+  const dropdownSortOptions = useMemo(() => 
+    SORT_OPTIONS.map(opt => ({
+      value: opt.value,
+      label: opt.label,
+      category: opt.category
+    })), 
+  []);
+
+  const dropdownPositionOptions = useMemo(() => 
+    POSITIONS.map(p => ({ value: p, label: p })), 
+  []);
+
+  const dropdownGradYearOptions = useMemo(() => 
+    GRAD_YEARS.map(y => ({ value: y, label: y })), 
+  []);
 
   const handleWatchlistSuccess = () => {
     setShowWatchlistPopup(false);
@@ -181,7 +190,8 @@ export default function DiscoverPage() {
 
           {/* ── Filter Row: Position · Grad Year · Sort By · Selection ── */}
           <div className="flex flex-wrap items-center gap-3">
-            <select
+            <AppDropdown
+              label="Position"
               value={filters.position || ""}
               onChange={(e) =>
                 setFilters((f) => {
@@ -191,17 +201,13 @@ export default function DiscoverPage() {
                   return next;
                 })
               }
-              className="rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
-            >
-              <option value="">All Positions</option>
-              {POSITIONS.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
+              options={dropdownPositionOptions}
+              placeholder="All Positions"
+              minWidth={160}
+            />
 
-            <select
+            <AppDropdown
+              label="Class"
               value={filters.gradYear || ""}
               onChange={(e) =>
                 setFilters((f) => {
@@ -211,17 +217,13 @@ export default function DiscoverPage() {
                   return next;
                 })
               }
-              className="rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
-            >
-              <option value="">All Classes</option>
-              {GRAD_YEARS.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
+              options={dropdownGradYearOptions}
+              placeholder="All Classes"
+              minWidth={140}
+            />
 
-            <select
+            <AppDropdown
+              label="Sort by Stat"
               value={filters.sortBy || ""}
               onChange={(e) =>
                 setFilters((f) => {
@@ -231,24 +233,15 @@ export default function DiscoverPage() {
                   return next;
                 })
               }
-              className="rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
-            >
-              <option value="">Sort by Stat</option>
-              {Object.entries(sortCategories).map(([cat, opts]) => (
-                <optgroup key={cat} label={cat}>
-                  {opts.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
+              options={dropdownSortOptions}
+              placeholder="Select Stat"
+              minWidth={180}
+            />
 
             {filtersActive && (
               <button
                 onClick={clearAllFilters}
-                className="rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 hover:border-slate-400 transition-colors"
+                className="rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 hover:border-slate-400 transition-colors h-[42px]"
               >
                 Clear All
               </button>

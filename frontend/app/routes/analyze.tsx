@@ -3,18 +3,13 @@ import { useSearchParams, Link } from "react-router";
 import PageLayout from "../components/page-layout";
 import { 
   Box, 
-  InputLabel, 
-  MenuItem, 
-  FormControl, 
-  Select, 
   Stack, 
   Checkbox, 
-  ListItemText, 
   FormControlLabel, 
   Typography,
   CircularProgress
 } from '@mui/material';
-import type { SelectChangeEvent } from '@mui/material/Select';
+import type { SelectChangeEvent } from '@mui/material';
 import { graphService, type RadarSeriesData, type TrendData } from "../lib/graph-service";
 import { gameService, type HydratedGameStat } from "../lib/game-service";
 import { athleteService } from "../lib/athlete-service";
@@ -25,15 +20,7 @@ import TrendLineChart from "../components/trend-line-chart";
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
 import AddPlayersPopup from "../components/add-players-popup";
 import RemovePlayersPopup from "../components/remove-players-popup";
-
-const STAT_OPTIONS = [
-  { value: 'points', label: 'Points' },
-  { value: 'rebounds', label: 'Rebounds' },
-  { value: 'assists', label: 'Assists' },
-  { value: 'steals', label: 'Steals' },
-  { value: 'blocks', label: 'Blocks' },
-  { value: 'turnovers', label: 'Turnovers' },
-];
+import AppDropdown from "../components/app-dropdown";
 
 const YEAR_OPTIONS = [
   { value: '25-26', label: '2025-26' },
@@ -51,34 +38,40 @@ const LIMIT_OPTIONS = [
 ];
 
 const AVAILABLE_STATS = [
-  { id: 'points_per_game', label: 'PPG' },
-  { id: 'rebounds_per_game', label: 'RPG' },
-  { id: 'assists_per_game', label: 'APG' },
-  { id: 'steals_per_game', label: 'SPG' },
-  { id: 'blocks_per_game', label: 'BPG' },
-  { id: 'fg_pct', label: 'FG%' },
-  { id: 'fg3_pct', label: '3P%' },
-  { id: 'fg2_pct', label: '2P%' },
-  { id: 'ft_pct', label: 'FT%' },
-  { id: 'efg_pct', label: 'eFG%' },
-  { id: 'ast_to_ratio', label: 'A/TO' },
-  { id: 'turnovers_per_game', label: 'TOPG' },
-  { id: 'games_played', label: 'GP' },
-  { id: 'minutes_per_game', label: 'MPG' },
-  { id: 'minutes_played', label: 'MIN' },
-  { id: 'points_per_shot', label: 'PPS' },
-  { id: 'double_doubles', label: 'DD' },
-  { id: 'triple_doubles', label: 'TD' },
-  { id: 'off_rebounds_per_game', label: 'ORPG' },
-  { id: 'def_rebounds_per_game', label: 'DRPG' },
-  { id: 'points', label: 'PTS' },
-  { id: 'rebounds', label: 'REB' },
-  { id: 'assists', label: 'AST' },
-  { id: 'steals', label: 'STL' },
-  { id: 'blocks', label: 'BLK' },
-  { id: 'turnovers', label: 'TO' },
-  { id: 'fouls_per_game', label: 'FPG' },
-  { id: 'fouls', label: 'PF' },
+  { value: 'points_per_game', label: 'PPG' },
+  { value: 'rebounds_per_game', label: 'RPG' },
+  { value: 'assists_per_game', label: 'APG' },
+  { value: 'steals_per_game', label: 'SPG' },
+  { value: 'blocks_per_game', label: 'BPG' },
+  { value: 'fg_pct', label: 'FG%' },
+  { value: 'fg3_pct', label: '3P%' },
+  { value: 'fg2_pct', label: '2P%' },
+  { value: 'ft_pct', label: 'FT%' },
+  { value: 'efg_pct', label: 'eFG%' },
+  { value: 'ast_to_ratio', label: 'A/TO' },
+  { value: 'stl_to_ratio', label: 'S/TO' },
+  { value: 'stl_pf_ratio', label: 'S/PF' },
+  { value: 'blk_pf_ratio', label: 'B/PF' },
+  { value: 'turnovers_per_game', label: 'TOPG' },
+  { value: 'games_played', label: 'Games Played' },
+  { value: 'minutes_per_game', label: 'MPG' },
+  { value: 'minutes_played', label: 'MIN' },
+  { value: 'points_per_shot', label: 'PPS' },
+  { value: 'double_doubles', label: 'DD' },
+  { value: 'triple_doubles', label: 'TD' },
+  { value: 'off_rebounds_per_game', label: 'ORPG' },
+  { value: 'def_rebounds_per_game', label: 'DRPG' },
+  { value: 'points', label: 'PTS' },
+  { value: 'rebounds', label: 'REB' },
+  { value: 'assists', label: 'AST' },
+  { value: 'steals', label: 'STL' },
+  { value: 'blocks', label: 'BLK' },
+  { value: 'turnovers', label: 'TO' },
+  { value: 'fouls_per_game', label: 'FPG' },
+  { value: 'fouls', label: 'PF' },
+  { value: 'charges', label: 'Charges' },
+  { value: 'deflections', label: 'Deflections' },
+  { value: 'tech_fouls', label: 'Tech Fouls' },
 ];
 
 const DEFAULT_COLUMNS = [
@@ -118,8 +111,8 @@ export default function AnalyzePage() {
   const [radarData, setRadarData] = React.useState<RadarSeriesData[]>([]);
   const [gameTrendData, setGameTrendData] = React.useState<TrendData[]>([]);
   
-  const [gridYear, setGridYear] = React.useState('25-26');
-  const [selectedStat, setSelectedStat] = React.useState('points');
+  const [gridYears, setGridYears] = React.useState<string[]>(['25-26']);
+  const [selectedStat, setSelectedStat] = React.useState('points_per_game');
   const [selectedYears, setSelectedYears] = React.useState<string[]>(['25-26']);
   const [gameLimit, setGameLimit] = React.useState(30);
   const [hiddenIds, setHiddenIds] = React.useState<string[]>([]);
@@ -152,8 +145,9 @@ export default function AnalyzePage() {
     setGameLimit(Number(event.target.value));
   };
 
-  const handleGridYearChange = (event: SelectChangeEvent) => {
-    setGridYear(event.target.value as string);
+  const handleGridYearChange = (event: SelectChangeEvent<string[]>) => {
+    const value = event.target.value;
+    setGridYears(typeof value === 'string' ? value.split(',') : value);
   };
 
   const handleColumnsChange = (event: SelectChangeEvent<string[]>) => {
@@ -234,12 +228,18 @@ export default function AnalyzePage() {
   const dynamicColumns: GridColDef[] = React.useMemo(() => {
     const base: GridColDef[] = [{ field: 'name', headerName: 'PLAYER', width: 200, sticky: 'left' as any }];
     const stats = selectedColumns.map(colId => {
-      const config = AVAILABLE_STATS.find(s => s.id === colId);
+      const config = AVAILABLE_STATS.find(s => s.value === colId);
       return {
         field: colId,
         headerName: config?.label || colId,
         type: 'number',
         width: 100,
+        valueFormatter: (v: number) => {
+          if (typeof v !== 'number') return v;
+          if (colId.includes('pct')) return `${Math.round(v)}%`;
+          if (colId.includes('_per_game') || colId.includes('ratio')) return v.toFixed(1);
+          return Math.round(v);
+        }
       } as GridColDef;
     });
     return [...base, ...stats];
@@ -247,17 +247,97 @@ export default function AnalyzePage() {
 
   const gridRows = React.useMemo(() => {
     return players.map(p => {
-      const record = p.records.find(r => r.year === gridYear) as BasketballStatRecord;
+      const records = p.records.filter(r => gridYears.includes(r.year)) as BasketballStatRecord[];
+      
+      // Aggregation logic
+      const totals = {
+        games_played: 0,
+        points: 0,
+        rebounds: 0,
+        assists: 0,
+        steals: 0,
+        blocks: 0,
+        turnovers: 0,
+        fouls: 0,
+        fg_made: 0,
+        fg_attempted: 0,
+        fg3_made: 0,
+        fg3_attempted: 0,
+        ft_made: 0,
+        ft_attempted: 0,
+        minutes_played: 0,
+        charges: 0,
+        deflections: 0,
+        tech_fouls: 0,
+        double_doubles: 0,
+        triple_doubles: 0,
+      };
+
+      records.forEach(r => {
+        totals.games_played += (r.games_played || 0);
+        totals.points += (r.points || 0);
+        totals.rebounds += (r.rebounds || 0);
+        totals.assists += (r.assists || 0);
+        totals.steals += (r.steals || 0);
+        totals.blocks += (r.blocks || 0);
+        totals.turnovers += (r.turnovers || 0);
+        totals.fouls += (r.fouls || 0);
+        totals.fg_made += (r.fg_made || 0);
+        totals.fg_attempted += (r.fg_attempted || 0);
+        totals.fg3_made += (r.fg3_made || 0);
+        totals.fg3_attempted += (r.fg3_attempted || 0);
+        totals.ft_made += (r.ft_made || 0);
+        totals.ft_attempted += (r.ft_attempted || 0);
+        totals.minutes_played += (r.minutes_played || 0);
+        totals.charges += (r.charges || 0);
+        totals.deflections += (r.deflections || 0);
+        totals.tech_fouls += (r.tech_fouls || 0);
+        totals.double_doubles += (r.double_doubles || 0);
+        totals.triple_doubles += (r.triple_doubles || 0);
+      });
+
+      const gp = totals.games_played || 1; // Avoid div by zero
+
       const row: any = {
         id: p.id,
         name: p.name,
+        // Totals
+        games_played: totals.games_played,
+        points: totals.points,
+        rebounds: totals.rebounds,
+        assists: totals.assists,
+        steals: totals.steals,
+        blocks: totals.blocks,
+        turnovers: totals.turnovers,
+        fouls: totals.fouls,
+        minutes_played: totals.minutes_played,
+        charges: totals.charges,
+        deflections: totals.deflections,
+        tech_fouls: totals.tech_fouls,
+        double_doubles: totals.double_doubles,
+        triple_doubles: totals.triple_doubles,
+        // Per Game (Weighted)
+        points_per_game: totals.points / gp,
+        rebounds_per_game: totals.rebounds / gp,
+        assists_per_game: totals.assists / gp,
+        steals_per_game: totals.steals / gp,
+        blocks_per_game: totals.blocks / gp,
+        turnovers_per_game: totals.turnovers / gp,
+        fouls_per_game: totals.fouls / gp,
+        minutes_per_game: totals.minutes_played / gp,
+        // Percentages
+        fg_pct: totals.fg_attempted ? (totals.fg_made / totals.fg_attempted) * 100 : 0,
+        fg3_pct: totals.fg3_attempted ? (totals.fg3_made / totals.fg3_attempted) * 100 : 0,
+        ft_pct: totals.ft_attempted ? (totals.ft_made / totals.ft_attempted) * 100 : 0,
+        // Ratios
+        ast_to_ratio: totals.turnovers ? totals.assists / totals.turnovers : totals.assists,
+        stl_to_ratio: totals.turnovers ? totals.steals / totals.turnovers : totals.steals,
+        points_per_shot: totals.fg_attempted ? totals.points / totals.fg_attempted : 0,
       };
-      selectedColumns.forEach(colId => {
-        row[colId] = (record as any)?.[colId] ?? 0;
-      });
+
       return row;
     });
-  }, [players, gridYear, selectedColumns]);
+  }, [players, gridYears]);
 
   if (playerIds.length === 0) {
     return (
@@ -291,7 +371,7 @@ export default function AnalyzePage() {
     );
   }
 
-  const selectedStatLabel = STAT_OPTIONS.find(opt => opt.value === selectedStat)?.label || 'Stats';
+  const selectedStatLabel = AVAILABLE_STATS.find(opt => opt.value === selectedStat)?.label || 'Stats';
 
   return (
     <PageLayout 
@@ -336,56 +416,25 @@ export default function AnalyzePage() {
                 </div>
 
                 <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                  <Box sx={{ minWidth: 200 }}>
-                    <FormControl fullWidth size="small">
-                      <InputLabel sx={{ color: 'black', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase' }}>Visible Stats</InputLabel>
-                      <Select
-                        multiple
-                        value={selectedColumns}
-                        onChange={handleColumnsChange as any}
-                        renderValue={(selected) => {
-                          const labels = (selected as string[]).map(id => AVAILABLE_STATS.find(s => s.id === id)?.label || id);
-                          return labels.join(', ');
-                        }}
-                        sx={{
-                          borderRadius: '16px',
-                          backgroundColor: '#f8fafc',
-                          '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-                          '& .MuiSelect-select': { fontWeight: 'bold', color: 'black', fontSize: '0.875rem' }
-                        }}
-                      >
-                        {AVAILABLE_STATS.map((stat) => (
-                          <MenuItem key={stat.id} value={stat.id}>
-                            <Checkbox checked={selectedColumns.indexOf(stat.id) > -1} />
-                            <ListItemText primary={stat.label} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
+                  <AppDropdown
+                    label="Visible Stats"
+                    value={selectedColumns}
+                    onChange={handleColumnsChange}
+                    options={AVAILABLE_STATS}
+                    multiple
+                    checkbox
+                    minWidth={220}
+                  />
 
-                  <Box sx={{ minWidth: 140 }}>
-                    <FormControl fullWidth size="small">
-                      <InputLabel sx={{ color: 'black', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase' }}>Filter Year</InputLabel>
-                      <Select
-                        value={gridYear}
-                        label="Filter Year"
-                        onChange={handleGridYearChange}
-                        sx={{
-                          borderRadius: '16px',
-                          backgroundColor: '#f8fafc',
-                          '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-                          '& .MuiSelect-select': { fontWeight: 'bold', color: 'black', fontSize: '0.875rem' }
-                        }}
-                      >
-                        {YEAR_OPTIONS.map(opt => (
-                          <MenuItem key={opt.value} value={opt.value} sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
-                            {opt.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
+                  <AppDropdown
+                    label="Aggregate Seasons"
+                    value={gridYears}
+                    onChange={handleGridYearChange}
+                    options={YEAR_OPTIONS}
+                    multiple
+                    checkbox
+                    minWidth={180}
+                  />
                 </Box>
               </div>
               <Box sx={{ height: 400, width: '100%' }}>
@@ -450,79 +499,31 @@ export default function AnalyzePage() {
                 </div>
                 
                 <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 2 }}>
-                  <Box sx={{ minWidth: 200 }}>
-                    <FormControl fullWidth size="small">
-                      <InputLabel sx={{ color: 'black', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase' }}>Seasons</InputLabel>
-                      <Select
-                        multiple
-                        value={selectedYears}
-                        onChange={handleYearsChange}
-                        renderValue={(selected) => selected.join(', ')}
-                        sx={{
-                          borderRadius: '16px',
-                          backgroundColor: 'white',
-                          '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e2e8f0' },
-                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00599c' },
-                          '& .MuiSelect-select': { fontWeight: 'bold', color: 'black' }
-                        }}
-                      >
-                        {YEAR_OPTIONS.map((opt) => (
-                          <MenuItem key={opt.value} value={opt.value}>
-                            <Checkbox checked={selectedYears.indexOf(opt.value) > -1} />
-                            <ListItemText primary={opt.label} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
+                  <AppDropdown
+                    label="Seasons"
+                    value={selectedYears}
+                    onChange={handleYearsChange}
+                    options={YEAR_OPTIONS}
+                    multiple
+                    checkbox
+                    minWidth={200}
+                  />
 
-                  <Box sx={{ minWidth: 140 }}>
-                    <FormControl fullWidth size="small">
-                      <InputLabel sx={{ color: 'black', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase' }}>Limit</InputLabel>
-                      <Select
-                        value={gameLimit}
-                        label="Limit"
-                        onChange={handleLimitChange as any}
-                        sx={{
-                          borderRadius: '16px',
-                          backgroundColor: 'white',
-                          '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e2e8f0' },
-                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00599c' },
-                          '& .MuiSelect-select': { fontWeight: 'bold', color: 'black' }
-                        }}
-                      >
-                        {LIMIT_OPTIONS.map(opt => (
-                          <MenuItem key={opt.value} value={opt.value} sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
-                            {opt.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
+                  <AppDropdown
+                    label="Limit"
+                    value={gameLimit}
+                    onChange={handleLimitChange}
+                    options={LIMIT_OPTIONS}
+                    minWidth={140}
+                  />
 
-                  <Box sx={{ minWidth: 140 }}>
-                    <FormControl fullWidth size="small">
-                      <InputLabel sx={{ color: 'black', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase' }}>Metric</InputLabel>
-                      <Select
-                        value={selectedStat}
-                        label="Metric"
-                        onChange={handleStatChange}
-                        sx={{
-                          borderRadius: '16px',
-                          backgroundColor: 'white',
-                          '& .MuiOutlinedInput-notchedOutline': { borderColor: '#e2e8f0' },
-                          '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00599c' },
-                          '& .MuiSelect-select': { fontWeight: 'bold', color: 'black' }
-                        }}
-                      >
-                        {STAT_OPTIONS.map(opt => (
-                          <MenuItem key={opt.value} value={opt.value} sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
-                            {opt.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
+                  <AppDropdown
+                    label="Metric"
+                    value={selectedStat}
+                    onChange={handleStatChange}
+                    options={AVAILABLE_STATS}
+                    minWidth={140}
+                  />
                 </Stack>
               </div>
 
