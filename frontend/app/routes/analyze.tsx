@@ -38,6 +38,7 @@ const LIMIT_OPTIONS = [
 ];
 
 const AVAILABLE_STATS = [
+  { value: 'positions', label: 'POS' },
   { value: 'points_per_game', label: 'PPG' },
   { value: 'rebounds_per_game', label: 'RPG' },
   { value: 'assists_per_game', label: 'APG' },
@@ -75,6 +76,7 @@ const AVAILABLE_STATS = [
 ];
 
 const DEFAULT_COLUMNS = [
+  'positions',
   'points_per_game',
   'rebounds_per_game',
   'assists_per_game',
@@ -116,6 +118,7 @@ export default function AnalyzePage() {
   const [selectedYears, setSelectedYears] = React.useState<string[]>(['25-26']);
   const [gameLimit, setGameLimit] = React.useState(30);
   const [hiddenIds, setHiddenIds] = React.useState<string[]>([]);
+  const [radarHiddenIds, setRadarHiddenIds] = React.useState<string[]>([]);
   const [selectedColumns, setSelectedColumns] = React.useState<string[]>(DEFAULT_COLUMNS);
   const [showAddPopup, setShowAddPopup] = React.useState(false);
   const [showRemovePopup, setShowRemovePopup] = React.useState(false);
@@ -138,7 +141,10 @@ export default function AnalyzePage() {
 
   const handleYearsChange = (event: SelectChangeEvent<string[]>) => {
     const value = event.target.value;
-    setSelectedYears(typeof value === 'string' ? value.split(',') : value);
+    const selected = typeof value === 'string' ? value.split(',') : value;
+    // Sort chronologically (Oldest first, e.g., '24-25' before '25-26')
+    const sorted = [...selected].sort((a, b) => a.localeCompare(b));
+    setSelectedYears(sorted);
   };
 
   const handleLimitChange = (event: SelectChangeEvent<number>) => {
@@ -147,7 +153,10 @@ export default function AnalyzePage() {
 
   const handleGridYearChange = (event: SelectChangeEvent<string[]>) => {
     const value = event.target.value;
-    setGridYears(typeof value === 'string' ? value.split(',') : value);
+    const selected = typeof value === 'string' ? value.split(',') : value;
+    // Sort chronologically
+    const sorted = [...selected].sort((a, b) => a.localeCompare(b));
+    setGridYears(sorted);
   };
 
   const handleColumnsChange = (event: SelectChangeEvent<string[]>) => {
@@ -157,6 +166,12 @@ export default function AnalyzePage() {
 
   const togglePlayerVisibility = (id: string) => {
     setHiddenIds(prev => 
+      prev.includes(id) ? prev.filter(hid => hid !== id) : [...prev, id]
+    );
+  };
+
+  const toggleRadarPlayerVisibility = (id: string) => {
+    setRadarHiddenIds(prev => 
       prev.includes(id) ? prev.filter(hid => hid !== id) : [...prev, id]
     );
   };
@@ -232,9 +247,11 @@ export default function AnalyzePage() {
       return {
         field: colId,
         headerName: config?.label || colId,
-        type: 'number',
+        type: colId === 'positions' ? 'string' : 'number',
         width: 100,
-        valueFormatter: (v: number) => {
+        valueFormatter: (v: any) => {
+          if (v === null || v === undefined) return '—';
+          if (colId === 'positions') return v;
           if (typeof v !== 'number') return v;
           if (colId.includes('pct')) return `${Math.round(v)}%`;
           if (colId.includes('_per_game') || colId.includes('ratio')) return v.toFixed(1);
@@ -247,8 +264,15 @@ export default function AnalyzePage() {
 
   const gridRows = React.useMemo(() => {
     return players.map(p => {
-      const records = p.records.filter(r => gridYears.includes(r.year)) as BasketballStatRecord[];
+      // Sort records by year (descending) to get the most recent position easily
+      const sortedRecords = [...p.records].sort((a, b) => b.year.localeCompare(a.year));
+      const selectedRecords = sortedRecords.filter(r => gridYears.includes(r.year)) as BasketballStatRecord[];
       
+      // Get primary position from the most recent selected record
+      const primaryPos = selectedRecords.length > 0 
+        ? (selectedRecords[0].positions?.[0] || "—") 
+        : "—";
+
       // Aggregation logic
       const totals = {
         games_played: 0,
@@ -273,7 +297,7 @@ export default function AnalyzePage() {
         triple_doubles: 0,
       };
 
-      records.forEach(r => {
+      selectedRecords.forEach(r => {
         totals.games_played += (r.games_played || 0);
         totals.points += (r.points || 0);
         totals.rebounds += (r.rebounds || 0);
@@ -301,6 +325,7 @@ export default function AnalyzePage() {
       const row: any = {
         id: p.id,
         name: p.name,
+        positions: primaryPos,
         // Totals
         games_played: totals.games_played,
         points: totals.points,
@@ -380,7 +405,9 @@ export default function AnalyzePage() {
       subtitle={`${playerIds.length} Athletes Selected`}
       description="Comparative performance profiling and production metrics."
       variant="hero"
-      actions={
+    >
+      <div className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 md:px-12 lg:px-24 space-y-12">
+        {/* ── Action Buttons Row (Moved below title) ── */}
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowRemovePopup(true)}
@@ -395,9 +422,7 @@ export default function AnalyzePage() {
             Add Athletes
           </button>
         </div>
-      }
-    >
-      <div className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 md:px-12 lg:px-24 space-y-12">
+
         {loading ? (
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 10, gap: 2 }}>
             <CircularProgress size={48} sx={{ color: '#00599c' }} />
@@ -473,12 +498,39 @@ export default function AnalyzePage() {
                 <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.25em', color: '#00599c' }}>Production Radar</Typography>
                 <Typography variant="h4" sx={{ mt: 1, fontWeight: 900, letterSpacing: '-0.02em', color: '#0f172a' }}>Profile Comparison</Typography>
               </div>
+
+              {/* Custom Legend with Checkboxes for Radar */}
+              <Box sx={{ mb: 4, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 3 }}>
+                {players.map((player) => (
+                  <FormControlLabel
+                    key={`radar-${player.id}`}
+                    control={
+                      <Checkbox
+                        checked={!radarHiddenIds.includes(player.id)}
+                        onChange={() => toggleRadarPlayerVisibility(player.id)}
+                        sx={{
+                          color: playerColors[player.id],
+                          '&.Mui-checked': {
+                            color: playerColors[player.id],
+                          },
+                        }}
+                      />
+                    }
+                    label={
+                      <Typography sx={{ fontWeight: '900', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#0f172a' }}>
+                        {player.name}
+                      </Typography>
+                    }
+                  />
+                ))}
+              </Box>
+
               <div className="flex justify-center">
                 <div className="w-full max-w-4xl">
                   {radarData.length > 0 ? (
                     <RadarVisualisation 
                       metrics={POSITION_METRICS[((players[0]?.currentStats as BasketballStatRecord)?.positions?.[0] || "PG").toUpperCase()] || DEFAULT_METRICS} 
-                      series={radarData.filter(s => !hiddenIds.includes(s.id!))} 
+                      series={radarData.filter(s => !radarHiddenIds.includes(s.id!))} 
                       height={400} 
                     />
                   ) : (
