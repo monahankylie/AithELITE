@@ -8,7 +8,9 @@ export default [
   route("/profile", "routes/profile.tsx"),
   route("/watchlists", "routes/watchlists.tsx"), 
   route("/discover", "routes/discover.tsx"), 
+  route("/analyze", "routes/analyze.tsx"),
   route("/players/:id", "routes/player.$id.tsx"),
   route("/players/:id/stats", "routes/player.$id.stats.tsx"),
   route("/players/:id/games", "routes/player.$id.games.tsx"),
+  route("/test", "routes/test.tsx"),
 ] satisfies RouteConfig;

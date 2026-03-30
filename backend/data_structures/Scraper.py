@@ -32,11 +32,14 @@ class Scraper_Task:
         self.current_html = "" #REFACTOR TO SOUP
 
         self.session = requests.Session()
-        ua = UserAgent()
+        ua = UserAgent(platforms='desktop',browsers=['Chrome'], os=['Windows', 'Mac OS X'],fallback = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
         # This provides the required key-value pair
+        selected_ua = ua.random
         self.session.headers.update({
-            "User-Agent": ua.chrome
-        })
+        "User-Agent": selected_ua,
+        "sec-ch-ua-mobile": "?0",  # Explicitly tell server "Not Mobile"
+        "sec-ch-ua-platform": '"Windows"' if "Windows" in selected_ua else '"macOS"'
+    })
         self.counter = count(0)
 #this funcion here defines how a json file shold be structured 
     def validation_and_setup(self, scrape_preset):
@@ -135,11 +138,10 @@ class Scraper_Task:
         
         i = self.which_step_am_i(step_config)
         if(len(matches) == 0):
-            print(f"NO MATCH FOUND FOR STEP {i}")
-            print(f"when looking for {regex} in {self.current_url}")
-            filename = "debug_output.html"
-            with open(filename, "w", encoding="utf-8") as f:
-                f.write(self.current_html)
+            os.makedirs("Debug", exist_ok=True)
+            file_path = os.path.join("Debug", f"{uuid.uuid1()}.txt")
+            with open(file_path,"w") as f:
+                f.write(f"AS {self.session.headers.get("User-Agent")}, \nNO MATCH FOUND FOR STEP {i} \n when looking for {regex} in {self.current_url} \n {str(self.current_html)})")
             backup = match_info.get("must_store",False)
             if(backup):
                 matches.append(backup)
@@ -203,6 +205,7 @@ class Scraper_Task:
         keys = extract_keys(current_pattern)
         step = self.which_step_am_i(step_config)
         processed_stuff = self.step_dict.get(step, [])
+        fork_dict = self.seed_dict
         new_path_buffer = []
 
         if processed_stuff: ##if we have stuff inside this 
@@ -213,7 +216,7 @@ class Scraper_Task:
                 start,end = match.span() #if pattern match, we will grab the substring for a better match
                 substring = target[start:end]
                 values = extract_values(current_pattern,substring)
-                fork_dict = dictionary_builder(keys,values)
+                fork_dict = fork_dict| dictionary_builder(keys,values)
                 for r_pattern in requested_patterns:
                     new_path = string_builder(r_pattern,fork_dict)
                     new_path = target[:start] + new_path + target[end:]
@@ -226,7 +229,7 @@ class Scraper_Task:
                 start,end = match.span() #if pattern match, we will grab the substring for a better match
                 substring = target[start:end]
                 values = extract_values(current_pattern,substring)
-                fork_dict = dictionary_builder(keys,values)
+                fork_dict = fork_dict |dictionary_builder(keys,values)
                 for r_pattern in requested_patterns:
                     new_path = string_builder(r_pattern,fork_dict)
                     new_path = target[:start] + new_path + target[end:]
@@ -254,8 +257,8 @@ class Scraper_Task:
             ".txt": lambda data, f: f.write(str(data))
         }
         namers = {
-            "uuid1": lambda: uuid.uuid1,
-            "uuid4": lambda: uuid.uuid4,
+            "uuid1": uuid.uuid1,
+            "uuid4": uuid.uuid4,
             "number":lambda: next(self.counter)
         }
 
@@ -268,7 +271,7 @@ class Scraper_Task:
         method = store_config.get("method","each")
         extension = store_config.get("ext",".json").lower().strip()
         write_method = writers.get(extension,writers[".json"]) ##ait if the user doesnt give us one, then itll  be json
-        name_method = namers.get(store_config.get("name_scheme"))
+        name_method = namers.get(store_config.get("name_scheme"),namers["uuid1"])
         ##can probs shove all these conditionals within a lambda
         ##lets make a write function in utils another time. rewriting serial is tedious.
         if method == "each":
@@ -317,10 +320,11 @@ class Scraper_Task:
             page.raise_for_status() 
             return BeautifulSoup(page.text, 'html.parser')
         except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 404:
-                print(f"404 Not Found: {URL}")
+            if e.response.status_code in (404,500):
+                server_info = e.response.headers.get('Server', 'Unknown')
+                print(f"{e.response.status_code} at {URL} | Server: {server_info}")
                 return None  # Return None so we can skip it
-            raise e # Still crash on 500s or other critical errors
+            raise e # Still crash on other critical errors
         except Exception as e:
             print(f"Connection Error at {URL}: {e}")
             return None
