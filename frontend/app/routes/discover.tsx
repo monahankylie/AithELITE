@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import PageLayout from "../components/page-layout";
 import AthleteList from "../components/athlete-list";
+import AppDropdown from "../components/app-dropdown";
+import type { SelectChangeEvent } from "@mui/material";
 
 // Import values/logic
 import { athleteService, hasActiveFilters, SORT_OPTIONS } from "../lib/athlete-service";
@@ -17,12 +19,15 @@ const GRAD_YEARS = ["2025", "2026", "2027", "2028"];
 
 export default function DiscoverPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const existingIds = searchParams.get("existing")?.split(",").filter(Boolean) || [];
+  
   const [players, setPlayers] = useState<Athlete[]>([]);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set(existingIds));
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
-  const [isSelectMode, setIsSelectMode] = useState(false);
+  const [isSelectMode, setIsSelectMode] = useState(existingIds.length > 0);
   const [hasMore, setHasMore] = useState(true);
   const [showWatchlistPopup, setShowWatchlistPopup] = useState(false);
 
@@ -104,14 +109,21 @@ export default function DiscoverPage() {
 
   const currentSport = players.length > 0 ? (players[0].currentStats?.sport || "Basketball") : "Basketball";
 
-  const sortCategories = useMemo(() => {
-    const cats: Record<string, typeof SORT_OPTIONS> = {};
-    for (const opt of SORT_OPTIONS) {
-      if (!cats[opt.category]) cats[opt.category] = [];
-      cats[opt.category].push(opt);
-    }
-    return cats;
-  }, []);
+  const dropdownSortOptions = useMemo(() => 
+    SORT_OPTIONS.map(opt => ({
+      value: opt.value,
+      label: opt.label,
+      category: opt.category
+    })), 
+  []);
+
+  const dropdownPositionOptions = useMemo(() => 
+    POSITIONS.map(p => ({ value: p, label: p })), 
+  []);
+
+  const dropdownGradYearOptions = useMemo(() => 
+    GRAD_YEARS.map(y => ({ value: y, label: y })), 
+  []);
 
   const handleWatchlistSuccess = () => {
     setShowWatchlistPopup(false);
@@ -136,45 +148,13 @@ export default function DiscoverPage() {
           : `Browse the top performing ${currentSport.toLowerCase()} talent.`
       }
       variant="hero"
-      actions={
-        <div className="flex items-center gap-4">
-          {selectedIds.size > 0 && isSelectMode && (
-            <>
-              <button
-                onClick={handleAnalyze}
-                className="rounded-2xl bg-amber-500 px-8 py-4 text-xs font-black uppercase tracking-widest text-white shadow-2xl hover:bg-amber-600 transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
-              >
-                Analyze ({selectedIds.size})
-              </button>
-              <button
-                onClick={() => setShowWatchlistPopup(true)}
-                className="rounded-2xl bg-[#00599c] px-8 py-4 text-xs font-black uppercase tracking-widest text-white shadow-2xl hover:bg-[#004a82] transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
-              >
-                Save ({selectedIds.size})
-              </button>
-            </>
-          )}
-          <button
-            onClick={() => {
-              setIsSelectMode(!isSelectMode);
-              if (isSelectMode) setSelectedIds(new Set());
-            }}
-            className={`rounded-2xl px-8 py-4 text-xs font-black uppercase tracking-widest transition-all shadow-sm border-2 whitespace-nowrap ${
-              isSelectMode
-                ? "bg-white text-[#00599c] border-[#00599c] shadow-md"
-                : "bg-white text-slate-900 border-slate-200 hover:border-slate-900 hover:bg-slate-50"
-            }`}
-          >
-            {isSelectMode ? "Cancel Selection" : "Select Players"}
-          </button>
-        </div>
-      }
     >
       <div className="pb-20 px-4 sm:px-6 md:px-12 lg:px-24">
-        {/* ── Sticky Search + Filters ── */}
-        <div className="sticky top-0 z-30 mb-6 bg-white/95 pt-2 pb-4 backdrop-blur-sm">
+        {/* ── Sticky Actions & Filters ── */}
+        <div className="sticky top-0 z-30 mb-6 bg-gray-50/95 pt-2 pb-4 backdrop-blur-sm space-y-4">
+          
           {/* ── Search Bar ── */}
-          <div className="mb-4">
+          <div className="">
             <div className="flex gap-3">
               <div className="relative flex-1">
                 <svg
@@ -196,7 +176,7 @@ export default function DiscoverPage() {
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && applySearch()}
-                  className="w-full rounded-2xl border-2 border-slate-200 bg-white py-4 pl-12 pr-4 text-sm font-medium text-slate-900 placeholder:text-slate-400 transition-all focus:border-[#00599c] focus:outline-none"
+                  className="w-full rounded-2xl border-2 border-slate-200 bg-slate-50 py-4 pl-12 pr-4 text-sm font-medium text-slate-900 placeholder:text-slate-400 transition-all focus:border-[#00599c] focus:outline-none"
                 />
               </div>
               <button
@@ -208,9 +188,10 @@ export default function DiscoverPage() {
             </div>
           </div>
 
-          {/* ── Filter Row: Position · Grad Year · Sort By ── */}
-          <div className="flex flex-wrap gap-3">
-            <select
+          {/* ── Filter Row: Position · Grad Year · Sort By · Selection ── */}
+          <div className="flex flex-wrap items-center gap-3">
+            <AppDropdown
+              label="Position"
               value={filters.position || ""}
               onChange={(e) =>
                 setFilters((f) => {
@@ -220,17 +201,13 @@ export default function DiscoverPage() {
                   return next;
                 })
               }
-              className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
-            >
-              <option value="">All Positions</option>
-              {POSITIONS.map((p) => (
-                <option key={p} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
+              options={dropdownPositionOptions}
+              placeholder="All Positions"
+              minWidth={160}
+            />
 
-            <select
+            <AppDropdown
+              label="Class"
               value={filters.gradYear || ""}
               onChange={(e) =>
                 setFilters((f) => {
@@ -240,17 +217,13 @@ export default function DiscoverPage() {
                   return next;
                 })
               }
-              className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
-            >
-              <option value="">All Classes</option>
-              {GRAD_YEARS.map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </select>
+              options={dropdownGradYearOptions}
+              placeholder="All Classes"
+              minWidth={140}
+            />
 
-            <select
+            <AppDropdown
+              label="Sort by Stat"
               value={filters.sortBy || ""}
               onChange={(e) =>
                 setFilters((f) => {
@@ -260,28 +233,52 @@ export default function DiscoverPage() {
                   return next;
                 })
               }
-              className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-700 focus:border-[#00599c] focus:outline-none transition-colors cursor-pointer"
-            >
-              <option value="">Sort by Stat</option>
-              {Object.entries(sortCategories).map(([cat, opts]) => (
-                <optgroup key={cat} label={cat}>
-                  {opts.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-            </select>
+              options={dropdownSortOptions}
+              placeholder="Select Stat"
+              minWidth={180}
+            />
 
             {filtersActive && (
               <button
                 onClick={clearAllFilters}
-                className="rounded-xl border-2 border-slate-200 bg-white px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 hover:border-slate-400 transition-colors"
+                className="rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 hover:border-slate-400 transition-colors h-[42px]"
               >
                 Clear All
               </button>
             )}
+
+            <div className="ml-auto flex items-center gap-2">
+              {selectedIds.size > 0 && isSelectMode && (
+                <>
+                  <button
+                    onClick={handleAnalyze}
+                    className="rounded-xl bg-amber-500 px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm hover:bg-amber-600 transition-all active:scale-95 whitespace-nowrap"
+                  >
+                    Analyze ({selectedIds.size})
+                  </button>
+                  <button
+                    onClick={() => setShowWatchlistPopup(true)}
+                    className="rounded-xl bg-[#00599c] px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm hover:bg-[#004a82] transition-all active:scale-95 whitespace-nowrap"
+                  >
+                    Save ({selectedIds.size})
+                  </button>
+                </>
+              )}
+              
+              <button
+                onClick={() => {
+                  setIsSelectMode(!isSelectMode);
+                  if (isSelectMode) setSelectedIds(new Set());
+                }}
+                className={`rounded-xl px-5 py-3 text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm border-2 whitespace-nowrap ${
+                  isSelectMode
+                    ? "bg-white text-[#00599c] border-[#00599c]"
+                    : "bg-white text-slate-900 border-slate-200 hover:border-slate-900 hover:bg-slate-50"
+                }`}
+              >
+                {isSelectMode ? "Cancel Selection" : "Select Players"}
+              </button>
+            </div>
           </div>
         </div>
 

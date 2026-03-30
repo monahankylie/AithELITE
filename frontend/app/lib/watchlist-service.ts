@@ -12,8 +12,9 @@ import {
   serverTimestamp,
   addDoc,
   increment,
-  FieldValue, // Added FieldValue
+  deleteField,
   deleteDoc,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "../../firebase-config";
 
@@ -183,14 +184,20 @@ class WatchlistService {
   async deleteList(userId: string, listId: string): Promise<void> {
     if (!db) throw new Error("Firestore not initialized");
 
+    const batch = writeBatch(db);
     const listRef = doc(db, "users", userId, "lists", listId);
-    await deleteDoc(listRef); // Assuming deleteDoc is also imported or available
-
-    // Remove entry from the user profile index
     const userRef = doc(db, "users", userId);
-    await updateDoc(userRef, {
-      [`watchlistIndex.${listId}`]: FieldValue.delete()
+
+    // 1. Delete the actual list document
+    batch.delete(listRef);
+
+    // 2. Remove the index entry from the user profile
+    batch.update(userRef, {
+      [`watchlistIndex.${listId}`]: deleteField()
     });
+
+    // 3. Commit both operations atomically
+    await batch.commit();
   }
 }
 

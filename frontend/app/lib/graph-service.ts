@@ -6,6 +6,7 @@ import { gameService } from './game-service';
  * Data structure for a single series in a Radar Chart.
  */
 export interface RadarSeriesData {
+  id?: string;
   label: string;
   data: number[];
   color?: string;
@@ -17,8 +18,10 @@ export interface RadarSeriesData {
  * Data structure for trend line charts (e.g., points over seasons or games).
  */
 export interface TrendData {
+  id: string;
   label: string;
   data: number[];
+  color?: string;
   xAxisData?: string[];
 }
 
@@ -46,6 +49,7 @@ class GraphService {
       });
 
       return {
+        id: player.id,
         label: player.name,
         data,
       };
@@ -81,6 +85,7 @@ class GraphService {
       });
 
       return {
+        id: player.id,
         label: player.name,
         data: data as number[],
         xAxisData: sortedYears,
@@ -117,13 +122,14 @@ class GraphService {
         const recentGames = allGames.slice(-gameLimit);
 
         return {
+          id: player.id,
           name: player.name,
-          gameData: recentGames.map(game => Number(game[metricName.toLowerCase()] ?? 0))
+          gameData: recentGames.map(game => this.resolveGameMetricValue(game, metricName))
         };
       })
     );
 
-    const validResults = playerGamesResults.filter((r): r is { name: string; gameData: number[] } => r !== null);
+    const validResults = playerGamesResults.filter((r): r is { id: string; name: string; gameData: (number | null)[] } => r !== null);
     const xAxisSize = gameLimit;
     
     return validResults.map(res => {
@@ -131,10 +137,50 @@ class GraphService {
       const padding = Array(paddingSize).fill(null);
       
       return {
+        id: res.id,
         label: res.name,
-        data: [...padding, ...res.gameData],
+        data: [...padding, ...res.gameData] as number[],
       };
     });
+  }
+
+  /**
+   * Resolves a metric value for a single game.
+   * Maps season-level keys to game-level fields.
+   */
+  private resolveGameMetricValue(game: any, metricName: string): number {
+    const name = metricName.toLowerCase();
+    
+    // 1. Direct Mappings (Per Game to Total)
+    if (name === 'points_per_game' || name === 'points') return Number(game.points ?? 0);
+    if (name === 'rebounds_per_game' || name === 'rebounds') return Number(game.rebounds ?? 0);
+    if (name === 'assists_per_game' || name === 'assists') return Number(game.assists ?? 0);
+    if (name === 'steals_per_game' || name === 'steals') return Number(game.steals ?? 0);
+    if (name === 'blocks_per_game' || name === 'blocks') return Number(game.blocks ?? 0);
+    if (name === 'turnovers_per_game' || name === 'turnovers') return Number(game.turnovers ?? 0);
+    if (name === 'minutes_per_game' || name === 'minutes_played') return Number(game.minutes_played ?? 0);
+    if (name === 'fouls_per_game' || name === 'fouls') return Number(game.fouls ?? 0);
+    if (name === 'off_rebounds_per_game' || name === 'off_rebounds') return Number(game.off_rebounds ?? 0);
+    if (name === 'def_rebounds_per_game' || name === 'def_rebounds') return Number(game.def_rebounds ?? 0);
+
+    // 2. Percentage Calculations (Game-specific)
+    if (name === 'fg_pct') {
+      return game.fg_attempted ? Math.round((game.fg_made / game.fg_attempted) * 100) : 0;
+    }
+    if (name === 'fg3_pct') {
+      return game.fg3_attempted ? Math.round((game.fg3_made / game.fg3_attempted) * 100) : 0;
+    }
+    if (name === 'ft_pct') {
+      return game.ft_attempted ? Math.round((game.ft_made / game.ft_attempted) * 100) : 0;
+    }
+
+    // 3. Ratios
+    if (name === 'ast_to_ratio') {
+      return game.turnovers ? Number((game.assists / game.turnovers).toFixed(2)) : Number(game.assists);
+    }
+
+    // 4. Default Fallback
+    return Number(game[name] ?? 0);
   }
 
   /**

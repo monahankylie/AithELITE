@@ -10,6 +10,7 @@ interface TrendLineChartProps {
   height?: number;
   yAxisLabel?: string;
   hideXAxisLabels?: boolean;
+  hiddenIds?: string[];
 }
 
 const TrendLineChart: React.FC<TrendLineChartProps> = ({ 
@@ -17,7 +18,8 @@ const TrendLineChart: React.FC<TrendLineChartProps> = ({
   data, 
   height = 300,
   yAxisLabel = "Value",
-  hideXAxisLabels = false
+  hideXAxisLabels = false,
+  hiddenIds = []
 }) => {
   // Use the length of the data to define the x-axis spread.
   const pointCount = data.length > 0 && data[0].data ? data[0].data.length : 30;
@@ -32,12 +34,15 @@ const TrendLineChart: React.FC<TrendLineChartProps> = ({
       )}
       <LineChart
         series={data.map(item => ({
+          id: item.id,
           curve: "linear",
           label: item.label,
           data: item.data,
+          color: item.color, // Pass color from data
           connectNulls: true,
           showMark: true,
-        }))}
+          valueFormatter: (v: number | null) => v !== null ? String(v) : "N/A",
+        })).filter(s => !hiddenIds.includes(s.id!))}
         xAxis={[{ 
           data: xAxisData,
           scaleType: 'linear',
@@ -60,14 +65,7 @@ const TrendLineChart: React.FC<TrendLineChartProps> = ({
         margin={{ left: 60, right: 20, top: 40, bottom: 40 }}
         slotProps={{
           legend: {
-            direction: 'row',
-            position: { vertical: 'bottom', horizontal: 'middle' },
-            padding: 0,
-            labelStyle: {
-              fontSize: 10,
-              fontWeight: 700,
-              fill: 'black'
-            }
+            hidden: true // Hide default legend to use custom checkboxes
           }
         }}
         sx={{
