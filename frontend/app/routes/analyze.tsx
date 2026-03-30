@@ -23,6 +23,8 @@ import { POSITION_METRICS, DEFAULT_METRICS } from "../lib/relevant-metrics";
 import RadarVisualisation from "../components/radar-visualisation";
 import TrendLineChart from "../components/trend-line-chart";
 import { DataGrid, type GridColDef } from '@mui/x-data-grid';
+import AddPlayersPopup from "../components/add-players-popup";
+import RemovePlayersPopup from "../components/remove-players-popup";
 
 const STAT_OPTIONS = [
   { value: 'points', label: 'Points' },
@@ -48,18 +50,64 @@ const LIMIT_OPTIONS = [
   { value: 100, label: 'Last 100' },
 ];
 
-const GRID_COLUMNS: GridColDef[] = [
-  { field: 'name', headerName: 'PLAYER', width: 200 },
-  { field: 'ppg', headerName: 'PPG', type: 'number', width: 100 },
-  { field: 'rpg', headerName: 'RPG', type: 'number', width: 100 },
-  { field: 'apg', headerName: 'APG', type: 'number', width: 100 },
-  { field: 'spg', headerName: 'STL', type: 'number', width: 100 },
-  { field: 'bpg', headerName: 'BLK', type: 'number', width: 100 },
-  { field: 'fg_pct', headerName: 'FG%', type: 'number', width: 100 },
-  { field: 'gp', headerName: 'GP', type: 'number', width: 100 },
+const AVAILABLE_STATS = [
+  { id: 'points_per_game', label: 'PPG' },
+  { id: 'rebounds_per_game', label: 'RPG' },
+  { id: 'assists_per_game', label: 'APG' },
+  { id: 'steals_per_game', label: 'SPG' },
+  { id: 'blocks_per_game', label: 'BPG' },
+  { id: 'fg_pct', label: 'FG%' },
+  { id: 'fg3_pct', label: '3P%' },
+  { id: 'fg2_pct', label: '2P%' },
+  { id: 'ft_pct', label: 'FT%' },
+  { id: 'efg_pct', label: 'eFG%' },
+  { id: 'ast_to_ratio', label: 'A/TO' },
+  { id: 'turnovers_per_game', label: 'TOPG' },
+  { id: 'games_played', label: 'GP' },
+  { id: 'minutes_per_game', label: 'MPG' },
+  { id: 'minutes_played', label: 'MIN' },
+  { id: 'points_per_shot', label: 'PPS' },
+  { id: 'double_doubles', label: 'DD' },
+  { id: 'triple_doubles', label: 'TD' },
+  { id: 'off_rebounds_per_game', label: 'ORPG' },
+  { id: 'def_rebounds_per_game', label: 'DRPG' },
+  { id: 'points', label: 'PTS' },
+  { id: 'rebounds', label: 'REB' },
+  { id: 'assists', label: 'AST' },
+  { id: 'steals', label: 'STL' },
+  { id: 'blocks', label: 'BLK' },
+  { id: 'turnovers', label: 'TO' },
+  { id: 'fouls_per_game', label: 'FPG' },
+  { id: 'fouls', label: 'PF' },
 ];
 
-const CHART_COLORS = ['#02B2AF', '#2E96FF', '#B800D8', '#60009B', '#2731C8', '#03008D'];
+const DEFAULT_COLUMNS = [
+  'points_per_game',
+  'rebounds_per_game',
+  'assists_per_game',
+  'steals_per_game',
+  'blocks_per_game',
+  'fg_pct',
+  'games_played'
+];
+
+const CHART_COLORS = [
+  '#02B2AF', // Teal
+  '#2E96FF', // Blue
+  '#B800D8', // Magenta
+  '#F97316', // Orange
+  '#10B981', // Green
+  '#EF4444', // Red
+  '#6366F1', // Indigo
+  '#F59E0B', // Amber
+  '#EC4899', // Pink
+  '#06B6D4', // Cyan
+  '#8B5CF6', // Violet
+  '#14B8A6', // Teal Dark
+  '#60009B', // Purple
+  '#2731C8', // Royal Blue
+  '#03008D', // Navy
+];
 
 export default function AnalyzePage() {
   const [searchParams] = useSearchParams();
@@ -75,6 +123,9 @@ export default function AnalyzePage() {
   const [selectedYears, setSelectedYears] = React.useState<string[]>(['25-26']);
   const [gameLimit, setGameLimit] = React.useState(30);
   const [hiddenIds, setHiddenIds] = React.useState<string[]>([]);
+  const [selectedColumns, setSelectedColumns] = React.useState<string[]>(DEFAULT_COLUMNS);
+  const [showAddPopup, setShowAddPopup] = React.useState(false);
+  const [showRemovePopup, setShowRemovePopup] = React.useState(false);
   
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -103,6 +154,11 @@ export default function AnalyzePage() {
 
   const handleGridYearChange = (event: SelectChangeEvent) => {
     setGridYear(event.target.value as string);
+  };
+
+  const handleColumnsChange = (event: SelectChangeEvent<string[]>) => {
+    const value = event.target.value;
+    setSelectedColumns(typeof value === 'string' ? value.split(',') : value);
   };
 
   const togglePlayerVisibility = (id: string) => {
@@ -139,10 +195,10 @@ export default function AnalyzePage() {
         const radar = await graphService.getRadarData(playerIds, metrics);
         
         // Inject stable colors into radar data
-        const coloredRadar = radar.map(s => {
-            const player = fetchedPlayers.find(p => p.name === s.label);
-            return { ...s, color: player ? playerColors[player.id] : undefined };
-        });
+        const coloredRadar = radar.map(s => ({
+          ...s,
+          color: s.id ? playerColors[s.id] : undefined
+        }));
 
         setRadarData(coloredRadar);
       } catch (err: any) {
@@ -175,22 +231,33 @@ export default function AnalyzePage() {
     loadGameTrend();
   }, [playerIds, selectedStat, selectedYears, gameLimit, loading, error, playerColors]);
 
+  const dynamicColumns: GridColDef[] = React.useMemo(() => {
+    const base: GridColDef[] = [{ field: 'name', headerName: 'PLAYER', width: 200, sticky: 'left' as any }];
+    const stats = selectedColumns.map(colId => {
+      const config = AVAILABLE_STATS.find(s => s.id === colId);
+      return {
+        field: colId,
+        headerName: config?.label || colId,
+        type: 'number',
+        width: 100,
+      } as GridColDef;
+    });
+    return [...base, ...stats];
+  }, [selectedColumns]);
+
   const gridRows = React.useMemo(() => {
     return players.map(p => {
       const record = p.records.find(r => r.year === gridYear) as BasketballStatRecord;
-      return {
+      const row: any = {
         id: p.id,
         name: p.name,
-        ppg: record?.points_per_game ?? 0,
-        rpg: record?.rebounds_per_game ?? 0,
-        apg: record?.assists_per_game ?? 0,
-        spg: record?.steals_per_game ?? 0,
-        bpg: record?.blocks_per_game ?? 0,
-        fg_pct: record?.fg_pct ?? 0,
-        gp: record?.games_played ?? 0,
       };
+      selectedColumns.forEach(colId => {
+        row[colId] = (record as any)?.[colId] ?? 0;
+      });
+      return row;
     });
-  }, [players, gridYear]);
+  }, [players, gridYear, selectedColumns]);
 
   if (playerIds.length === 0) {
     return (
@@ -233,6 +300,22 @@ export default function AnalyzePage() {
       subtitle={`${playerIds.length} Athletes Selected`}
       description="Comparative performance profiling and production metrics."
       variant="hero"
+      actions={
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowRemovePopup(true)}
+            className="rounded-2xl border-2 border-red-50 bg-white px-6 py-3 text-xs font-black uppercase tracking-widest text-red-500 shadow-sm transition-all hover:border-red-500 hover:bg-red-50 active:scale-95"
+          >
+            Remove Athletes
+          </button>
+          <button
+            onClick={() => setShowAddPopup(true)}
+            className="rounded-2xl bg-white border-2 border-slate-200 px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-900 shadow-sm transition-all hover:border-[#00599c] hover:bg-slate-50 active:scale-95"
+          >
+            Add Athletes
+          </button>
+        </div>
+      }
     >
       <div className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 md:px-12 lg:px-24 space-y-12">
         {loading ? (
@@ -252,33 +335,63 @@ export default function AnalyzePage() {
                   <Typography sx={{ mt: 0.5, fontSize: '0.875rem', fontWeight: 500, color: '#64748b' }}>Comparing profile campaign averages</Typography>
                 </div>
 
-                <Box sx={{ minWidth: 180 }}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel sx={{ color: 'black', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase' }}>Filter Year</InputLabel>
-                    <Select
-                      value={gridYear}
-                      label="Filter Year"
-                      onChange={handleGridYearChange}
-                      sx={{
-                        borderRadius: '16px',
-                        backgroundColor: '#f8fafc',
-                        '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-                        '& .MuiSelect-select': { fontWeight: 'bold', color: 'black' }
-                      }}
-                    >
-                      {YEAR_OPTIONS.map(opt => (
-                        <MenuItem key={opt.value} value={opt.value} sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
-                          {opt.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                  <Box sx={{ minWidth: 200 }}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel sx={{ color: 'black', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase' }}>Visible Stats</InputLabel>
+                      <Select
+                        multiple
+                        value={selectedColumns}
+                        onChange={handleColumnsChange as any}
+                        renderValue={(selected) => {
+                          const labels = (selected as string[]).map(id => AVAILABLE_STATS.find(s => s.id === id)?.label || id);
+                          return labels.join(', ');
+                        }}
+                        sx={{
+                          borderRadius: '16px',
+                          backgroundColor: '#f8fafc',
+                          '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                          '& .MuiSelect-select': { fontWeight: 'bold', color: 'black', fontSize: '0.875rem' }
+                        }}
+                      >
+                        {AVAILABLE_STATS.map((stat) => (
+                          <MenuItem key={stat.id} value={stat.id}>
+                            <Checkbox checked={selectedColumns.indexOf(stat.id) > -1} />
+                            <ListItemText primary={stat.label} />
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Box>
+
+                  <Box sx={{ minWidth: 140 }}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel sx={{ color: 'black', fontWeight: 'bold', fontSize: '0.75rem', textTransform: 'uppercase' }}>Filter Year</InputLabel>
+                      <Select
+                        value={gridYear}
+                        label="Filter Year"
+                        onChange={handleGridYearChange}
+                        sx={{
+                          borderRadius: '16px',
+                          backgroundColor: '#f8fafc',
+                          '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                          '& .MuiSelect-select': { fontWeight: 'bold', color: 'black', fontSize: '0.875rem' }
+                        }}
+                      >
+                        {YEAR_OPTIONS.map(opt => (
+                          <MenuItem key={opt.value} value={opt.value} sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
+                            {opt.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Box>
                 </Box>
               </div>
               <Box sx={{ height: 400, width: '100%' }}>
                 <DataGrid
                   rows={gridRows}
-                  columns={GRID_COLUMNS}
+                  columns={dynamicColumns}
                   initialState={{
                     pagination: { paginationModel: { pageSize: 5 } },
                   }}
@@ -316,10 +429,7 @@ export default function AnalyzePage() {
                   {radarData.length > 0 ? (
                     <RadarVisualisation 
                       metrics={POSITION_METRICS[((players[0]?.currentStats as BasketballStatRecord)?.positions?.[0] || "PG").toUpperCase()] || DEFAULT_METRICS} 
-                      series={radarData.filter(s => {
-                        const pid = players.find(p => p.name === s.label)?.id;
-                        return pid ? !hiddenIds.includes(pid) : true;
-                      })} 
+                      series={radarData.filter(s => !hiddenIds.includes(s.id!))} 
                       height={400} 
                     />
                   ) : (
@@ -461,6 +571,20 @@ export default function AnalyzePage() {
           </>
         )}
       </div>
+
+      {showAddPopup && (
+        <AddPlayersPopup 
+          currentIds={playerIds} 
+          onClose={() => setShowAddPopup(false)} 
+        />
+      )}
+
+      {showRemovePopup && (
+        <RemovePlayersPopup
+          players={players}
+          onClose={() => setShowRemovePopup(false)}
+        />
+      )}
     </PageLayout>
   );
 }

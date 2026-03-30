@@ -6,6 +6,7 @@ import { gameService } from './game-service';
  * Data structure for a single series in a Radar Chart.
  */
 export interface RadarSeriesData {
+  id?: string;
   label: string;
   data: number[];
   color?: string;
@@ -48,6 +49,7 @@ class GraphService {
       });
 
       return {
+        id: player.id,
         label: player.name,
         data,
       };

@@ -51,19 +51,19 @@ const PageLayout = ({
             
             <main className="flex-1">
                 {title && (
-                    <header className="mx-auto w-full px-4 sm:px-6 md:px-12 lg:px-24 py-4 md:py-6">
-                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <header className="mx-auto w-full px-4 sm:px-6 md:px-12 lg:px-24 py-6 md:py-10">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                             <div className="min-w-0 flex-1">
-                                <h1 className="truncate text-xl font-black tracking-tight text-slate-900 leading-[1.1] sm:text-2xl md:text-3xl uppercase">
+                                <h1 className="truncate text-2xl font-black tracking-tight text-slate-900 leading-[1.1] sm:text-3xl md:text-4xl uppercase">
                                     {title}
                                     {subtitle && (
                                         <>
-                                            <span className="text-[#00599c] ml-2">{subtitle}</span>
+                                            <span className="text-[#00599c] ml-3">{subtitle}</span>
                                         </>
                                     )}
                                 </h1>
                                 {description && (
-                                    <p className="mt-1 text-sm font-medium text-[#00599c]/70 max-w-2xl">
+                                    <p className="mt-1.5 text-base font-medium text-[#00599c]/70 max-w-2xl">
                                         {description}
                                     </p>
                                 )}

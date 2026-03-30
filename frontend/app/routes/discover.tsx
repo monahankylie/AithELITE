@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import PageLayout from "../components/page-layout";
 import AthleteList from "../components/athlete-list";
 
@@ -17,12 +17,15 @@ const GRAD_YEARS = ["2025", "2026", "2027", "2028"];
 
 export default function DiscoverPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const existingIds = searchParams.get("existing")?.split(",").filter(Boolean) || [];
+  
   const [players, setPlayers] = useState<Athlete[]>([]);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set(existingIds));
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
-  const [isSelectMode, setIsSelectMode] = useState(false);
+  const [isSelectMode, setIsSelectMode] = useState(existingIds.length > 0);
   const [hasMore, setHasMore] = useState(true);
   const [showWatchlistPopup, setShowWatchlistPopup] = useState(false);
 
