@@ -141,6 +141,12 @@ class Player(BaseModel):
         mpid = info.data.get("maxpreps_career_id", "ABC")
         raw_id = f"{fn}{ln}{gc}{mpid}".lower().replace(" ", "")
         return re.sub(r'[^a-z0-9]', '', raw_id) 
+    @field_validator("first_name", "last_name", mode="before")
+    @classmethod
+    def parse_names(cls, v):
+        if v is None: 
+            return "Unknown"
+        return str(v).strip().lower().title()
         
     @field_validator("height", mode="before")
     @classmethod
