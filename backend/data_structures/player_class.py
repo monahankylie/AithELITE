@@ -90,6 +90,14 @@ class BasketballSeasonRecord(SeasonRecord):
     double_doubles: int = Field(0, validation_alias=AliasChoices("DoubleDouble", "double_doubles"))
     triple_doubles: int = Field(0, validation_alias=AliasChoices("TripleDouble", "triple_doubles"))
 
+    @field_validator("jersey", mode="after")
+    @classmethod
+    def parse_jersey(cls, v):
+        if isinstance(v, int):
+            v = str.format(v)
+        if isinstance(v, str):
+            return v.strip("#").strip()
+        return v
     @property
     def is_empty(self) -> bool:
         """Checks if the record has any non-zero/non-default stats."""
