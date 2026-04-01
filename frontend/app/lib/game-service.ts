@@ -84,33 +84,20 @@ class GameService {
 
   /**
    * Fetches game stats for a specific internal athlete_id (player_id in game_stats).
-   * Optional limit for efficiency.
    */
-  async fetchGamesByPlayerId(playerId: string, gameLimit?: number): Promise<BasketballGameStat[]> {
+  async fetchGamesByPlayerId(playerId: string): Promise<BasketballGameStat[]> {
     if (!db) throw new Error("Firestore not initialized");
     if (!playerId) return [];
 
-    // Only use cache if no limit is specified (or we have enough)
     const cached = this.playerGamesCache.get(playerId);
-    if (cached && (!gameLimit || cached.length >= gameLimit)) {
-      return gameLimit ? cached.slice(-gameLimit) : cached;
-    }
+    if (cached) return cached;
 
-    console.debug(`[GameService] Fetching games for player_id: ${playerId}${gameLimit ? ` (limit ${gameLimit})` : ""}`);
+    console.debug(`[GameService] Fetching games for player_id: ${playerId}`);
 
-    let q = query(
+    const q = query(
       collection(db, "game_stats"),
       where("player_id", "==", playerId)
     );
-
-    // If we have a limit, we should ideally orderBy and limit on server.
-    // However, if we need chronological order (Oldest to Newest) but want the LAST N games,
-    // we have to order by date DESC, limit N, then reverse in memory.
-    if (gameLimit) {
-      q = query(q, limit(gameLimit)); 
-      // Note: Without orderBy, this is just a random sample. 
-      // For real 'Last N', we need an index on player_id + date.
-    }
 
     const snap = await getDocs(q);
 
@@ -121,9 +108,19 @@ class GameService {
 
     const games = snap.docs.map((doc) => {
       const data = doc.data();
+      
+      // Normalize date to string for consistent sorting
+      let dateStr = data.date;
+      if (data.date && typeof data.date.toDate === 'function') {
+        dateStr = data.date.toDate().toISOString();
+      } else if (data.date instanceof Date) {
+        dateStr = data.date.toISOString();
+      }
+
       return {
         id: doc.id,
         ...data,
+        date: dateStr || "",
         points: Number(data.points ?? 0),
         rebounds: Number(data.rebounds ?? 0),
         assists: Number(data.assists ?? 0),
@@ -133,15 +130,14 @@ class GameService {
       } as BasketballGameStat;
     });
 
+    // Sort chronologically (Oldest to Newest) using normalized ISO strings
     const sorted = games.sort((a, b) => {
       const dateA = a.date || "";
       const dateB = b.date || "";
       return dateA.localeCompare(dateB);
     });
 
-    if (!gameLimit) {
-      this.playerGamesCache.set(playerId, sorted);
-    }
+    this.playerGamesCache.set(playerId, sorted);
     return sorted;
   }
 
@@ -170,7 +166,6 @@ class GameService {
 
   /**
    * Fetches all game stats for multiple internal athlete_ids.
-   * Useful for retrieving a player's history across different seasons/records.
    */
   async fetchGamesByInternalIds(internalIds: string[], gameLimit?: number): Promise<BasketballGameStat[]> {
     if (!db || internalIds.length === 0) return [];
@@ -180,7 +175,7 @@ class GameService {
     // Fetch in parallel for speed
     await Promise.all(
       internalIds.map(async (id) => {
-        const games = await this.fetchGamesByPlayerId(id, gameLimit);
+        const games = await this.fetchGamesByPlayerId(id);
         allGames.push(...games);
       })
     );

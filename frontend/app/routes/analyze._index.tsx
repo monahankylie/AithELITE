@@ -1,11 +1,11 @@
 import * as React from "react";
-import { useOutletContext } from "react-router";
+import { useOutletContext, Link } from "react-router";
 import { 
   Box, 
   Typography,
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material';
-import { DataGrid, type GridColDef } from '@mui/x-data-grid';
+import { DataGrid, type GridColDef, type GridRenderCellParams } from '@mui/x-data-grid';
 import type { Athlete, BasketballStatRecord } from "../lib/athlete-types";
 import AppDropdown from "../components/app-dropdown";
 
@@ -88,7 +88,21 @@ export default React.memo(function AnalyzeOverview() {
   };
 
   const dynamicColumns: GridColDef[] = React.useMemo(() => {
-    const base: GridColDef[] = [{ field: 'name', headerName: 'PLAYER', width: 200 }];
+    const base: GridColDef[] = [
+      { 
+        field: 'name', 
+        headerName: 'PLAYER', 
+        width: 200,
+        renderCell: (params: GridRenderCellParams) => (
+          <Link 
+            to={`/players/${params.row.id}`} 
+            className="text-[#00599c] hover:underline transition-all"
+          >
+            {params.value}
+          </Link>
+        )
+      }
+    ];
     const stats = selectedColumns.map(colId => {
       const config = AVAILABLE_STATS.find(s => s.value === colId);
       return {
