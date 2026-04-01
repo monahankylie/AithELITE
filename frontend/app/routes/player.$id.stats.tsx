@@ -216,7 +216,7 @@ export default function PlayerStatsPage() {
         </div>
 
         <div className="overflow-hidden rounded-[40px] border border-white/10 bg-white shadow-2xl">
-          <section className="bg-slate-950 p-8 lg:p-12 text-white">
+          <section className="bg-slate-950 p-4 lg:p-12 text-white">
             <div className="grid gap-12 lg:grid-cols-[1.5fr_1fr] items-center">
               <div className="space-y-6">
                 <h1 className="text-5xl font-black tracking-tighter sm:text-7xl">{player.name}</h1>
@@ -234,7 +234,7 @@ export default function PlayerStatsPage() {
             </div>
           </section>
 
-          <section className="border-y border-slate-100 bg-slate-50/50 p-6 lg:px-10 lg:py-8">
+          <section className="border-y border-slate-100 bg-slate-50/50 p-6 lg:px-5 lg:py-4">
             <div className="rounded-[40px] border border-slate-200 bg-white px-8 pt-8 pb-5 shadow-sm">
               <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                 <div>
@@ -308,7 +308,7 @@ export default function PlayerStatsPage() {
             </div>
           </section>
 
-          <div className="grid gap-8 p-8 lg:grid-cols-[1.6fr_1fr] lg:p-12">
+          <div className="grid gap-8 p-4 lg:grid-cols-[1.6fr_1fr] lg:p-6">
             <div className="space-y-8">
               <Panel title="Scouting Strengths">
                 <div className="grid gap-4">
@@ -368,7 +368,7 @@ function ProductionBar({ label, value, max }: { label: string; value: number | n
 
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-[32px] border border-slate-100 bg-white p-8 shadow-sm">
+    <div className="rounded-[32px] border border-slate-100 bg-white p-4 shadow-sm">
       <h3 className="mb-6 text-xs font-black uppercase tracking-[0.2em] text-[#00599c]">{title}</h3>
       {children}
     </div>
