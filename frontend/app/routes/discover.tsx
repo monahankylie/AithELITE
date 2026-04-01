@@ -3,13 +3,14 @@ import { useNavigate, useSearchParams } from "react-router";
 import PageLayout from "../components/page-layout";
 import AthleteList from "../components/athlete-list";
 import AppDropdown from "../components/app-dropdown";
-import type { SelectChangeEvent } from "@mui/material";
+import SelectionActions from "../components/selection-actions";
 
 // Import values/logic
-import { athleteService, hasActiveFilters, SORT_OPTIONS } from "../lib/athlete-service";
+import { athleteService, hasActiveFilters, DISCOVER_SORT_OPTIONS } from "../lib/athlete-service";
+import { usePlayerSelection } from "../lib/use-player-selection";
 
 // Import types only
-import type { Athlete, AthleteFilters, SortKey } from "../lib/athlete-types";
+import type { Athlete, AthleteFilters, DiscoverSortKey } from "../lib/athlete-types";
 import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 
 import WatchlistPopup from "../components/watchlist-popup";
@@ -23,11 +24,18 @@ export default function DiscoverPage() {
   const existingIds = searchParams.get("existing")?.split(",").filter(Boolean) || [];
   
   const [players, setPlayers] = useState<Athlete[]>([]);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set(existingIds));
+  const { 
+    selectedIds, 
+    isSelectMode, 
+    toggleSelectMode, 
+    togglePlayer, 
+    clearSelection,
+    setSelectedIds 
+  } = usePlayerSelection(existingIds);
+
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
-  const [isSelectMode, setIsSelectMode] = useState(existingIds.length > 0);
   const [hasMore, setHasMore] = useState(true);
   const [showWatchlistPopup, setShowWatchlistPopup] = useState(false);
 
@@ -42,7 +50,7 @@ export default function DiscoverPage() {
     if (filters.position) chips.push({key: "position", label: "Position", display: filters.position});
     if (filters.gradYear) chips.push({key: "gradYear", label: "Class", display: filters.gradYear});
     if (filters.sortBy) {
-      const opt = SORT_OPTIONS.find((o) => o.value === filters.sortBy);
+      const opt = DISCOVER_SORT_OPTIONS.find((o) => o.value === filters.sortBy);
       chips.push({key: "sortBy", label: "Sorted by", display: opt?.label ?? filters.sortBy});
     }
     return chips;
@@ -109,13 +117,15 @@ export default function DiscoverPage() {
 
   const currentSport = players.length > 0 ? (players[0].currentStats?.sport || "Basketball") : "Basketball";
 
-  const dropdownSortOptions = useMemo(() => 
-    SORT_OPTIONS.map(opt => ({
-      value: opt.value,
-      label: opt.label,
-      category: opt.category
-    })), 
-  []);
+  const dropdownSortOptions = useMemo(
+    () =>
+      DISCOVER_SORT_OPTIONS.map((opt) => ({
+        value: opt.value,
+        label: opt.label,
+        category: opt.category,
+      })),
+    [],
+  );
 
   const dropdownPositionOptions = useMemo(() => 
     POSITIONS.map(p => ({ value: p, label: p })), 
@@ -127,8 +137,7 @@ export default function DiscoverPage() {
 
   const handleWatchlistSuccess = () => {
     setShowWatchlistPopup(false);
-    setSelectedIds(new Set());
-    setIsSelectMode(false);
+    clearSelection();
   };
 
   const handleAnalyze = () => {
@@ -189,7 +198,7 @@ export default function DiscoverPage() {
           </div>
 
           {/* ── Filter Row: Position · Grad Year · Sort By · Selection ── */}
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-end gap-3">
             <AppDropdown
               label="Position"
               value={filters.position || ""}
@@ -223,61 +232,49 @@ export default function DiscoverPage() {
             />
 
             <AppDropdown
-              label="Sort by Stat"
+              label="Sort by"
               value={filters.sortBy || ""}
               onChange={(e) =>
                 setFilters((f) => {
                   const next = {...f};
-                  if (e.target.value) next.sortBy = e.target.value as SortKey;
+                  if (e.target.value) next.sortBy = e.target.value as DiscoverSortKey;
                   else delete next.sortBy;
                   return next;
                 })
               }
               options={dropdownSortOptions}
-              placeholder="Select Stat"
-              minWidth={180}
+              placeholder="Select sort"
+              minWidth={200}
             />
 
             {filtersActive && (
-              <button
-                onClick={clearAllFilters}
-                className="rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 hover:border-slate-400 transition-colors h-[42px]"
-              >
-                Clear All
-              </button>
+              <div className="flex flex-col">
+                <div className="h-[18px]" /> {/* Spacer matching dropdown labels */}
+                <button
+                  onClick={clearAllFilters}
+                  className="rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 hover:border-slate-400 transition-all active:scale-95"
+                >
+                  Clear All
+                </button>
+              </div>
             )}
 
             <div className="ml-auto flex items-center gap-2">
-              {selectedIds.size > 0 && isSelectMode && (
-                <>
-                  <button
-                    onClick={handleAnalyze}
-                    className="rounded-xl bg-amber-500 px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm hover:bg-amber-600 transition-all active:scale-95 whitespace-nowrap"
-                  >
-                    Analyze ({selectedIds.size})
-                  </button>
-                  <button
-                    onClick={() => setShowWatchlistPopup(true)}
-                    className="rounded-xl bg-[#00599c] px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm hover:bg-[#004a82] transition-all active:scale-95 whitespace-nowrap"
-                  >
-                    Save ({selectedIds.size})
-                  </button>
-                </>
+              {isSelectMode ? (
+                <SelectionActions
+                  selectedCount={selectedIds.size}
+                  onAnalyze={handleAnalyze}
+                  onSave={() => setShowWatchlistPopup(true)}
+                  onCancel={toggleSelectMode}
+                />
+              ) : (
+                <button
+                  onClick={toggleSelectMode}
+                  className="rounded-xl bg-white text-slate-900 border-slate-200 border-2 px-5 py-3 text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm hover:border-slate-900 hover:bg-slate-50 whitespace-nowrap"
+                >
+                  Select Players
+                </button>
               )}
-              
-              <button
-                onClick={() => {
-                  setIsSelectMode(!isSelectMode);
-                  if (isSelectMode) setSelectedIds(new Set());
-                }}
-                className={`rounded-xl px-5 py-3 text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm border-2 whitespace-nowrap ${
-                  isSelectMode
-                    ? "bg-white text-[#00599c] border-[#00599c]"
-                    : "bg-white text-slate-900 border-slate-200 hover:border-slate-900 hover:bg-slate-50"
-                }`}
-              >
-                {isSelectMode ? "Cancel Selection" : "Select Players"}
-              </button>
             </div>
           </div>
         </div>
@@ -309,14 +306,7 @@ export default function DiscoverPage() {
           loading={loading}
           isSelectMode={isSelectMode}
           selectedIds={selectedIds}
-          onToggle={(id) =>
-            setSelectedIds((prev) => {
-              const next = new Set(prev);
-              if (next.has(id)) next.delete(id);
-              else next.add(id);
-              return next;
-            })
-          }
+          onToggle={togglePlayer}
           emptyMessage={filtersActive ? "No prospects match your filters." : "No prospects found."}
         />
 

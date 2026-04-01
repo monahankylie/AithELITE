@@ -40,7 +40,7 @@ const RadarVisualisation: React.FC<RadarVisualisationProps> = ({
         }}
         series={processedSeries.map(s => ({
           ...s,
-          valueFormatter: (v: number | null) => v !== null ? `${v}% of Profile Max` : "",
+          valueFormatter: (v: number | null) => v !== null ? `${v/10}` : "",
         }))}
         sx={{
           '& text': { 
