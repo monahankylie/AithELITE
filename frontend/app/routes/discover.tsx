@@ -247,12 +247,15 @@ export default function DiscoverPage() {
             />
 
             {filtersActive && (
-              <button
-                onClick={clearAllFilters}
-                className="rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 hover:border-slate-400 transition-all active:scale-95 mb-0.5"
-              >
-                Clear All
-              </button>
+              <div className="flex flex-col">
+                <div className="h-[18px]" /> {/* Spacer matching dropdown labels */}
+                <button
+                  onClick={clearAllFilters}
+                  className="rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 hover:border-slate-400 transition-all active:scale-95"
+                >
+                  Clear All
+                </button>
+              </div>
             )}
 
             <div className="ml-auto flex items-center gap-2">

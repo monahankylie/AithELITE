@@ -27,6 +27,12 @@ class AthleteService {
 
   private mapAthleteData(id: string, data: DocumentData): Athlete {
     const rawRecords = (data.records || []) as AnySportRecord[];
+    
+    // Log keys of the first document processed to help debug missing fields
+    if (this.playerCache.size === 0) {
+      console.log("[AthleteService] Debug - Document Keys:", Object.keys(data));
+    }
+
     const sortedRecords = [...rawRecords].sort((a, b) => b.year.localeCompare(a.year));
     const current = sortedRecords[0];
 
@@ -82,8 +88,8 @@ class AthleteService {
   }
 
   /**
-   * Performs global Firestore queries for top-level fields (name, classYear).
-   * Embedded stats filtering and sorting are handled in-memory.
+   * Performs global Firestore queries for the primary filter (Search or Class).
+   * Remaining filters (Position, Sort) are handled in-memory.
    */
   async fetchFilteredAthletes(
     filters: AthleteFilters,
@@ -92,20 +98,26 @@ class AthleteService {
   ): Promise<FetchResult> {
     const constraints: QueryConstraint[] = [];
 
-    // 1. Global Filter: Grad Year (top-level field 'class' in DB)
-    if (filters.gradYear) {
+    // 1. Prioritize Global Search (Prefix Matching on first_name)
+    if (filters.search) {
+      const raw = filters.search.trim();
+      // Normalize: Capitalize first letter (e.g. "bryan" -> "Bryan") to match Firestore indexing
+      const s = raw.charAt(0).toUpperCase() + raw.slice(1);
+      
+      console.log(`[AthleteService] Search query (first_name) - Raw: "${raw}", Normalized: "${s}"`);
+      console.log(`[AthleteService] Query bounds: >= "${s}", <= "${s}\uf8ff"`);
+
+      constraints.push(where("first_name", ">=", s));
+      constraints.push(where("first_name", "<=", s + "\uf8ff"));
+      constraints.push(orderBy("first_name", "asc"));
+    } 
+    // 2. Fallback to Global Class Filter
+    else if (filters.gradYear) {
+      console.log(`[AthleteService] Filtering by Class: ${filters.gradYear}`);
       constraints.push(where("class", "==", Number(filters.gradYear)));
     }
 
-    // 2. Global Filter: Prefix Search on Name (top-level field)
-    if (filters.search) {
-      const s = filters.search.trim();
-      constraints.push(where("name", ">=", s));
-      constraints.push(where("name", "<=", s + "\uf8ff"));
-      constraints.push(orderBy("name", "asc"));
-    }
-
-    // Use a reasonable batch size for in-memory processing
+    // Fetch a batch size that balances performance and filtering flexibility
     const batchSize = 100;
     constraints.push(limit(batchSize)); 
     if (cursor) constraints.push(startAfter(cursor));
@@ -116,7 +128,11 @@ class AthleteService {
       
       let players = snap.docs.map((d) => this.mapAthleteData(d.id, d.data()));
 
-      // 3. In-memory Filter: Position (embedded in records)
+      // 3. In-memory Secondary Filters (handles the filters not prioritized above)
+      if (filters.search && filters.gradYear) {
+        players = players.filter(p => p.classYear === Number(filters.gradYear));
+      }
+
       if (filters.position) {
         const pos = filters.position.toLowerCase();
         players = players.filter(p => {
@@ -125,12 +141,12 @@ class AthleteService {
         });
       }
 
-      // 4. In-memory Sort: Selected Stat (embedded in records)
+      // 4. In-memory Sort
       if (filters.sortBy) {
         players.sort((a, b) => this.getStatValue(b, filters.sortBy!) - this.getStatValue(a, filters.sortBy!));
       }
 
-      // 5. Paginate the result
+      // 5. Paginate
       const paginatedPlayers = players.slice(0, pageSize);
 
       return {
