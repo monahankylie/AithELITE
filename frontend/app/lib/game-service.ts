@@ -52,6 +52,8 @@ export type HydratedGameStat = BasketballGameStat & {
 };
 
 class GameService {
+  private playerGamesCache: Map<string, BasketballGameStat[]> = new Map();
+
   /**
    * Fetches a specific game record from the 'games' collection.
    */
@@ -87,6 +89,9 @@ class GameService {
     if (!db) throw new Error("Firestore not initialized");
     if (!playerId) return [];
 
+    const cached = this.playerGamesCache.get(playerId);
+    if (cached) return cached;
+
     console.debug(`[GameService] Fetching games for player_id: ${playerId}`);
 
     const q = query(
@@ -116,11 +121,14 @@ class GameService {
     });
 
     // Sort chronologically (Oldest to Newest)
-    return games.sort((a, b) => {
+    const sorted = games.sort((a, b) => {
       const dateA = a.date || "";
       const dateB = b.date || "";
       return dateA.localeCompare(dateB);
     });
+
+    this.playerGamesCache.set(playerId, sorted);
+    return sorted;
   }
 
   /**
