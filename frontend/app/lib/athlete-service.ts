@@ -14,7 +14,18 @@ import {
   type QueryConstraint,
 } from "firebase/firestore";
 import { db } from "../../firebase-config";
-import type { Athlete, BasketballStatRecord, AnySportRecord, SortKey, AthleteFilters } from "./athlete-types";
+import type {
+  Athlete,
+  BasketballStatRecord,
+  AnySportRecord,
+  SortKey,
+  DiscoverSortKey,
+  AthleteFilters,
+} from "./athlete-types";
+import {
+  extractCompositionRatingFromDocument,
+  estimateCompositionRatingFromBasketballStats,
+} from "./composition-rating";
 
 export type FetchResult = {
   players: Athlete[];
@@ -22,14 +33,14 @@ export type FetchResult = {
   hasMore: boolean;
 };
 
-class AthleteService {
-  private playerCache: Map<string, Athlete> = new Map();
+let loggedFirstDocKeys = false;
 
+class AthleteService {
   private mapAthleteData(id: string, data: DocumentData): Athlete {
     const rawRecords = (data.records || []) as AnySportRecord[];
-    
-    // Log keys of the first document processed to help debug missing fields
-    if (this.playerCache.size === 0) {
+
+    if (!loggedFirstDocKeys) {
+      loggedFirstDocKeys = true;
       console.log("[AthleteService] Debug - Document Keys:", Object.keys(data));
     }
 
@@ -38,6 +49,15 @@ class AthleteService {
 
     const firstName = data.first_name || data.firstName || "";
     const lastName = data.last_name || data.lastName || "";
+
+    const compositionRating = (() => {
+      const fromDoc = extractCompositionRatingFromDocument(data);
+      if (fromDoc != null) return fromDoc;
+      const stats = current as BasketballStatRecord;
+      if (stats?.sport !== "Basketball") return null;
+      const est = estimateCompositionRatingFromBasketballStats(stats);
+      return est != null && Number.isFinite(est) ? est : null;
+    })();
 
     return {
       id,
@@ -53,6 +73,7 @@ class AthleteService {
       maxpreps_career_id: data.maxpreps_career_id || null,
       maxpreps_link: data.maxpreps_link || null,
       scouting_report: data.scouting_report || null,
+      compositionRating,
       records: sortedRecords,
       currentStats: current,
     };
@@ -142,8 +163,19 @@ class AthleteService {
       }
 
       // 4. In-memory Sort
-      if (filters.sortBy) {
-        players.sort((a, b) => this.getStatValue(b, filters.sortBy!) - this.getStatValue(a, filters.sortBy!));
+      if (filters.sortBy === "composition_rating") {
+        const rank = (p: Athlete) =>
+          p.compositionRating != null && Number.isFinite(p.compositionRating)
+            ? p.compositionRating
+            : Number.NEGATIVE_INFINITY;
+        // Highest composition first (best → worst); missing ratings last
+        players.sort((a, b) => rank(b) - rank(a));
+      } else if (filters.sortBy) {
+        players.sort(
+          (a, b) =>
+            this.getStatValue(b, filters.sortBy as SortKey) -
+            this.getStatValue(a, filters.sortBy as SortKey),
+        );
       }
 
       // 5. Paginate
@@ -161,49 +193,32 @@ class AthleteService {
   }
 
   async fetchAthleteById(id: string): Promise<Athlete> {
-    const cached = this.playerCache.get(id);
-    if (cached) return cached;
-
     const snap = await getDoc(doc(db, "athletes", id));
     if (!snap.exists()) throw new Error(`Athlete ${id} not found`);
-
-    const mapped = this.mapAthleteData(id, snap.data());
-    this.playerCache.set(id, mapped);
-    return mapped;
+    return this.mapAthleteData(id, snap.data());
   }
 
   async fetchAthletesByIds(ids: string[]): Promise<Athlete[]> {
     if (!db || ids.length === 0) return [];
 
-    const result: Athlete[] = [];
-    const idsToFetch: string[] = [];
-
-    ids.forEach(id => {
-      const cached = this.playerCache.get(id);
-      if (cached) result.push(cached);
-      else idsToFetch.push(id);
-    });
-
-    if (idsToFetch.length === 0) return result;
-
     const chunks: string[][] = [];
-    for (let i = 0; i < idsToFetch.length; i += 30) {
-      chunks.push(idsToFetch.slice(i, i + 30));
+    for (let i = 0; i < ids.length; i += 30) {
+      chunks.push(ids.slice(i, i + 30));
     }
 
-    const fetchedPlayers = await Promise.all(
+    const byId = new Map<string, Athlete>();
+
+    await Promise.all(
       chunks.map(async (chunk) => {
         const q = query(collection(db, "athletes"), where(documentId(), "in", chunk));
         const snap = await getDocs(q);
-        return snap.docs.map(d => {
-          const mapped = this.mapAthleteData(d.id, d.data());
-          this.playerCache.set(d.id, mapped);
-          return mapped;
+        snap.docs.forEach((d) => {
+          byId.set(d.id, this.mapAthleteData(d.id, d.data()));
         });
-      })
+      }),
     );
 
-    return [...result, ...fetchedPlayers.flat()];
+    return ids.map((id) => byId.get(id)).filter((a): a is Athlete => a != null);
   }
 }
 
@@ -220,6 +235,16 @@ export const SORT_OPTIONS: { value: SortKey; label: string; category: string }[]
   { value: "steals_per_game", label: "Steals Per Game", category: "Defense" },
   { value: "blocks_per_game", label: "Blocks Per Game", category: "Defense" },
   { value: "games_played", label: "Games Played", category: "General" },
+];
+
+/** Discover sort dropdown: stat sorts + composition (best rating first) */
+export const DISCOVER_SORT_OPTIONS: { value: DiscoverSortKey; label: string; category: string }[] = [
+  ...SORT_OPTIONS,
+  {
+    value: "composition_rating",
+    label: "Composition rating (high → low)",
+    category: "Ratings",
+  },
 ];
 
 export function hasActiveFilters(f: AthleteFilters): boolean {
