@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router";
+import { Link, useParams, useNavigate } from "react-router";
 import PageLayout from "../components/page-layout";
 import { athleteService } from "../lib/athlete-service";
 import { athleteFormatter } from "../lib/athlete-formatter";
@@ -12,6 +12,7 @@ import WatchlistPopup from "../components/watchlist-popup";
 
 export default function PlayerProfilePage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [player, setPlayer] = useState<Athlete | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -146,6 +147,10 @@ export default function PlayerProfilePage() {
                     <button onClick={() => { setShowMenu(false); setShowWatchlistPopup(true); }} className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 hover:bg-slate-50">
                       <svg className="h-5 w-5 text-[#00599c]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path d="M12 4v16m8-8H4" /></svg>
                       Add to Watchlist
+                    </button>
+                    <button onClick={() => { setShowMenu(false); navigate(`/analyze?ids=${player.id}`); }} className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-slate-900 hover:bg-slate-50">
+                      <svg className="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                      Add to Analysis
                     </button>
                   </div>
                 </>

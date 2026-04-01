@@ -3,10 +3,12 @@ import { useNavigate, useSearchParams } from "react-router";
 import PageLayout from "../components/page-layout";
 import AthleteList from "../components/athlete-list";
 import AppDropdown from "../components/app-dropdown";
+import SelectionActions from "../components/selection-actions";
 import type { SelectChangeEvent } from "@mui/material";
 
 // Import values/logic
 import { athleteService, hasActiveFilters, SORT_OPTIONS } from "../lib/athlete-service";
+import { usePlayerSelection } from "../lib/use-player-selection";
 
 // Import types only
 import type { Athlete, AthleteFilters, SortKey } from "../lib/athlete-types";
@@ -23,11 +25,18 @@ export default function DiscoverPage() {
   const existingIds = searchParams.get("existing")?.split(",").filter(Boolean) || [];
   
   const [players, setPlayers] = useState<Athlete[]>([]);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set(existingIds));
+  const { 
+    selectedIds, 
+    isSelectMode, 
+    toggleSelectMode, 
+    togglePlayer, 
+    clearSelection,
+    setSelectedIds 
+  } = usePlayerSelection(existingIds);
+
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
-  const [isSelectMode, setIsSelectMode] = useState(existingIds.length > 0);
   const [hasMore, setHasMore] = useState(true);
   const [showWatchlistPopup, setShowWatchlistPopup] = useState(false);
 
@@ -127,8 +136,7 @@ export default function DiscoverPage() {
 
   const handleWatchlistSuccess = () => {
     setShowWatchlistPopup(false);
-    setSelectedIds(new Set());
-    setIsSelectMode(false);
+    clearSelection();
   };
 
   const handleAnalyze = () => {
@@ -189,7 +197,7 @@ export default function DiscoverPage() {
           </div>
 
           {/* ── Filter Row: Position · Grad Year · Sort By · Selection ── */}
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-end gap-3">
             <AppDropdown
               label="Position"
               value={filters.position || ""}
@@ -241,43 +249,28 @@ export default function DiscoverPage() {
             {filtersActive && (
               <button
                 onClick={clearAllFilters}
-                className="rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-slate-600 hover:border-slate-400 transition-colors h-[42px]"
+                className="rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 hover:border-slate-400 transition-all active:scale-95 mb-0.5"
               >
                 Clear All
               </button>
             )}
 
             <div className="ml-auto flex items-center gap-2">
-              {selectedIds.size > 0 && isSelectMode && (
-                <>
-                  <button
-                    onClick={handleAnalyze}
-                    className="rounded-xl bg-amber-500 px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm hover:bg-amber-600 transition-all active:scale-95 whitespace-nowrap"
-                  >
-                    Analyze ({selectedIds.size})
-                  </button>
-                  <button
-                    onClick={() => setShowWatchlistPopup(true)}
-                    className="rounded-xl bg-[#00599c] px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-white shadow-sm hover:bg-[#004a82] transition-all active:scale-95 whitespace-nowrap"
-                  >
-                    Save ({selectedIds.size})
-                  </button>
-                </>
+              {isSelectMode ? (
+                <SelectionActions
+                  selectedCount={selectedIds.size}
+                  onAnalyze={handleAnalyze}
+                  onSave={() => setShowWatchlistPopup(true)}
+                  onCancel={toggleSelectMode}
+                />
+              ) : (
+                <button
+                  onClick={toggleSelectMode}
+                  className="rounded-xl bg-white text-slate-900 border-slate-200 border-2 px-5 py-3 text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm hover:border-slate-900 hover:bg-slate-50 whitespace-nowrap"
+                >
+                  Select Players
+                </button>
               )}
-              
-              <button
-                onClick={() => {
-                  setIsSelectMode(!isSelectMode);
-                  if (isSelectMode) setSelectedIds(new Set());
-                }}
-                className={`rounded-xl px-5 py-3 text-[10px] font-bold uppercase tracking-widest transition-all shadow-sm border-2 whitespace-nowrap ${
-                  isSelectMode
-                    ? "bg-white text-[#00599c] border-[#00599c]"
-                    : "bg-white text-slate-900 border-slate-200 hover:border-slate-900 hover:bg-slate-50"
-                }`}
-              >
-                {isSelectMode ? "Cancel Selection" : "Select Players"}
-              </button>
             </div>
           </div>
         </div>
@@ -309,14 +302,7 @@ export default function DiscoverPage() {
           loading={loading}
           isSelectMode={isSelectMode}
           selectedIds={selectedIds}
-          onToggle={(id) =>
-            setSelectedIds((prev) => {
-              const next = new Set(prev);
-              if (next.has(id)) next.delete(id);
-              else next.add(id);
-              return next;
-            })
-          }
+          onToggle={togglePlayer}
           emptyMessage={filtersActive ? "No prospects match your filters." : "No prospects found."}
         />
 

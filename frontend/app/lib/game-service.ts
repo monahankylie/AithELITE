@@ -52,6 +52,8 @@ export type HydratedGameStat = BasketballGameStat & {
 };
 
 class GameService {
+  private playerGamesCache: Map<string, BasketballGameStat[]> = new Map();
+
   /**
    * Fetches a specific game record from the 'games' collection.
    */
@@ -81,11 +83,14 @@ class GameService {
   }
 
   /**
-   * Fetches all game stats for a specific internal athlete_id (player_id in game_stats).
+   * Fetches game stats for a specific internal athlete_id (player_id in game_stats).
    */
   async fetchGamesByPlayerId(playerId: string): Promise<BasketballGameStat[]> {
     if (!db) throw new Error("Firestore not initialized");
     if (!playerId) return [];
+
+    const cached = this.playerGamesCache.get(playerId);
+    if (cached) return cached;
 
     console.debug(`[GameService] Fetching games for player_id: ${playerId}`);
 
@@ -103,9 +108,19 @@ class GameService {
 
     const games = snap.docs.map((doc) => {
       const data = doc.data();
+      
+      // Normalize date to string for consistent sorting
+      let dateStr = data.date;
+      if (data.date && typeof data.date.toDate === 'function') {
+        dateStr = data.date.toDate().toISOString();
+      } else if (data.date instanceof Date) {
+        dateStr = data.date.toISOString();
+      }
+
       return {
         id: doc.id,
         ...data,
+        date: dateStr || "",
         points: Number(data.points ?? 0),
         rebounds: Number(data.rebounds ?? 0),
         assists: Number(data.assists ?? 0),
@@ -115,12 +130,15 @@ class GameService {
       } as BasketballGameStat;
     });
 
-    // Sort chronologically (Oldest to Newest)
-    return games.sort((a, b) => {
+    // Sort chronologically (Oldest to Newest) using normalized ISO strings
+    const sorted = games.sort((a, b) => {
       const dateA = a.date || "";
       const dateB = b.date || "";
       return dateA.localeCompare(dateB);
     });
+
+    this.playerGamesCache.set(playerId, sorted);
+    return sorted;
   }
 
   /**
@@ -148,9 +166,8 @@ class GameService {
 
   /**
    * Fetches all game stats for multiple internal athlete_ids.
-   * Useful for retrieving a player's history across different seasons/records.
    */
-  async fetchGamesByInternalIds(internalIds: string[]): Promise<BasketballGameStat[]> {
+  async fetchGamesByInternalIds(internalIds: string[], gameLimit?: number): Promise<BasketballGameStat[]> {
     if (!db || internalIds.length === 0) return [];
 
     const allGames: BasketballGameStat[] = [];
@@ -164,11 +181,13 @@ class GameService {
     );
 
     // Sort the aggregated list chronologically (Oldest to Newest)
-    return allGames.sort((a, b) => {
+    const sorted = allGames.sort((a, b) => {
       const dateA = a.date || "";
       const dateB = b.date || "";
       return dateA.localeCompare(dateB);
     });
+
+    return gameLimit ? sorted.slice(-gameLimit) : sorted;
   }
 
   /**

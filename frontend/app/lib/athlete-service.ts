@@ -5,7 +5,10 @@ import {
   getDocs,
   limit,
   query,
+  where,
+  orderBy,
   startAfter,
+  documentId,
   QueryDocumentSnapshot,
   type DocumentData,
   type QueryConstraint,
@@ -57,6 +60,7 @@ class AthleteService {
 
   /**
    * Standard paginated fetch for the Discover page.
+   * Uses default Firestore ordering (Document ID) to ensure all documents are returned.
    */
   async fetchAthletes(
     pageSize: number = 20,
@@ -78,52 +82,66 @@ class AthleteService {
   }
 
   /**
-   * Filtered fetch for search, position, and stat-sorting.
+   * Performs global Firestore queries for top-level fields (name, classYear).
+   * Embedded stats filtering and sorting are handled in-memory.
    */
   async fetchFilteredAthletes(
     filters: AthleteFilters,
-    pageSize: number = 200,
+    pageSize: number = 20,
     cursor: QueryDocumentSnapshot<DocumentData> | null = null
   ): Promise<FetchResult> {
-    // Fetch a larger batch to filter in-memory since Firestore 
-    // does not support cross-field partial string matching natively.
-    const constraints: QueryConstraint[] = [limit(pageSize)];
+    const constraints: QueryConstraint[] = [];
+
+    // 1. Global Filter: Grad Year (top-level field 'class' in DB)
+    if (filters.gradYear) {
+      constraints.push(where("class", "==", Number(filters.gradYear)));
+    }
+
+    // 2. Global Filter: Prefix Search on Name (top-level field)
+    if (filters.search) {
+      const s = filters.search.trim();
+      constraints.push(where("name", ">=", s));
+      constraints.push(where("name", "<=", s + "\uf8ff"));
+      constraints.push(orderBy("name", "asc"));
+    }
+
+    // Use a reasonable batch size for in-memory processing
+    const batchSize = 100;
+    constraints.push(limit(batchSize)); 
     if (cursor) constraints.push(startAfter(cursor));
 
-    const q = query(collection(db, "athletes"), ...constraints);
-    const snap = await getDocs(q);
-    
-    let players = snap.docs.map((d) => this.mapAthleteData(d.id, d.data()));
+    try {
+      const q = query(collection(db, "athletes"), ...constraints);
+      const snap = await getDocs(q);
+      
+      let players = snap.docs.map((d) => this.mapAthleteData(d.id, d.data()));
 
-    if (filters.search) {
-      const s = filters.search.toLowerCase();
-      players = players.filter(p => 
-        p.name.toLowerCase().includes(s) || 
-        (p.currentStats?.school_name?.toLowerCase() || "").includes(s)
-      );
+      // 3. In-memory Filter: Position (embedded in records)
+      if (filters.position) {
+        const pos = filters.position.toLowerCase();
+        players = players.filter(p => {
+          const stats = p.currentStats as BasketballStatRecord;
+          return stats?.positions?.some(rp => String(rp).toLowerCase() === pos);
+        });
+      }
+
+      // 4. In-memory Sort: Selected Stat (embedded in records)
+      if (filters.sortBy) {
+        players.sort((a, b) => this.getStatValue(b, filters.sortBy!) - this.getStatValue(a, filters.sortBy!));
+      }
+
+      // 5. Paginate the result
+      const paginatedPlayers = players.slice(0, pageSize);
+
+      return {
+        players: paginatedPlayers,
+        lastDoc: snap.docs[snap.docs.length - 1] || null,
+        hasMore: snap.docs.length === batchSize, 
+      };
+    } catch (error: any) {
+      console.error("[AthleteService] Filtered fetch failed:", error);
+      throw error;
     }
-
-    if (filters.position) {
-      const pos = filters.position.toLowerCase();
-      players = players.filter(p => {
-        const stats = p.currentStats as BasketballStatRecord;
-        return stats?.positions?.some(rp => String(rp).toLowerCase() === pos);
-      });
-    }
-
-    if (filters.gradYear) {
-      players = players.filter(p => String(p.classYear) === filters.gradYear);
-    }
-
-    if (filters.sortBy) {
-      players.sort((a, b) => this.getStatValue(b, filters.sortBy!) - this.getStatValue(a, filters.sortBy!));
-    }
-
-    return {
-      players,
-      lastDoc: snap.docs[snap.docs.length - 1] || null,
-      hasMore: snap.docs.length === pageSize, 
-    };
   }
 
   async fetchAthleteById(id: string): Promise<Athlete> {
@@ -141,18 +159,35 @@ class AthleteService {
   async fetchAthletesByIds(ids: string[]): Promise<Athlete[]> {
     if (!db || ids.length === 0) return [];
 
-    const players = await Promise.all(
-      ids.map(async (id) => {
-        try {
-          return await this.fetchAthleteById(id);
-        } catch (error) {
-          console.error(`Failed to fetch athlete ${id}:`, error);
-          return null;
-        }
+    const result: Athlete[] = [];
+    const idsToFetch: string[] = [];
+
+    ids.forEach(id => {
+      const cached = this.playerCache.get(id);
+      if (cached) result.push(cached);
+      else idsToFetch.push(id);
+    });
+
+    if (idsToFetch.length === 0) return result;
+
+    const chunks: string[][] = [];
+    for (let i = 0; i < idsToFetch.length; i += 30) {
+      chunks.push(idsToFetch.slice(i, i + 30));
+    }
+
+    const fetchedPlayers = await Promise.all(
+      chunks.map(async (chunk) => {
+        const q = query(collection(db, "athletes"), where(documentId(), "in", chunk));
+        const snap = await getDocs(q);
+        return snap.docs.map(d => {
+          const mapped = this.mapAthleteData(d.id, d.data());
+          this.playerCache.set(d.id, mapped);
+          return mapped;
+        });
       })
     );
 
-    return players.filter((p): p is Athlete => p !== null);
+    return [...result, ...fetchedPlayers.flat()];
   }
 }
 
