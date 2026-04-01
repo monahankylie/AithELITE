@@ -4,14 +4,13 @@ import PageLayout from "../components/page-layout";
 import AthleteList from "../components/athlete-list";
 import AppDropdown from "../components/app-dropdown";
 import SelectionActions from "../components/selection-actions";
-import type { SelectChangeEvent } from "@mui/material";
 
 // Import values/logic
-import { athleteService, hasActiveFilters, SORT_OPTIONS } from "../lib/athlete-service";
+import { athleteService, hasActiveFilters, DISCOVER_SORT_OPTIONS } from "../lib/athlete-service";
 import { usePlayerSelection } from "../lib/use-player-selection";
 
 // Import types only
-import type { Athlete, AthleteFilters, SortKey } from "../lib/athlete-types";
+import type { Athlete, AthleteFilters, DiscoverSortKey } from "../lib/athlete-types";
 import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 
 import WatchlistPopup from "../components/watchlist-popup";
@@ -51,7 +50,7 @@ export default function DiscoverPage() {
     if (filters.position) chips.push({key: "position", label: "Position", display: filters.position});
     if (filters.gradYear) chips.push({key: "gradYear", label: "Class", display: filters.gradYear});
     if (filters.sortBy) {
-      const opt = SORT_OPTIONS.find((o) => o.value === filters.sortBy);
+      const opt = DISCOVER_SORT_OPTIONS.find((o) => o.value === filters.sortBy);
       chips.push({key: "sortBy", label: "Sorted by", display: opt?.label ?? filters.sortBy});
     }
     return chips;
@@ -118,13 +117,15 @@ export default function DiscoverPage() {
 
   const currentSport = players.length > 0 ? (players[0].currentStats?.sport || "Basketball") : "Basketball";
 
-  const dropdownSortOptions = useMemo(() => 
-    SORT_OPTIONS.map(opt => ({
-      value: opt.value,
-      label: opt.label,
-      category: opt.category
-    })), 
-  []);
+  const dropdownSortOptions = useMemo(
+    () =>
+      DISCOVER_SORT_OPTIONS.map((opt) => ({
+        value: opt.value,
+        label: opt.label,
+        category: opt.category,
+      })),
+    [],
+  );
 
   const dropdownPositionOptions = useMemo(() => 
     POSITIONS.map(p => ({ value: p, label: p })), 
@@ -231,19 +232,19 @@ export default function DiscoverPage() {
             />
 
             <AppDropdown
-              label="Sort by Stat"
+              label="Sort by"
               value={filters.sortBy || ""}
               onChange={(e) =>
                 setFilters((f) => {
                   const next = {...f};
-                  if (e.target.value) next.sortBy = e.target.value as SortKey;
+                  if (e.target.value) next.sortBy = e.target.value as DiscoverSortKey;
                   else delete next.sortBy;
                   return next;
                 })
               }
               options={dropdownSortOptions}
-              placeholder="Select Stat"
-              minWidth={180}
+              placeholder="Select sort"
+              minWidth={200}
             />
 
             {filtersActive && (

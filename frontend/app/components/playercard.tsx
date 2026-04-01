@@ -23,6 +23,11 @@ export default function PlayerCard({
   const primaryPos = (stats?.positions?.[0] || "PG").toUpperCase();
   const metrics = POSITION_METRICS[primaryPos] || DEFAULT_METRICS;
 
+  const compositionRatingText =
+    player.compositionRating != null && !Number.isNaN(player.compositionRating)
+      ? athleteFormatter.formatAvg(player.compositionRating)
+      : null;
+
   // Logic for the large "Featured Stats" line in default variant - keep existing logic
   const statsText = metrics.slice(0, 3).map(m => {
     const val = athleteService.getStatValue(player, m.key);
@@ -54,6 +59,13 @@ export default function PlayerCard({
             </div>
           )}
         </div>
+
+        {compositionRatingText && (
+          <div className="flex shrink-0 flex-col items-center justify-center rounded-2xl border border-[#00599c]/15 bg-[#00599c]/[0.06] px-2 py-1 min-w-[3.25rem]">
+            <span className="text-[8px] font-black uppercase tracking-wider text-[#00599c]/70">Comp</span>
+            <span className="text-sm font-black tabular-nums leading-tight text-[#00599c]">{compositionRatingText}</span>
+          </div>
+        )}
 
         {/* Compact Info Section */}
         <div className="flex-1 min-w-0 flex flex-col justify-center">
@@ -126,7 +138,15 @@ export default function PlayerCard({
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-[2rem] font-black leading-none tracking-tight text-slate-900">{player.name}</h3>
+          <div className="flex items-start justify-between gap-3">
+            <h3 className="truncate text-[2rem] font-black leading-none tracking-tight text-slate-900">{player.name}</h3>
+            {compositionRatingText && (
+              <div className="flex shrink-0 flex-col items-end rounded-2xl border border-[#00599c]/15 bg-[#00599c]/[0.06] px-3 py-1.5">
+                <span className="text-[9px] font-black uppercase tracking-widest text-[#00599c]/70">Composition</span>
+                <span className="text-xl font-black tabular-nums leading-none text-[#00599c]">{compositionRatingText}</span>
+              </div>
+            )}
+          </div>
           <p className="mt-2 text-sm font-semibold text-slate-600">
             {player.currentStats?.sport || "Basketball"} {primaryPos ? `/ ${primaryPos}` : ""}
           </p>

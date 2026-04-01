@@ -79,6 +79,8 @@ export interface Athlete {
   maxpreps_career_id: string | null;
   maxpreps_link: string | null;
   scouting_report: string | null;
+  /** 0–100 composition score: Firestore `composition_rating` when set, else estimated from season stats */
+  compositionRating?: number | null;
   // History
   records: AnySportRecord[];
   currentStats?: AnySportRecord;
@@ -86,9 +88,12 @@ export interface Athlete {
 
 export type SortKey = keyof BasketballStatRecord;
 
+/** Discover page sort: box-score stats or aggregate composition rating */
+export type DiscoverSortKey = SortKey | "composition_rating";
+
 export interface AthleteFilters {
   search?: string;
   position?: string;
   gradYear?: string;
-  sortBy?: SortKey;
+  sortBy?: DiscoverSortKey;
 }
