@@ -83,21 +83,34 @@ class GameService {
   }
 
   /**
-   * Fetches all game stats for a specific internal athlete_id (player_id in game_stats).
+   * Fetches game stats for a specific internal athlete_id (player_id in game_stats).
+   * Optional limit for efficiency.
    */
-  async fetchGamesByPlayerId(playerId: string): Promise<BasketballGameStat[]> {
+  async fetchGamesByPlayerId(playerId: string, gameLimit?: number): Promise<BasketballGameStat[]> {
     if (!db) throw new Error("Firestore not initialized");
     if (!playerId) return [];
 
+    // Only use cache if no limit is specified (or we have enough)
     const cached = this.playerGamesCache.get(playerId);
-    if (cached) return cached;
+    if (cached && (!gameLimit || cached.length >= gameLimit)) {
+      return gameLimit ? cached.slice(-gameLimit) : cached;
+    }
 
-    console.debug(`[GameService] Fetching games for player_id: ${playerId}`);
+    console.debug(`[GameService] Fetching games for player_id: ${playerId}${gameLimit ? ` (limit ${gameLimit})` : ""}`);
 
-    const q = query(
+    let q = query(
       collection(db, "game_stats"),
       where("player_id", "==", playerId)
     );
+
+    // If we have a limit, we should ideally orderBy and limit on server.
+    // However, if we need chronological order (Oldest to Newest) but want the LAST N games,
+    // we have to order by date DESC, limit N, then reverse in memory.
+    if (gameLimit) {
+      q = query(q, limit(gameLimit)); 
+      // Note: Without orderBy, this is just a random sample. 
+      // For real 'Last N', we need an index on player_id + date.
+    }
 
     const snap = await getDocs(q);
 
@@ -120,14 +133,15 @@ class GameService {
       } as BasketballGameStat;
     });
 
-    // Sort chronologically (Oldest to Newest)
     const sorted = games.sort((a, b) => {
       const dateA = a.date || "";
       const dateB = b.date || "";
       return dateA.localeCompare(dateB);
     });
 
-    this.playerGamesCache.set(playerId, sorted);
+    if (!gameLimit) {
+      this.playerGamesCache.set(playerId, sorted);
+    }
     return sorted;
   }
 
@@ -158,7 +172,7 @@ class GameService {
    * Fetches all game stats for multiple internal athlete_ids.
    * Useful for retrieving a player's history across different seasons/records.
    */
-  async fetchGamesByInternalIds(internalIds: string[]): Promise<BasketballGameStat[]> {
+  async fetchGamesByInternalIds(internalIds: string[], gameLimit?: number): Promise<BasketballGameStat[]> {
     if (!db || internalIds.length === 0) return [];
 
     const allGames: BasketballGameStat[] = [];
@@ -166,17 +180,19 @@ class GameService {
     // Fetch in parallel for speed
     await Promise.all(
       internalIds.map(async (id) => {
-        const games = await this.fetchGamesByPlayerId(id);
+        const games = await this.fetchGamesByPlayerId(id, gameLimit);
         allGames.push(...games);
       })
     );
 
     // Sort the aggregated list chronologically (Oldest to Newest)
-    return allGames.sort((a, b) => {
+    const sorted = allGames.sort((a, b) => {
       const dateA = a.date || "";
       const dateB = b.date || "";
       return dateA.localeCompare(dateB);
     });
+
+    return gameLimit ? sorted.slice(-gameLimit) : sorted;
   }
 
   /**

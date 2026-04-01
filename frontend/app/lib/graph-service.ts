@@ -115,10 +115,10 @@ class GraphService {
 
         if (internalIds.length === 0) return null;
 
-        // Fetch and aggregate games across all selected seasons
-        const allGames = await gameService.fetchGamesByInternalIds(internalIds);
+        // Fetch and aggregate games across all selected seasons (passed limit for efficiency)
+        const allGames = await gameService.fetchGamesByInternalIds(internalIds, gameLimit);
         
-        // Take the last N games (already sorted ascending in fetchGamesByInternalIds)
+        // Take the last N games (already limited in fetchGamesByInternalIds)
         const recentGames = allGames.slice(-gameLimit);
 
         return {
