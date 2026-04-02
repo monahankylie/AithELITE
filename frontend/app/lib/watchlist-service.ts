@@ -3,17 +3,13 @@ import {
   doc,
   getDoc,
   getDocs,
-  setDoc,
   updateDoc,
   arrayUnion,
-  arrayRemove, // Added arrayRemove
-  query,
-  where,
+  arrayRemove,
   serverTimestamp,
   addDoc,
   increment,
   deleteField,
-  deleteDoc,
   writeBatch,
 } from "firebase/firestore";
 import { db } from "../../firebase-config";
@@ -22,9 +18,35 @@ export interface UserList {
   id: string;
   name: string;
   playerIds: string[];
+  tags: string[];
+  favorite: boolean;
 }
 
 class WatchlistService {
+  private sanitizeName(name: string) {
+    return name.trim();
+  }
+
+  private sanitizeTags(tags: string[] = []) {
+    return Array.from(
+      new Set(
+        tags
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+      ),
+    ).slice(0, 8);
+  }
+
+  private mapList(id: string, data: Record<string, unknown>): UserList {
+    return {
+      id,
+      name: typeof data.name === "string" && data.name.trim() ? data.name : "Untitled List",
+      playerIds: Array.isArray(data.playerIds) ? (data.playerIds as string[]) : [],
+      tags: this.sanitizeTags(Array.isArray(data.tags) ? (data.tags as string[]) : []),
+      favorite: Boolean(data.favorite),
+    };
+  }
+
   /**
    * Fetches all lists for a specific user from /users/{userId}/lists
    * (Keep this for when we need the full player ID list)
@@ -35,11 +57,7 @@ class WatchlistService {
     const listsRef = collection(db, "users", userId, "lists");
     const snap = await getDocs(listsRef);
 
-    return snap.docs.map((d) => ({
-      id: d.id,
-      name: d.data().name || "Untitled List",
-      playerIds: d.data().playerIds || [],
-    }));
+    return snap.docs.map((d) => this.mapList(d.id, d.data() as Record<string, unknown>));
   }
 
   /**
@@ -53,34 +71,57 @@ class WatchlistService {
 
     if (!snap.exists()) return null;
 
-    return {
-      id: snap.id,
-      name: snap.data().name || "Untitled List",
-      playerIds: snap.data().playerIds || [],
-    };
+    return this.mapList(snap.id, snap.data() as Record<string, unknown>);
   }
 
   /**
    * Creates a new list in /users/{userId}/lists and updates the user profile index
    */
-  async createList(userId: string, name: string, playerIds: string[] = []): Promise<{ id: string; addedCount: number }> {
+  async createList(
+    userId: string,
+    name: string,
+    playerIds: string[] = [],
+    options: { tags?: string[]; favorite?: boolean } = {},
+  ): Promise<{ id: string; addedCount: number }> {
     if (!db) throw new Error("Firestore not initialized");
+
+    const sanitizedName = this.sanitizeName(name);
+    if (!sanitizedName) throw new Error("List name is required.");
+
+    const tags = this.sanitizeTags(options.tags);
+    const favorite = Boolean(options.favorite);
 
     const listsRef = collection(db, "users", userId, "lists");
     const docRef = await addDoc(listsRef, {
-      name,
+      name: sanitizedName,
       playerIds,
+      tags,
+      favorite,
       createdAt: serverTimestamp(),
     });
 
-    // Sync metadata to user profile for efficient indexing using dot notation to avoid overwriting the whole map
     const userRef = doc(db, "users", userId);
-    await updateDoc(userRef, {
+    const batch = writeBatch(db);
+    batch.update(userRef, {
       [`watchlistIndex.${docRef.id}`]: {
-        name,
-        count: playerIds.length
-      }
+        name: sanitizedName,
+        count: playerIds.length,
+        tags,
+        favorite,
+      },
     });
+
+    if (favorite) {
+      const existingLists = await this.fetchUserLists(userId);
+      for (const list of existingLists.filter((item) => item.id !== docRef.id)) {
+        batch.update(doc(db, "users", userId, "lists", list.id), { favorite: false });
+        batch.update(userRef, {
+          [`watchlistIndex.${list.id}.favorite`]: false,
+        });
+      }
+    }
+
+    await batch.commit();
 
     return { id: docRef.id, addedCount: playerIds.length };
   }
@@ -165,17 +206,66 @@ class WatchlistService {
    */
   async renameList(userId: string, listId: string, newName: string): Promise<void> {
     if (!db) throw new Error("Firestore not initialized");
+    const sanitizedName = this.sanitizeName(newName);
+    if (!sanitizedName) throw new Error("List name is required.");
 
     const listRef = doc(db, "users", userId, "lists", listId);
     await updateDoc(listRef, {
-      name: newName,
+      name: sanitizedName,
     });
 
     // Update name in the user profile index
     const userRef = doc(db, "users", userId);
     await updateDoc(userRef, {
-      [`watchlistIndex.${listId}.name`]: newName
+      [`watchlistIndex.${listId}.name`]: sanitizedName
     });
+  }
+
+  async updateListTags(userId: string, listId: string, tags: string[]): Promise<void> {
+    if (!db) throw new Error("Firestore not initialized");
+
+    const sanitizedTags = this.sanitizeTags(tags);
+    const listRef = doc(db, "users", userId, "lists", listId);
+    const userRef = doc(db, "users", userId);
+
+    const batch = writeBatch(db);
+    batch.update(listRef, { tags: sanitizedTags });
+    batch.update(userRef, {
+      [`watchlistIndex.${listId}.tags`]: sanitizedTags,
+    });
+    await batch.commit();
+  }
+
+  async setFavoriteList(userId: string, listId: string): Promise<void> {
+    if (!db) throw new Error("Firestore not initialized");
+
+    const lists = await this.fetchUserLists(userId);
+    const userRef = doc(db, "users", userId);
+    const batch = writeBatch(db);
+
+    for (const list of lists) {
+      const isTarget = list.id === listId;
+      batch.update(doc(db, "users", userId, "lists", list.id), { favorite: isTarget });
+      batch.update(userRef, {
+        [`watchlistIndex.${list.id}.favorite`]: isTarget,
+      });
+    }
+
+    await batch.commit();
+  }
+
+  async clearFavoriteList(userId: string, listId: string): Promise<void> {
+    if (!db) throw new Error("Firestore not initialized");
+
+    const listRef = doc(db, "users", userId, "lists", listId);
+    const userRef = doc(db, "users", userId);
+
+    const batch = writeBatch(db);
+    batch.update(listRef, { favorite: false });
+    batch.update(userRef, {
+      [`watchlistIndex.${listId}.favorite`]: false,
+    });
+    await batch.commit();
   }
 
   /**

@@ -43,17 +43,28 @@ const DashboardPage = () => {
   useEffect(() => {
     async function fetchWatchlist() {
       if (!user || !profile?.watchlistIndex) {
+        setWatchlistPlayers([]);
         setLoadingWatchlist(false);
         return;
       }
 
       const listIds = Object.keys(profile.watchlistIndex);
       if (listIds.length === 0) {
+        setWatchlistPlayers([]);
         setLoadingWatchlist(false);
         return;
       }
 
-      const firstListId = listIds[0];
+      const dashboardListEntry =
+        Object.entries(profile.watchlistIndex).find(([, value]) => value.favorite) ||
+        Object.entries(profile.watchlistIndex)[0];
+
+      const firstListId = dashboardListEntry?.[0];
+      if (!firstListId) {
+        setWatchlistPlayers([]);
+        setLoadingWatchlist(false);
+        return;
+      }
 
       try {
         const list = await watchlistService.fetchListById(user.uid, firstListId);
@@ -63,9 +74,12 @@ const DashboardPage = () => {
             list.playerIds.map(id => athleteService.fetchAthleteById(id))
           );
           setWatchlistPlayers(fetched);
+        } else {
+          setWatchlistPlayers([]);
         }
       } catch (error) {
         console.error("Failed to fetch watchlist for dashboard:", error);
+        setWatchlistPlayers([]);
       } finally {
         setLoadingWatchlist(false);
       }
@@ -74,10 +88,17 @@ const DashboardPage = () => {
     fetchWatchlist();
   }, [user, profile?.watchlistIndex]);
 
-  const firstListName =
-    profile?.watchlistIndex && Object.keys(profile.watchlistIndex).length > 0
-      ? profile.watchlistIndex[Object.keys(profile.watchlistIndex)[0]].name
-      : "Watchlist";
+  const firstListName = (() => {
+    if (!profile?.watchlistIndex || Object.keys(profile.watchlistIndex).length === 0) {
+      return "Watchlist";
+    }
+
+    const dashboardListEntry =
+      Object.entries(profile.watchlistIndex).find(([, value]) => value.favorite) ||
+      Object.entries(profile.watchlistIndex)[0];
+
+    return dashboardListEntry?.[1].name ?? "Watchlist";
+  })();
 
   return (
     <PageLayout 

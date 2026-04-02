@@ -15,7 +15,7 @@ interface UserProfile {
   email: string;
   organization?: string;
   role?: string;
-  watchlistIndex?: Record<string, { name: string; count: number }>;
+  watchlistIndex?: Record<string, { name: string; count: number; tags?: string[]; favorite?: boolean }>;
 }
 
 interface AuthContextType {
