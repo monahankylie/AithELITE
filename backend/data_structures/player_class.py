@@ -34,7 +34,6 @@ class BasketballSeasonRecord(SeasonRecord):
     jersey: Optional[str] = None
     team_id: Optional[str] = None 
     
-    # --- PER GAME AVERAGES ---
     games_played: int = Field(0, validation_alias=AliasChoices("GamesPlayed", "games_played"))
     minutes_per_game: float = Field(0.0, validation_alias=AliasChoices("MinutesPerGame", "minutes_per_game"))
     points_per_game: float = Field(0.0, validation_alias=AliasChoices("PointsPerGame", "points_per_game"))
@@ -59,7 +58,6 @@ class BasketballSeasonRecord(SeasonRecord):
     turnovers: int = Field(0, validation_alias=AliasChoices("Turnovers", "turnovers"))
     fouls: int = Field(0, validation_alias=AliasChoices("PersonalFouls", "fouls"))
 
-    # --- SHOOTING ---
     fg_made: int = Field(0, validation_alias=AliasChoices("FieldGoalsMade", "fg_made"))
     fg_attempted: int = Field(0, validation_alias=AliasChoices("FieldGoalAttempts", "fg_attempted"))
     fg_pct: float = Field(0.0, validation_alias=AliasChoices("FieldGoalPercentage", "fg_pct"))
@@ -79,7 +77,6 @@ class BasketballSeasonRecord(SeasonRecord):
     points_per_shot: float = Field(0.0, validation_alias=AliasChoices("PointsPerShot", "points_per_shot"))
     efg_pct: float = Field(0.0, validation_alias=AliasChoices("AdjustedFGPercentage", "efg_pct"))
 
-    # --- ADVANCED / MISC ---
     ast_to_ratio: float = Field(0.0, validation_alias=AliasChoices("AssistsPerTurnover", "ast_to_ratio"))
     stl_to_ratio: float = Field(0.0, validation_alias=AliasChoices("StealsPerTurnover", "stl_to_ratio"))
     stl_pf_ratio: float = Field(0.0, validation_alias=AliasChoices("StealsPerPersonalFoul", "stl_pf_ratio"))
@@ -115,7 +112,7 @@ class Player(BaseModel):
     maxpreps_career_id: Optional[str] = None
     id_247: Optional[str] = None
     base_player_id: Optional[str] = Field(None,validate_default=True)
-    maxpreps_link: Optional[str] = Field(None)
+    maxpreps_link: Optional[str] = Field(None,  validation_alias=AliasChoices("maxPrepsLink", "canonicalUrl", "maxpreps_link"))
     records: list[Any] = Field(default_factory=list)
 
     def add_record(self, record: SeasonRecord):

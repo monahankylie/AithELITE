@@ -282,13 +282,13 @@ class Scraper_Task:
                     if not os.path.exists(file_path):
                         break
                 with open(file_path, 'w') as f:
-                    write_method(str(data), f)
+                    write_method(data, f)
         else:
             serial = name_method()
             file_path = os.path.join(base_path, f"{serial}{extension}")
             if method == "page":
                 with open(file_path, 'w') as f:
-                    write_method(str(self.current_soup),f)
+                    write_method(self.current_soup,f)
             elif method == "all":
                 with open(file_path, 'w') as f:
                     write_method("\n".join([str(p) for p in processed_stuff]),f)

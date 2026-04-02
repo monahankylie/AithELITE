@@ -106,6 +106,7 @@ class AthletesParsingClass(BaseModel):
         player_raw = traverse_paths(json_blob, self.player_mapping)
         if not player_raw: return team_obj, None
         
+
         try:
             player = Player(**player_raw)
         except Exception as e: return team_obj, None

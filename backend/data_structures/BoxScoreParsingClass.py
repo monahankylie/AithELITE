@@ -9,16 +9,8 @@ import uuid
 from utils.html_utils import clean_html_text, extract_numeric_value, find_table_by_header
 
 class BoxScoreParsingClass(BaseModel):
-    """
-    Centralized parsing class for box scores from MaxPreps.
-    Orchestrates extraction from both Context (summary) and DOM (detailed stats).
-    """
 
     def parse_context_game(self, context_html: str) -> List[Dict[str, Any]]:
-        """
-        Parses the BoxScoresContext file containing list of games.
-        Returns a list of game summaries with URLs and basic info.
-        """
         soup = BeautifulSoup(context_html, 'html.parser')
         game_links = soup.find_all('a', href=True)
         summaries = []

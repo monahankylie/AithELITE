@@ -27,7 +27,6 @@ class BasketballGameStats(GameRecord):
     jersey: Optional[str] = Field(None, validation_alias=AliasChoices("#", "jersey"))
     class_year: Optional[str] = None
     
-    # --- FROM DOM COLUMNS ONLY ---
     minutes_played: int = Field(0, validation_alias=AliasChoices("Min", "minutes_played"))
     points: int = Field(0, validation_alias=AliasChoices("Pts", "points"))
     fg_made: int = Field(0, validation_alias=AliasChoices("FGM", "fg_made"))

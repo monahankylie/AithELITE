@@ -14,7 +14,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLAYER_STATS_DIR = os.path.join(BASE_DIR, "PlayerStats")
 FB_ACC_PATH = os.path.join(BASE_DIR, "fbACC.json")
 
-# Initialize Firebase
 try:
     firebase_admin.get_app()
 except ValueError:
@@ -28,7 +27,6 @@ except ValueError:
 
 db = firestore.client()
 
-# Official Parser Setup
 ATHLETE_PARSER = AthletesParsingClass(
     sport_type="Basketball",
     player_mapping=os.path.join(BASE_DIR, "Resources/player_bio.json"),
@@ -52,7 +50,6 @@ def merge_records(existing_records, new_records):
     return list(merged.values())
 
 def push_player_to_firestore(player: Player, team: Team):
-    """Pipeline: Pydantic Obj -> Firestore (Stable ID, Matched by base_player_id)"""
     try:
         p_id = player.base_player_id
         if not p_id: return None

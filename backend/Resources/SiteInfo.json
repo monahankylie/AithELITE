@@ -122,10 +122,30 @@
         ]
       }
     },
-    "testing":{
+    "sprint3DEMO":{
       "site_url": "https://www.maxpreps.com",
       "scraping": {
-        "steps": []}
+        "steps": [{
+          "description": "sprint 3 demo",
+          "scrape_method":["entry","access_each"],
+          "pattern": "/ca/chatsworth/sierra-canyon-trailblazers/athletes/bronny-james-jr/basketball/stats/?careerid=fhqi0mvbh37sc"
+        },
+          {"description" : "scrape 1 person",
+          "scrape_method": ["match","extract","store"],
+            "match": {
+              "pattern": "__NEXT_DATA__",
+              "tag": "script",
+              "attr": "id"
+            },
+            "extract":{
+              "type": "json"
+            },
+            "store": {
+              "path": "Sprint3Demo/",
+              "method": "each"
+            }}
+
+        ]}
     },
      "maxpreps_games":{
     "site_url": "https://www.maxpreps.com",
@@ -200,11 +220,6 @@
     "site_url": "https://www.maxpreps.com",
       "scraping": {
         "steps": [
-          {
-            "description": "State-level directory of teams",
-            "scrape_method":["entry","access_each"],
-            "pattern": "/ca/los-gatos/los-gatos-wildcats/basketball/schedule/"
-          },
           {
             "description": "All games of school",
             "scrape_method": ["match","store","extract","access_each"],

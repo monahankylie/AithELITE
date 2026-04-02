@@ -6,5 +6,6 @@
     "height_ft": ["props", "pageProps", "careerContext", "careerData", "heightFeet"],
     "height_in": ["props", "pageProps", "careerContext", "careerData", "heightInches"],
     "weight": ["props", "pageProps", "careerContext", "careerData", "weight"],
-    "maxpreps_career_id":["props","pageProps","careerContext","careerData","careerId"]
+    "maxpreps_career_id":["props","pageProps","careerContext","careerData","careerId"],
+    "maxpreps_link": ["props", "pageProps", "canonicalUrl"]
 }
