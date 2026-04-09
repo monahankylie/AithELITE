@@ -15,7 +15,7 @@ const AddPlayersPopup: React.FC<AddPlayersPopupProps> = ({ currentIds, onClose }
   const lists = Object.entries(profile?.watchlistIndex || {}).map(([id, data]) => ({
     id,
     ...data
-  })).sort((a, b) => a.name.localeCompare(b.name));
+  })).sort((a, b) => (a.name || "").localeCompare(b.name || ""));
 
   const handleDiscover = () => {
     // Navigate to discover, passing current IDs to keep selection
