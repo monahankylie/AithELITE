@@ -6,8 +6,9 @@ from firebase_admin import credentials, firestore, auth
 import uvicorn  
 from fastapi import FastAPI, BackgroundTasks, HTTPException,Request
 from fastapi.middleware.cors import CORSMiddleware
-from specific_scripts import parse_script, push_athletes, parse_boxscores, push_games
+from specific_scripts import parse_script, push_athletes, parse_boxscores, push_games, taketherecordsout
 from fake_useragent import UserAgent
+
 
 
 app = FastAPI()
@@ -118,6 +119,11 @@ async def scrape(background_tasks: BackgroundTasks):
 @app.get("/")
 def health_check():
     return {"status": "ok"}
+
+@app.get("/grab_athletes")
+async def grab_athletes(background_tasks: BackgroundTasks):
+    background_tasks.add_task(taketherecordsout.test)
+    return {"athletes": "pulling"}
 
 def run_server():
     ##start server and listen for requests

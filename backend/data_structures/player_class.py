@@ -6,9 +6,11 @@ import re
 
 class SeasonRecord(BaseModel):
     sport: Optional[str] = None
+    team_id: Optional[str] = None
     year: Optional[str] = None
     player_level: Optional[str] = Field("Varsity", validation_alias=AliasChoices("teamLevel", "team"))
-    athlete_id: Optional[str] = Field(None,validation_alias=AliasChoices("AthleteID"))
+    athlete_id: Optional[str] = Field(None,validation_alias=AliasChoices("AthleteID","athlete_id","athleteId"))
+    record_id: Optional[str] = Field(None,validate_default=True)
     @model_validator(mode='before')
     @classmethod
     def filter_none_values(cls, data: Any) -> Any:
@@ -27,7 +29,18 @@ class SeasonRecord(BaseModel):
             # A more robust solution might check the field's type annotation.
             return 0
         return v
-
+    
+    @field_validator("record_id", mode="after")
+    @classmethod
+    def create_record_id(cls, v, info):
+        if v:
+            return v
+        sport = str(info.data.get("sport", "unknown")).lower()
+        year = str(info.data.get("year", "unknown")).lower()
+        athlete_id = str(info.data.get("athlete_id", "unknown")).lower()
+        raw_id = f"{sport}_{year}_{athlete_id}"
+        return raw_id.strip().replace(" ", "_")
+    
 class BasketballSeasonRecord(SeasonRecord):
     sport: str = "basketball"
     positions: Optional[list] = None
@@ -113,18 +126,11 @@ class Player(BaseModel):
     id_247: Optional[str] = None
     base_player_id: Optional[str] = Field(None,validate_default=True)
     maxpreps_link: Optional[str] = Field(None,  validation_alias=AliasChoices("maxPrepsLink", "canonicalUrl", "maxpreps_link"))
-    records: list[Any] = Field(default_factory=list)
+    records: list[Union[BasketballSeasonRecord, SeasonRecord]] = Field(default_factory=list)
 
     def add_record(self, record: SeasonRecord):
         """Adds a sport record to the player's records list."""
         self.records.append(record)
-
-    @model_validator(mode='before')
-    @classmethod
-    def filter_none_values(cls, data: Any) -> Any:
-        if isinstance(data, dict):
-            return {k: v for k, v in data.items() if v is not None}
-        return data
 
     @field_validator("base_player_id", mode="after")
     @classmethod
