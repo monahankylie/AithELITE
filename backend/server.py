@@ -12,6 +12,7 @@ from fake_useragent import UserAgent
 
 
 
+
 app = FastAPI()
 
 app.add_middleware(
@@ -120,6 +121,12 @@ async def scrape(background_tasks: BackgroundTasks):
 @app.get("/")
 def health_check():
     return {"status": "ok"}
+
+@app.get("/test_db")
+def test_db(background_tasks: BackgroundTasks):
+    background_tasks.add_task(aggregate_stats.test)
+    return {"status": "DB test completed"}
+
 
 
 
