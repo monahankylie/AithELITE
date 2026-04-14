@@ -255,7 +255,7 @@ export default function WatchlistsPage() {
                             : "border border-slate-200 bg-white text-slate-700 hover:border-amber-300 hover:text-amber-600"
                         }`}
                       >
-                        {list.favorite ? "Unfavorite" : "Favorite List"}
+                        {list.favorite ? "Undo Favorite" : "Favorite List"}
                       </button>
 
                       <Link
