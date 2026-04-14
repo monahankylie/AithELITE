@@ -48,7 +48,7 @@ class BasketballSeasonRecord(SeasonRecord):
     jersey: Optional[str] = None
     team_id: Optional[str] = None 
     
-    games_played: int = Field(0, validation_alias=AliasChoices("GamesPlayed", "games_played"))
+    games_played: float | int = Field(0, validation_alias=AliasChoices("GamesPlayed", "games_played"))
     minutes_per_game: float = Field(0.0, validation_alias=AliasChoices("MinutesPerGame", "minutes_per_game"))
     points_per_game: float = Field(0.0, validation_alias=AliasChoices("PointsPerGame", "points_per_game"))
     off_rebounds_per_game: float = Field(0.0, validation_alias=AliasChoices("OffensiveReboundsPerGame", "off_rebounds_per_game"))
@@ -61,31 +61,31 @@ class BasketballSeasonRecord(SeasonRecord):
     fouls_per_game: float = Field(0.0, validation_alias=AliasChoices("PersonalFoulsPerGame", "fouls_per_game"))
 
     # --- SEASON TOTALS ---
-    minutes_played: int = Field(0, validation_alias=AliasChoices("MinutesPlayed", "minutes_played"))
-    points: int = Field(0, validation_alias=AliasChoices("Points", "points"))
-    off_rebounds: int = Field(0, validation_alias=AliasChoices("OffensiveRebounds", "off_rebounds"))
-    def_rebounds: int = Field(0, validation_alias=AliasChoices("DefensiveRebounds", "def_rebounds"))
-    rebounds: int = Field(0, validation_alias=AliasChoices("Rebounds", "rebounds"))
-    assists: int = Field(0, validation_alias=AliasChoices("Assists", "assists"))
-    steals: int = Field(0, validation_alias=AliasChoices("Steals", "steals"))
-    blocks: int = Field(0, validation_alias=AliasChoices("BlockedShots", "blocks"))
-    turnovers: int = Field(0, validation_alias=AliasChoices("Turnovers", "turnovers"))
-    fouls: int = Field(0, validation_alias=AliasChoices("PersonalFouls", "fouls"))
+    minutes_played: float | int = Field(0, validation_alias=AliasChoices("MinutesPlayed", "minutes_played"))
+    points: float | int = Field(0, validation_alias=AliasChoices("Points", "points"))
+    off_rebounds: float | int = Field(0, validation_alias=AliasChoices("OffensiveRebounds", "off_rebounds"))
+    def_rebounds: float | int = Field(0, validation_alias=AliasChoices("DefensiveRebounds", "def_rebounds"))
+    rebounds: float | int = Field(0, validation_alias=AliasChoices("Rebounds", "rebounds"))
+    assists: float | int = Field(0, validation_alias=AliasChoices("Assists", "assists"))
+    steals: float | int = Field(0, validation_alias=AliasChoices("Steals", "steals"))
+    blocks: float | int = Field(0, validation_alias=AliasChoices("BlockedShots", "blocks"))
+    turnovers: float | int = Field(0, validation_alias=AliasChoices("Turnovers", "turnovers"))
+    fouls: float | int = Field(0, validation_alias=AliasChoices("PersonalFouls", "fouls"))
 
-    fg_made: int = Field(0, validation_alias=AliasChoices("FieldGoalsMade", "fg_made"))
-    fg_attempted: int = Field(0, validation_alias=AliasChoices("FieldGoalAttempts", "fg_attempted"))
+    fg_made: float | int = Field(0, validation_alias=AliasChoices("FieldGoalsMade", "fg_made"))
+    fg_attempted: float | int = Field(0, validation_alias=AliasChoices("FieldGoalAttempts", "fg_attempted"))
     fg_pct: float = Field(0.0, validation_alias=AliasChoices("FieldGoalPercentage", "fg_pct"))
     
-    fg2_made: int = Field(0, validation_alias=AliasChoices("TwoPointsMade", "fg2_made"))
-    fg2_attempted: int = Field(0, validation_alias=AliasChoices("TwoPointAttempts", "fg2_attempted"))
+    fg2_made: float | int = Field(0, validation_alias=AliasChoices("TwoPointsMade", "fg2_made"))
+    fg2_attempted: float | int = Field(0, validation_alias=AliasChoices("TwoPointAttempts", "fg2_attempted"))
     fg2_pct: float = Field(0.0, validation_alias=AliasChoices("TwoPointPercentage", "fg2_pct"))
 
-    fg3_made: int = Field(0, validation_alias=AliasChoices("ThreePointsMade", "fg3_made"))
-    fg3_attempted: int = Field(0, validation_alias=AliasChoices("ThreePointAttempts", "fg3_attempted"))
+    fg3_made: float | int = Field(0, validation_alias=AliasChoices("ThreePointsMade", "fg3_made"))
+    fg3_attempted: float | int = Field(0, validation_alias=AliasChoices("ThreePointAttempts", "fg3_attempted"))
     fg3_pct: float = Field(0.0, validation_alias=AliasChoices("ThreePointPercentage", "fg3_pct"))
     
-    ft_made: int = Field(0, validation_alias=AliasChoices("FreeThrowsMade", "ft_made"))
-    ft_attempted: int = Field(0, validation_alias=AliasChoices("FreeThrowAttempts", "ft_attempted"))
+    ft_made: float | int = Field(0, validation_alias=AliasChoices("FreeThrowsMade", "ft_made"))
+    ft_attempted: float | int = Field(0, validation_alias=AliasChoices("FreeThrowAttempts", "ft_attempted"))
     ft_pct: float = Field(0.0, validation_alias=AliasChoices("FreeThrowPercentage", "ft_pct"))
     
     points_per_shot: float = Field(0.0, validation_alias=AliasChoices("PointsPerShot", "points_per_shot"))
@@ -95,11 +95,11 @@ class BasketballSeasonRecord(SeasonRecord):
     stl_to_ratio: float = Field(0.0, validation_alias=AliasChoices("StealsPerTurnover", "stl_to_ratio"))
     stl_pf_ratio: float = Field(0.0, validation_alias=AliasChoices("StealsPerPersonalFoul", "stl_pf_ratio"))
     blk_pf_ratio: float = Field(0.0, validation_alias=AliasChoices("BlocksPerPersonalFoul", "blk_pf_ratio"))
-    charges: int = Field(0, validation_alias=AliasChoices("Charges", "charges"))
-    deflections: int = Field(0, validation_alias=AliasChoices("Deflections", "deflections"))
-    tech_fouls: int = Field(0, validation_alias=AliasChoices("TechnicalFouls", "tech_fouls"))
-    double_doubles: int = Field(0, validation_alias=AliasChoices("DoubleDouble", "double_doubles"))
-    triple_doubles: int = Field(0, validation_alias=AliasChoices("TripleDouble", "triple_doubles"))
+    charges: float | int = Field(0, validation_alias=AliasChoices("Charges", "charges"))
+    deflections: float | int = Field(0, validation_alias=AliasChoices("Deflections", "deflections"))
+    tech_fouls: float | int = Field(0, validation_alias=AliasChoices("TechnicalFouls", "tech_fouls"))
+    double_doubles: float | int = Field(0, validation_alias=AliasChoices("DoubleDouble", "double_doubles"))
+    triple_doubles: float | int = Field(0, validation_alias=AliasChoices("TripleDouble", "triple_doubles"))
 
     @field_validator("jersey", mode="after")
     @classmethod

@@ -1,5 +1,6 @@
 
 import pandas as pd
+import json
 
 
 from utils import firestore_helper
@@ -19,4 +20,15 @@ def test():
     main_class.junk_detection()
     main_class.drop_junk()
     main_class.arbitrary_drops()
-    print(main_class.cleaned_data.count())
+    main_class.create_agg_records()
+    dump_to_json(main_class)
+
+def dump_to_json(main_class, filename="basketball_agg.json"):
+    # Convert the dictionary of Pydantic objects to a standard dictionary
+    serializable_data = {
+        position: record.model_dump() 
+        for position, record in main_class.agg_records.items()
+    }
+
+    with open(filename, "w") as f:
+        json.dump(serializable_data, f, indent=4)

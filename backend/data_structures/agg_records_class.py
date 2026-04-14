@@ -3,7 +3,7 @@
 ##class has Sport_Name
 
 from data_structures.player_class import BasketballSeasonRecord, SeasonRecord
-from pydantic import BaseModel, Field, field_validator, model_validator, AliasChoices, FieldValidationInfo, ConfigDict
+from pydantic import BaseModel, Field, field_validator, model_validator, AliasChoices, FieldValidationInfo, ConfigDict, field_serializer
 from typing import ClassVar, Dict, List, Optional, Any, Type, Union, get_args, get_origin, Generic, TypeVar, Optional, Union
 from datetime import datetime
 import re
@@ -47,7 +47,7 @@ junk_rules = [
 ]
 
 
-
+#id should be sport and position
 class AggRecordsClass(BaseModel,Generic[T]):
     position : Optional[str] = "All"
     avg : Optional[T] = None
@@ -61,15 +61,52 @@ class AggRecordsClass(BaseModel,Generic[T]):
     count : Optional[int] = 0
     ##histograms here!! with bins
     #so i dont forget: {stat : {points : list of points , counts : list of counts}}
-    histograms: Dict[str, Dict[str, List[float]]]
+    histograms: Dict[str, Dict[str, List[float]]] = None
+
+    @field_validator('*',mode="before")
+    def check_record_type(cls, v: Dict[str, Any], info: FieldValidationInfo) -> Dict[str, Any]:
+        field_name = info.field_name
+        if field_name in ['histograms', 'position', 'count']:
+            return v
+        try:
+            v = T(**v)
+        except Exception as e:
+            raise ValueError(f"Error validating field '{field_name}': {e}")
+    
+    @classmethod
+    def fill_from_df(cls, df: pd.DataFrame, T : Type[T], position: Optional[str] = "All") -> 'AggRecordsClass':
+        record = cls(position=position)
+        record.avg = T(**df.mean().to_dict())
+        record.std = T(**df.std().to_dict())
+        record.median = T(**df.median().to_dict())
+        record.f_quartile = T(**df.quantile(0.25).to_dict())
+        record.t_quartile = T(**df.quantile(0.75).to_dict())
+        record.min = T(**df.min().to_dict())
+        record.max = T(**df.max().to_dict())
+        record.range = T(**(df.max() - df.min()).to_dict())
+        record.count = len(df)
+        #histogram logic here soon
+        return record
+
+    @field_serializer('avg', 'std', 'median', 'f_quartile', 't_quartile', 'min', 'max', 'range')
+    def serialize_stats(self, stat_record: T):
+        if stat_record is None:
+            return None
+        
+        # model_dump converts the record to a dict
+        # We filter to keep only int/float and explicitly skip bools
+        return {
+            k: v for k, v in stat_record.model_dump().items() 
+            if isinstance(v, (int, float)) and not isinstance(v, bool)
+        }
 
 
-class MainRecordsClass(BaseModel,Generic[T]):
+class MainRecordsClass(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     sport_name: str
     data_file : Optional[str] = None
-    agg_records: Dict[str, AggRecordsClass[T]] = None
+    agg_records: Dict[str, AggRecordsClass[T]] = {}
     sport_record_class: Optional[type] = None
     original_data: Optional[pd.DataFrame] = None
     cleaned_data: Optional[pd.DataFrame] = None
@@ -130,20 +167,34 @@ class MainRecordsClass(BaseModel,Generic[T]):
     def arbitrary_drops(self) -> None:
         ##use drop conditions lambdas 
         df = self.cleaned_data
-        df.drop(columns = 'minutes_played',inplace=True)
+        df.drop(columns = ['minutes_played', 'minutes_per_game'],inplace=True)
         df = df[df['games_played'] > 4]
         self.cleaned_data = df
 
-    ##validators to make sure we have a csv first
-    ##clean the data first
-    ##there should be an automate function
-    ##three functions: expand lists within cells, convert to numeric but put position back in, 
-    ##conditions for cleaning PER sport
-    ##USE THE JUNK RULES TO MAKE IT NAN FIRST ADD POINTS
-    ##FINALLY DROP 
-    ##so clean, then find junk, then drop
+    def create_hist_buckets(self, pos:str):
+        pass #SOON
 
+    def create_agg_records(self):
+        ##for each position, create an agg record class then for each stat, all we gotta do is:
+        record_type = self.sport_record_class
+        df = self.cleaned_data
+        for pos_name, subset in df.groupby('positions'):
+            if pos_name == "":
+                continue
+            subset = subset.select_dtypes(exclude=['object'])
+            agg_record = AggRecordsClass.fill_from_df(subset, record_type, position=pos_name)
+            self.agg_records[pos_name] = agg_record
+        
+        df_n = df.select_dtypes(exclude=['object'])
+        self.agg_records["All"] = AggRecordsClass.fill_from_df(df_n, record_type, position="All")
 
+        
+
+    ##Done for non histogram stuff. Do histogram stuff NOW
+    ##After histogram stuff, create the dang records quickry like this: for EACH position(because all sport have positions?),
+    ##create an agg record class then for each stat, all we gotta do is:
+    ##dataframe -> get the position -> get the mean of all stat -> turn into dict -> put in agg record class -> add to main class dict with position as key
+    ##there should always be an "All" position that just takes the mean of all players regardless of position but this is less precise(bigger sameple tho)
 
 def create_agg_records_class(sport_name: str, data_file: Optional[str] = None) -> MainRecordsClass:
     record_class = RECORD_DICT.get(sport_name, SeasonRecord)
