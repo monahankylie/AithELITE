@@ -61,7 +61,7 @@ class AggRecordsClass(BaseModel,Generic[T]):
     count : Optional[int] = 0
     ##histograms here!! with bins
     #so i dont forget: {stat : {points : list of points , counts : list of counts}}
-    histograms: Dict[str, Dict[str, List[float]]] = None
+    histograms: Dict[str, Dict[str, List[float]]] = {}
 
     @field_validator('*',mode="before")
     def check_record_type(cls, v: Dict[str, Any], info: FieldValidationInfo) -> Dict[str, Any]:
@@ -87,6 +87,14 @@ class AggRecordsClass(BaseModel,Generic[T]):
         record.count = len(df)
         #histogram logic here soon
         return record
+
+    def create_histogram(self, df_n: pd.DataFrame, bins: int = 100) -> None:
+        for stat in df_n.columns:
+            counts, bin_edges = np.histogram(df_n[stat].dropna(), bins=bins)
+            self.histograms[stat] = {
+                "points": bin_edges.tolist(),
+                "counts": counts.tolist()
+            }
 
     @field_serializer('avg', 'std', 'median', 'f_quartile', 't_quartile', 'min', 'max', 'range')
     def serialize_stats(self, stat_record: T):
@@ -178,18 +186,16 @@ class MainRecordsClass(BaseModel):
         ##for each position, create an agg record class then for each stat, all we gotta do is:
         record_type = self.sport_record_class
         df = self.cleaned_data
-        for pos_name, subset in df.groupby('positions'):
+        groups = list(df.groupby('positions'))
+        groups.append(('All', df))
+        for pos_name, subset in groups:
             if pos_name == "":
                 continue
-            subset = subset.select_dtypes(exclude=['object'])
-            agg_record = AggRecordsClass.fill_from_df(subset, record_type, position=pos_name)
+            subset_n = subset.select_dtypes(exclude=['object'])
+            agg_record = AggRecordsClass.fill_from_df(subset_n, record_type, position=pos_name)
+            agg_record.create_histogram(subset_n)
             self.agg_records[pos_name] = agg_record
         
-        df_n = df.select_dtypes(exclude=['object'])
-        self.agg_records["All"] = AggRecordsClass.fill_from_df(df_n, record_type, position="All")
-
-        
-
     ##Done for non histogram stuff. Do histogram stuff NOW
     ##After histogram stuff, create the dang records quickry like this: for EACH position(because all sport have positions?),
     ##create an agg record class then for each stat, all we gotta do is:
