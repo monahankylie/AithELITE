@@ -75,6 +75,22 @@ def put_in_csv(list : list, filename : str):
         dict_writer.writeheader()
         for item in list:
             dict_writer.writerow(item.model_dump())  # Convert Pydantic model to dict
+
+def push_agg(agg_data: dict, sport: str):
+    """
+    Pushes aggregated statistics to Firestore.
+    Schema: collective_sports_stats -> {sport} -> agg_by_pos -> {position}
+    """
+    sport_ref = db.collection("collective_sports_stats").document(sport.lower())
+    # Ensure parent document exists
+    sport_ref.set({"last_updated": firestore.SERVER_TIMESTAMP}, merge=True)
+    
+    subcollection = sport_ref.collection("agg_by_pos")
+    
+    for position, data in agg_data.items():
+        print(f"[PUSH] Uploading aggregate stats for {sport} - {position} to subcollection 'agg_by_pos'")
+        subcollection.document(position).set(data)
+
 def test():
     athletes = list(pull_athletes(4915))
     athlete_objs = model_from_doc(athletes, Player)

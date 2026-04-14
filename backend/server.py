@@ -122,6 +122,18 @@ async def scrape(background_tasks: BackgroundTasks):
 def health_check():
     return {"status": "ok"}
 
+@app.get("/aggregate/{sport}")
+async def aggregate_sport_stats(sport: str, background_tasks: BackgroundTasks):
+    """
+    Triggers the aggregation and push to Firestore for a specific sport.
+    Currently only 'basketball' is fully supported via records_per_season.csv.
+    """
+    if sport.lower() != "basketball":
+        raise HTTPException(status_code=400, detail="Only 'basketball' is currently supported for aggregation.")
+    
+    background_tasks.add_task(aggregate_stats.test)
+    return {"status": f"Aggregation and push for {sport} started in background"}
+
 @app.get("/test_db")
 def test_db(background_tasks: BackgroundTasks):
     background_tasks.add_task(aggregate_stats.test)
