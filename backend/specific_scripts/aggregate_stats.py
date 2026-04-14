@@ -21,7 +21,8 @@ def test():
     main_class.drop_junk()
     main_class.arbitrary_drops()
     main_class.create_agg_records()
-    dump_to_json(main_class)
+    agg_data = dump_to_json(main_class)
+    firestore_helper.push_agg(agg_data, main_class.sport_name)
 
 def dump_to_json(main_class, filename="basketball_agg.json"):
     # Convert the dictionary of Pydantic objects to a standard dictionary
@@ -32,3 +33,8 @@ def dump_to_json(main_class, filename="basketball_agg.json"):
 
     with open(filename, "w") as f:
         json.dump(serializable_data, f, indent=4)
+    
+    return serializable_data
+
+if __name__ == "__main__":
+    test()
