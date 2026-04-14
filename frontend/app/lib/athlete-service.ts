@@ -36,12 +36,6 @@ export type FetchResult = {
 };
 
 let loggedFirstDocKeys = false;
-
-/**
- * AthleteService handles all interactions with Firestore for athlete data.
- * NOTE: For collectionGroup queries to work, you must update your security rules 
- * and create indexes. See /FIRESTORECONFIG.md for setup instructions and links.
- */
 class AthleteService {
   private mapAthleteData(id: string, data: DocumentData): Athlete {
     const rawRecords = (data.records || []) as AnySportRecord[];
