@@ -150,7 +150,11 @@ const StatHistogramChart: React.FC<StatHistogramChartProps> = ({
           if (binIdx === -1) return null;
 
           // 2. Map to the processed (aggregated) bin index
-          const processedBinIdx = Math.floor(binIdx / binWindow);
+          // Shifted +1 because it was appearing "one back"
+          const processedBinIdx = Math.min(
+            Math.floor((binIdx + 1) / binWindow),
+            xAxisData.length - 1
+          );
           
           // 3. Get the exact label used in xAxis.data
           const targetLabel = xAxisData[processedBinIdx];
