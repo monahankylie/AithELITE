@@ -53,9 +53,9 @@ class AthleteService {
 
     const sortedRecords = [...rawRecords].sort((a, b) => b.year.localeCompare(a.year));
     
-    // Create an athlete stub for aggregation
-    const athleteStub = { records: sortedRecords } as Athlete;
-    const current = athleteFormatter.aggregateStats(athleteStub) as AnySportRecord;
+    // Use the most recent season record as currentStats (Recruiter's standard)
+    // instead of an aggregate average to preserve single-season high-performance rankings.
+    const current = sortedRecords[0] || {} as AnySportRecord;
 
     const firstName = data.first_name || data.firstName || "";
     const lastName = data.last_name || data.lastName || "";
@@ -227,8 +227,15 @@ class AthleteService {
     
     const constraints: QueryConstraint[] = [
       orderBy(sortKey, order),
-      limit(firestoreLimit)
     ];
+
+    // If sorting ASC, we must exclude 0/null values to get meaningful "lowest" performers.
+    // Otherwise, Firestore just returns every athlete who never played or has no stats first.
+    if (order === "asc") {
+      constraints.push(where(sortKey, ">", 0));
+    }
+
+    constraints.push(limit(firestoreLimit));
     if (cursor) constraints.push(startAfter(cursor));
 
     if (filters.position) {
@@ -238,15 +245,18 @@ class AthleteService {
     const q = query(collectionGroup(db, "sport_records"), ...constraints);
     const snap = await getDocs(q);
 
+    // Keep track of the BEST record found for each athlete during this query
+    const athleteBestRecord = new Map<string, AnySportRecord>();
     const athleteIds: string[] = [];
-    const seenIds = new Set<string>();
 
     for (const d of snap.docs) {
       const parentRef = d.ref.parent.parent;
       if (!parentRef) continue;
-      if (!seenIds.has(parentRef.id)) {
-        athleteIds.push(parentRef.id);
-        seenIds.add(parentRef.id);
+      const athleteId = parentRef.id;
+      
+      if (!athleteBestRecord.has(athleteId)) {
+        athleteIds.push(athleteId);
+        athleteBestRecord.set(athleteId, d.data() as AnySportRecord);
       }
     }
 
@@ -265,6 +275,8 @@ class AthleteService {
         const id = adoc.id;
         const allRecordsSnap = await getDocs(collection(adoc.ref, "sport_records"));
         const allRecords = allRecordsSnap.docs.map(rd => rd.data() as AnySportRecord);
+        
+        // mapAthleteData will correctly identify the most recent season as currentStats
         const athlete = this.mapAthleteData(id, { ...adoc.data(), records: allRecords });
         
         if (filters.gradYear && athlete.classYear !== Number(filters.gradYear)) {
@@ -278,7 +290,9 @@ class AthleteService {
       }
     }
 
-    // Sort respects direction
+    // CRITICAL: We now re-sort the final list of athletes based on their LATEST season stats
+    // (the ones actually shown on the card). This ensures that a 2.3 PPG player 
+    // stays at 2.3 PPG and is ranked appropriately relative to others.
     players.sort((a, b) => {
       const valA = this.getStatValue(a, filters.sortBy as SortKey);
       const valB = this.getStatValue(b, filters.sortBy as SortKey);
