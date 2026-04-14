@@ -96,6 +96,7 @@ export interface AthleteFilters {
   position?: string;
   gradYear?: string;
   sortBy?: DiscoverSortKey;
+  sortDirection?: "asc" | "desc";
 }
 
 export interface StatHistogram {

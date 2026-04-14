@@ -22,6 +22,12 @@ interface AnalyzeContext {
   playerColors: Record<string, string>;
 }
 
+function getOrdinalSuffix(n: number): string {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
 export default function AnalyzeDistribution() {
   const { players, loading, playerColors } = useOutletContext<AnalyzeContext>();
   const [aggData, setAggData] = React.useState<AggregatedStats | null>(null);
@@ -88,19 +94,46 @@ export default function AnalyzeDistribution() {
   const metricName = DEFAULT_METRICS.find(m => m.key === selectedMetric)?.name || selectedMetric;
 
   const markers = React.useMemo(() => {
-    if (!histogram) return [];
+    if (!histogram || !histogram.counts || !histogram.points) return [];
+    
+    const totalCount = histogram.counts.reduce((a, b) => a + b, 0);
+    if (totalCount === 0) return [];
+
     return players
       .filter(p => !hiddenIds.includes(p.id))
       .map(p => {
         const stats = athleteFormatter.aggregateStats(p);
         const val = (stats as any)?.[selectedMetric];
         if (typeof val !== 'number') return null;
+
+        // Calculate Percentile
+        let countBelow = 0;
+        const { points, counts } = histogram;
+        for (let i = 0; i < counts.length; i++) {
+          if (val > points[i + 1]) {
+            countBelow += counts[i];
+          } else {
+            // Linear interpolation for more accuracy within the bin
+            const binWidth = points[i + 1] - points[i];
+            if (binWidth > 0) {
+              const fraction = (val - points[i]) / binWidth;
+              countBelow += counts[i] * Math.max(0, Math.min(1, fraction));
+            }
+            break;
+          }
+        }
+        
+        const percentile = (countBelow / totalCount) * 100;
+        const roundedPercentile = Math.round(percentile);
+        const percentileLabel = percentile > 99 ? "Top 1%" : `${getOrdinalSuffix(roundedPercentile)}`;
+
         return {
           value: val,
           color: playerColors[p.id],
-          label: p.lastName || p.name.split(' ').pop() || ''
+          label: `${p.lastName || p.name.split(' ').pop() || ''} (${percentileLabel})`,
+          percentile: percentile
         };
-      }).filter((m): m is { value: number; color: string; label: string } => m !== null);
+      }).filter((m): m is { value: number; color: string; label: string; percentile: number } => m !== null);
   }, [players, histogram, selectedMetric, playerColors, hiddenIds]);
 
   return (
@@ -194,6 +227,10 @@ export default function AnalyzeDistribution() {
                   const formattedVal = typeof val === 'number' ? (selectedMetric.includes('pct') ? `${val.toFixed(1)}%` : val.toFixed(1)) : 'N/A';
                   const isHidden = hiddenIds.includes(p.id);
                   
+                  // Calculate Percentile for sidebar display
+                  const marker = markers.find(m => m.label.startsWith(p.lastName || p.name.split(' ').pop() || ''));
+                  const percentileText = marker ? marker.label.split(' (').pop()?.replace(')', '') : '';
+
                   return (
                     <Box 
                       key={p.id} 
@@ -218,9 +255,16 @@ export default function AnalyzeDistribution() {
                         backgroundColor: isHidden ? '#cbd5e1' : playerColors[p.id], 
                         mr: 1.5, flexShrink: 0 
                       }} />
-                      <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, color: isHidden ? '#94a3b8' : '#0f172a', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {p.lastName || p.name.split(' ').pop()}
-                      </Typography>
+                      <Box sx={{ flex: 1, minWidth: 0, mr: 1 }}>
+                        <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, color: isHidden ? '#94a3b8' : '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {p.lastName || p.name.split(' ').pop()}
+                        </Typography>
+                        {!isHidden && percentileText && (
+                          <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            {percentileText} Percentile
+                          </Typography>
+                        )}
+                      </Box>
                       <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, color: isHidden ? '#cbd5e1' : playerColors[p.id] }}>
                         {formattedVal}
                       </Typography>

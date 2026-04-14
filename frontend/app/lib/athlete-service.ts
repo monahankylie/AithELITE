@@ -1,5 +1,6 @@
 import {
   collection,
+  collectionGroup,
   doc,
   getDoc,
   getDocs,
@@ -36,6 +37,11 @@ export type FetchResult = {
 
 let loggedFirstDocKeys = false;
 
+/**
+ * AthleteService handles all interactions with Firestore for athlete data.
+ * NOTE: For collectionGroup queries to work, you must update your security rules 
+ * and create indexes. See /FIRESTORECONFIG.md for setup instructions and links.
+ */
 class AthleteService {
   private mapAthleteData(id: string, data: DocumentData): Athlete {
     const rawRecords = (data.records || []) as AnySportRecord[];
@@ -117,91 +123,226 @@ class AthleteService {
   }
 
   /**
-   * Performs global Firestore queries for the primary filter (Search or Class).
-   * Remaining filters (Position, Sort) are handled in-memory.
+   * Performs global Firestore queries for the primary filter (Search, Class, or Sort).
+   * Remaining filters are handled in-memory if they cannot be combined in a single query.
    */
   async fetchFilteredAthletes(
     filters: AthleteFilters,
     pageSize: number = 20,
     cursor: QueryDocumentSnapshot<DocumentData> | null = null
   ): Promise<FetchResult> {
-    const constraints: QueryConstraint[] = [];
-
-    // 1. Prioritize Global Search (Prefix Matching on first_name)
-    if (filters.search) {
-      const raw = filters.search.trim();
-      // Normalize: Capitalize first letter (e.g. "bryan" -> "Bryan") to match Firestore indexing
-      const s = raw.charAt(0).toUpperCase() + raw.slice(1);
+    try {
+      const isStatSort = filters.sortBy && filters.sortBy !== "composition_rating";
       
-      console.log(`[AthleteService] Search query (first_name) - Raw: "${raw}", Normalized: "${s}"`);
-      console.log(`[AthleteService] Query bounds: >= "${s}", <= "${s}\uf8ff"`);
+      // Path A: Search by name (Priority)
+      if (filters.search) {
+        return await this.fetchBySearch(filters, pageSize, cursor);
+      } 
+      
+      // Path B: Sort by Stat (using collectionGroup)
+      if (isStatSort) {
+        return await this.fetchByStatSort(filters, pageSize, cursor);
+      }
 
-      constraints.push(where("first_name", ">=", s));
-      constraints.push(where("first_name", "<=", s + "\uf8ff"));
-      constraints.push(orderBy("first_name", "asc"));
-    } 
-    // 2. Fallback to Global Class Filter
-    else if (filters.gradYear) {
-      console.log(`[AthleteService] Filtering by Class: ${filters.gradYear}`);
+      // Path C: Sort by Composition or Class Filter (direct athletes query)
+      return await this.fetchByAthleteQuery(filters, pageSize, cursor);
+    } catch (error) {
+      console.error("[AthleteService] fetchFilteredAthletes failed:", error);
+      throw error;
+    }
+  }
+
+  private async fetchBySearch(
+    filters: AthleteFilters,
+    pageSize: number = 20,
+    cursor: QueryDocumentSnapshot<DocumentData> | null = null
+  ): Promise<FetchResult> {
+    const raw = filters.search!.trim();
+    const s = raw.charAt(0).toUpperCase() + raw.slice(1);
+    
+    const constraints: QueryConstraint[] = [
+      where("first_name", ">=", s),
+      where("first_name", "<=", s + "\uf8ff"),
+      orderBy("first_name", "asc"),
+      limit(100)
+    ];
+    if (cursor) constraints.push(startAfter(cursor));
+
+    const q = query(collection(db, "athletes"), ...constraints);
+    const snap = await getDocs(q);
+    
+    let players = await Promise.all(snap.docs.map(async (d) => {
+      const recordsSnap = await getDocs(collection(d.ref, "sport_records"));
+      const records = recordsSnap.docs.map(rd => rd.data() as AnySportRecord);
+      return this.mapAthleteData(d.id, { ...d.data(), records });
+    }));
+
+    // Post-filter in memory
+    if (filters.gradYear) {
+      players = players.filter(p => p.classYear === Number(filters.gradYear));
+    }
+    if (filters.position) {
+      const pos = filters.position.toLowerCase();
+      players = players.filter(p => {
+        const stats = p.currentStats as BasketballStatRecord;
+        return stats?.positions?.some(rp => String(rp).toLowerCase() === pos);
+      });
+    }
+
+    // In-memory sort since we can't combine name search with stat sort in Firestore
+    if (filters.sortBy) {
+      const order = filters.sortDirection || "desc";
+      if (filters.sortBy === "composition_rating") {
+        players.sort((a, b) => {
+          const valA = a.compositionRating || 0;
+          const valB = b.compositionRating || 0;
+          return order === "desc" ? valB - valA : valA - valB;
+        });
+      } else {
+        const sortKey = filters.sortBy as SortKey;
+        players.sort((a, b) => {
+          const valA = this.getStatValue(a, sortKey);
+          const valB = this.getStatValue(b, sortKey);
+          return order === "desc" ? valB - valA : valA - valB;
+        });
+      }
+    }
+
+    return {
+      players: players.slice(0, pageSize),
+      lastDoc: snap.docs[snap.docs.length - 1] || null,
+      hasMore: snap.docs.length === 100,
+    };
+  }
+
+  private async fetchByStatSort(
+    filters: AthleteFilters,
+    pageSize: number = 20,
+    cursor: QueryDocumentSnapshot<DocumentData> | null = null
+  ): Promise<FetchResult> {
+    const sortKey = filters.sortBy as string;
+    const order = filters.sortDirection || "desc";
+    // Fetch more to account for de-duplication and class filtering
+    const firestoreLimit = Math.max(pageSize * 3, 100); 
+    
+    const constraints: QueryConstraint[] = [
+      orderBy(sortKey, order),
+      limit(firestoreLimit)
+    ];
+    if (cursor) constraints.push(startAfter(cursor));
+
+    if (filters.position) {
+      constraints.push(where("positions", "array-contains", filters.position));
+    }
+
+    const q = query(collectionGroup(db, "sport_records"), ...constraints);
+    const snap = await getDocs(q);
+
+    const athleteIds: string[] = [];
+    const seenIds = new Set<string>();
+
+    for (const d of snap.docs) {
+      const parentRef = d.ref.parent.parent;
+      if (!parentRef) continue;
+      if (!seenIds.has(parentRef.id)) {
+        athleteIds.push(parentRef.id);
+        seenIds.add(parentRef.id);
+      }
+    }
+
+    // Fetch athlete parent documents and ALL their records
+    const players: Athlete[] = [];
+    const chunks = [];
+    for (let i = 0; i < athleteIds.length; i += 30) {
+      chunks.push(athleteIds.slice(i, i + 30));
+    }
+
+    for (const chunk of chunks) {
+      const qAthletes = query(collection(db, "athletes"), where(documentId(), "in", chunk));
+      const aSnap = await getDocs(qAthletes);
+      
+      const chunkPlayers = await Promise.all(aSnap.docs.map(async (adoc) => {
+        const id = adoc.id;
+        const allRecordsSnap = await getDocs(collection(adoc.ref, "sport_records"));
+        const allRecords = allRecordsSnap.docs.map(rd => rd.data() as AnySportRecord);
+        const athlete = this.mapAthleteData(id, { ...adoc.data(), records: allRecords });
+        
+        if (filters.gradYear && athlete.classYear !== Number(filters.gradYear)) {
+          return null;
+        }
+        return athlete;
+      }));
+      
+      for (const p of chunkPlayers) {
+        if (p) players.push(p);
+      }
+    }
+
+    // Sort respects direction
+    players.sort((a, b) => {
+      const valA = this.getStatValue(a, filters.sortBy as SortKey);
+      const valB = this.getStatValue(b, filters.sortBy as SortKey);
+      return order === "desc" ? valB - valA : valA - valB;
+    });
+
+    return {
+      players: players.slice(0, pageSize),
+      lastDoc: snap.docs[snap.docs.length - 1] || null,
+      hasMore: snap.docs.length === firestoreLimit,
+    };
+  }
+
+  private async fetchByAthleteQuery(
+    filters: AthleteFilters,
+    pageSize: number = 20,
+    cursor: QueryDocumentSnapshot<DocumentData> | null = null
+  ): Promise<FetchResult> {
+    const firestoreLimit = Math.max(pageSize, 100);
+    const order = filters.sortDirection || "desc";
+    const constraints: QueryConstraint[] = [];
+    
+    if (filters.gradYear) {
       constraints.push(where("class", "==", Number(filters.gradYear)));
     }
 
-    // Fetch a batch size that balances performance and filtering flexibility
-    const batchSize = 100;
-    constraints.push(limit(batchSize)); 
+    if (filters.sortBy === "composition_rating") {
+      constraints.push(orderBy("composition_rating", order));
+    }
+
+    constraints.push(limit(firestoreLimit));
     if (cursor) constraints.push(startAfter(cursor));
 
-    try {
-      const q = query(collection(db, "athletes"), ...constraints);
-      const snap = await getDocs(q);
-      
-      let players = await Promise.all(snap.docs.map(async (d) => {
-        const recordsSnap = await getDocs(collection(d.ref, "sport_records"));
-        const records = recordsSnap.docs.map(rd => rd.data() as AnySportRecord);
-        return this.mapAthleteData(d.id, { ...d.data(), records });
-      }));
+    const q = query(collection(db, "athletes"), ...constraints);
+    const snap = await getDocs(q);
+    
+    let players = await Promise.all(snap.docs.map(async (d) => {
+      const recordsSnap = await getDocs(collection(d.ref, "sport_records"));
+      const records = recordsSnap.docs.map(rd => rd.data() as AnySportRecord);
+      return this.mapAthleteData(d.id, { ...d.data(), records });
+    }));
 
-      // 3. In-memory Secondary Filters (handles the filters not prioritized above)
-      if (filters.search && filters.gradYear) {
-        players = players.filter(p => p.classYear === Number(filters.gradYear));
-      }
-
-      if (filters.position) {
-        const pos = filters.position.toLowerCase();
-        players = players.filter(p => {
-          const stats = p.currentStats as BasketballStatRecord;
-          return stats?.positions?.some(rp => String(rp).toLowerCase() === pos);
-        });
-      }
-
-      // 4. In-memory Sort
-      if (filters.sortBy === "composition_rating") {
-        const rank = (p: Athlete) =>
-          p.compositionRating != null && Number.isFinite(p.compositionRating)
-            ? p.compositionRating
-            : Number.NEGATIVE_INFINITY;
-        // Highest composition first (best → worst); missing ratings last
-        players.sort((a, b) => rank(b) - rank(a));
-      } else if (filters.sortBy) {
-        players.sort(
-          (a, b) =>
-            this.getStatValue(b, filters.sortBy as SortKey) -
-            this.getStatValue(a, filters.sortBy as SortKey),
-        );
-      }
-
-      // 5. Paginate
-      const paginatedPlayers = players.slice(0, pageSize);
-
-      return {
-        players: paginatedPlayers,
-        lastDoc: snap.docs[snap.docs.length - 1] || null,
-        hasMore: snap.docs.length === batchSize, 
-      };
-    } catch (error: any) {
-      console.error("[AthleteService] Filtered fetch failed:", error);
-      throw error;
+    if (filters.position) {
+      const pos = filters.position.toLowerCase();
+      players = players.filter(p => {
+        const stats = p.currentStats as BasketballStatRecord;
+        return stats?.positions?.some(rp => String(rp).toLowerCase() === pos);
+      });
     }
+
+    // Ensure final in-memory sort matches requested order if Firestore couldn't handle it
+    if (filters.sortBy === "composition_rating") {
+        players.sort((a, b) => {
+            const valA = a.compositionRating || 0;
+            const valB = b.compositionRating || 0;
+            return order === "desc" ? valB - valA : valA - valB;
+        });
+    }
+
+    return {
+      players: players.slice(0, pageSize),
+      lastDoc: snap.docs[snap.docs.length - 1] || null,
+      hasMore: snap.docs.length === firestoreLimit,
+    };
   }
 
   async fetchAthleteById(id: string): Promise<Athlete> {
@@ -248,6 +389,11 @@ class AthleteService {
 
 export const athleteService = new AthleteService();
 
+// Expose to window for index generation scripts and debugging
+if (typeof window !== "undefined") {
+  (window as any).athleteService = athleteService;
+}
+
 export const SORT_OPTIONS: { value: SortKey; label: string; category: string }[] = [
   { value: "points_per_game", label: "Points Per Game", category: "Scoring" },
   { value: "points", label: "Total Points", category: "Scoring" },
@@ -266,11 +412,11 @@ export const DISCOVER_SORT_OPTIONS: { value: DiscoverSortKey; label: string; cat
   ...SORT_OPTIONS,
   {
     value: "composition_rating",
-    label: "Composition rating (high → low)",
+    label: "Composition rating",
     category: "Ratings",
   },
 ];
 
 export function hasActiveFilters(f: AthleteFilters): boolean {
-  return !!(f.search || f.position || f.gradYear || f.sortBy);
+  return !!(f.search || f.position || f.gradYear || f.sortBy || f.sortDirection);
 }
