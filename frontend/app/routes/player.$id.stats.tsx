@@ -202,7 +202,7 @@ export default function PlayerStatsPage() {
 
   return (
     <PageLayout requireAuth variant="hero">
-      <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-5 flex items-center gap-3 text-sm font-semibold text-slate-500">
           <Link to="/discover" className="transition hover:text-[#00599c]">
             Discover
@@ -216,7 +216,7 @@ export default function PlayerStatsPage() {
         </div>
 
         <div className="overflow-hidden rounded-[40px] border border-white/10 bg-white shadow-2xl">
-          <section className="bg-slate-950 p-4 lg:p-12 text-white">
+          <section className="relative overflow-hidden bg-gradient-to-br from-[#07111f] via-[#0e2950] to-[#00599c] px-6 py-8 text-white sm:px-8 lg:px-10 lg:py-10">
             <div className="grid gap-12 lg:grid-cols-[1.5fr_1fr] items-center">
               <div className="space-y-6">
                 <h1 className="text-5xl font-black tracking-tighter sm:text-7xl">{player.name}</h1>
