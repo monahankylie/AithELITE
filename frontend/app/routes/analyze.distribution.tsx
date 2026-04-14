@@ -13,7 +13,7 @@ import {
 import type { Athlete, AggregatedStats } from "../lib/athlete-types";
 import { aggStatsService } from "../lib/agg-stats-service";
 import StatHistogramChart from "../components/stat-histogram-chart";
-import { DEFAULT_METRICS } from "../lib/relevant-metrics";
+import { DEFAULT_METRICS, ALL_BASKETBALL_METRICS } from "../lib/relevant-metrics";
 
 interface AnalyzeContext {
   players: Athlete[];
@@ -28,6 +28,13 @@ export default function AnalyzeDistribution() {
   const [selectedPosition, setSelectedPosition] = React.useState<string>("All");
   const [selectedMetric, setSelectedMetric] = React.useState<string>("points_per_game");
   const [binWindow, setBinWindow] = React.useState<number>(1);
+  const [hiddenIds, setHiddenIds] = React.useState<string[]>([]);
+
+  const togglePlayerVisibility = (id: string) => {
+    setHiddenIds(prev => 
+      prev.includes(id) ? prev.filter(hid => hid !== id) : [...prev, id]
+    );
+  };
 
   // Determine available positions based on selected athletes
   const availablePositions = React.useMemo(() => {
@@ -81,16 +88,18 @@ export default function AnalyzeDistribution() {
 
   const markers = React.useMemo(() => {
     if (!histogram) return [];
-    return players.map(p => {
-      const val = (p.currentStats as any)?.[selectedMetric];
-      if (typeof val !== 'number') return null;
-      return {
-        value: val,
-        color: playerColors[p.id],
-        label: p.lastName || p.name.split(' ').pop() || ''
-      };
-    }).filter((m): m is { value: number; color: string; label: string } => m !== null);
-  }, [players, histogram, selectedMetric, playerColors]);
+    return players
+      .filter(p => !hiddenIds.includes(p.id))
+      .map(p => {
+        const val = (p.currentStats as any)?.[selectedMetric];
+        if (typeof val !== 'number') return null;
+        return {
+          value: val,
+          color: playerColors[p.id],
+          label: p.lastName || p.name.split(' ').pop() || ''
+        };
+      }).filter((m): m is { value: number; color: string; label: string } => m !== null);
+  }, [players, histogram, selectedMetric, playerColors, hiddenIds]);
 
   return (
     <Box sx={{ 
@@ -133,14 +142,9 @@ export default function AnalyzeDistribution() {
           <FormControl size="small" sx={{ minWidth: 150 }}>
             <InputLabel>Metric</InputLabel>
             <Select value={selectedMetric} label="Metric" onChange={handleMetricChange} sx={{ borderRadius: '12px', fontWeight: 700 }}>
-              <MenuItem value="points_per_game">Points Per Game</MenuItem>
-              <MenuItem value="rebounds_per_game">Rebounds Per Game</MenuItem>
-              <MenuItem value="assists_per_game">Assists Per Game</MenuItem>
-              <MenuItem value="steals_per_game">Steals Per Game</MenuItem>
-              <MenuItem value="blocks_per_game">Blocks Per Game</MenuItem>
-              <MenuItem value="fg_pct">FG%</MenuItem>
-              <MenuItem value="fg3_pct">3P%</MenuItem>
-              <MenuItem value="ft_pct">FT%</MenuItem>
+              {ALL_BASKETBALL_METRICS.map(m => (
+                <MenuItem key={m.key} value={m.key}>{m.name}</MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Box>
@@ -185,16 +189,36 @@ export default function AnalyzeDistribution() {
                 {players.map(p => {
                   const val = (p.currentStats as any)?.[selectedMetric];
                   const formattedVal = typeof val === 'number' ? (selectedMetric.includes('pct') ? `${val.toFixed(1)}%` : val.toFixed(1)) : 'N/A';
+                  const isHidden = hiddenIds.includes(p.id);
+                  
                   return (
-                    <Box key={p.id} sx={{ 
-                      display: 'flex', alignItems: 'center', px: 1.5, py: 1, borderRadius: '12px', 
-                      backgroundColor: 'white', border: '2px solid', borderColor: playerColors[p.id],
-                      boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
-                    }}>
-                      <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, color: '#0f172a', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <Box 
+                      key={p.id} 
+                      onClick={() => togglePlayerVisibility(p.id)}
+                      sx={{ 
+                        display: 'flex', alignItems: 'center', px: 1.5, py: 1, borderRadius: '12px', 
+                        backgroundColor: isHidden ? '#f8fafc' : 'white', 
+                        border: '2px solid', 
+                        borderColor: isHidden ? '#e2e8f0' : playerColors[p.id],
+                        boxShadow: isHidden ? 'none' : '0 1px 2px rgba(0,0,0,0.02)',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        opacity: isHidden ? 0.5 : 1,
+                        '&:hover': {
+                          borderColor: playerColors[p.id],
+                          opacity: 1
+                        }
+                      }}
+                    >
+                      <Box sx={{ 
+                        width: 8, height: 8, borderRadius: '50%', 
+                        backgroundColor: isHidden ? '#cbd5e1' : playerColors[p.id], 
+                        mr: 1.5, flexShrink: 0 
+                      }} />
+                      <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, color: isHidden ? '#94a3b8' : '#0f172a', flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {p.lastName || p.name.split(' ').pop()}
                       </Typography>
-                      <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, color: playerColors[p.id] }}>
+                      <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, color: isHidden ? '#cbd5e1' : playerColors[p.id] }}>
                         {formattedVal}
                       </Typography>
                     </Box>

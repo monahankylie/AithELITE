@@ -8,6 +8,7 @@ import type { SelectChangeEvent } from '@mui/material';
 import { DataGrid, type GridColDef, type GridRenderCellParams } from '@mui/x-data-grid';
 import type { Athlete, BasketballStatRecord } from "../lib/athlete-types";
 import AppDropdown from "../components/app-dropdown";
+import { ALL_BASKETBALL_METRICS } from "../lib/relevant-metrics";
 
 const YEAR_OPTIONS = [
   { value: '25-26', label: '2025-26' },
@@ -18,40 +19,10 @@ const YEAR_OPTIONS = [
 
 const AVAILABLE_STATS = [
   { value: 'positions', label: 'POS' },
-  { value: 'points_per_game', label: 'PPG' },
-  { value: 'rebounds_per_game', label: 'RPG' },
-  { value: 'assists_per_game', label: 'APG' },
-  { value: 'steals_per_game', label: 'SPG' },
-  { value: 'blocks_per_game', label: 'BPG' },
-  { value: 'fg_pct', label: 'FG%' },
-  { value: 'fg3_pct', label: '3P%' },
-  { value: 'fg2_pct', label: '2P%' },
-  { value: 'ft_pct', label: 'FT%' },
-  { value: 'efg_pct', label: 'eFG%' },
-  { value: 'ast_to_ratio', label: 'A/TO' },
-  { value: 'stl_to_ratio', label: 'S/TO' },
-  { value: 'stl_pf_ratio', label: 'S/PF' },
-  { value: 'blk_pf_ratio', label: 'B/PF' },
-  { value: 'turnovers_per_game', label: 'TOPG' },
-  { value: 'games_played', label: 'Games Played' },
-  { value: 'minutes_per_game', label: 'MPG' },
-  { value: 'minutes_played', label: 'MIN' },
-  { value: 'points_per_shot', label: 'PPS' },
-  { value: 'double_doubles', label: 'DD' },
-  { value: 'triple_doubles', label: 'TD' },
-  { value: 'off_rebounds_per_game', label: 'ORPG' },
-  { value: 'def_rebounds_per_game', label: 'DRPG' },
-  { value: 'points', label: 'PTS' },
-  { value: 'rebounds', label: 'REB' },
-  { value: 'assists', label: 'AST' },
-  { value: 'steals', label: 'STL' },
-  { value: 'blocks', label: 'BLK' },
-  { value: 'turnovers', label: 'TO' },
-  { value: 'fouls_per_game', label: 'FPG' },
-  { value: 'fouls', label: 'PF' },
-  { value: 'charges', label: 'Charges' },
-  { value: 'deflections', label: 'Deflections' },
-  { value: 'tech_fouls', label: 'Tech Fouls' },
+  ...ALL_BASKETBALL_METRICS.map(m => ({
+    value: m.key,
+    label: m.shortLabel || m.name
+  }))
 ];
 
 const DEFAULT_COLUMNS = [
