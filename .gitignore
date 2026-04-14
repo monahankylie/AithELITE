@@ -3,3 +3,4 @@
 fbACC.json
 *.ipynb
 GEMINI.md
+node_modules/*
