@@ -14,6 +14,7 @@ import type { Athlete, AggregatedStats } from "../lib/athlete-types";
 import { aggStatsService } from "../lib/agg-stats-service";
 import StatHistogramChart from "../components/stat-histogram-chart";
 import { DEFAULT_METRICS, ALL_BASKETBALL_METRICS } from "../lib/relevant-metrics";
+import { athleteFormatter } from "../lib/athlete-formatter";
 
 interface AnalyzeContext {
   players: Athlete[];
@@ -91,7 +92,8 @@ export default function AnalyzeDistribution() {
     return players
       .filter(p => !hiddenIds.includes(p.id))
       .map(p => {
-        const val = (p.currentStats as any)?.[selectedMetric];
+        const stats = athleteFormatter.aggregateStats(p);
+        const val = (stats as any)?.[selectedMetric];
         if (typeof val !== 'number') return null;
         return {
           value: val,
@@ -187,7 +189,8 @@ export default function AnalyzeDistribution() {
               
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, flex: 1, overflowY: 'auto' }}>
                 {players.map(p => {
-                  const val = (p.currentStats as any)?.[selectedMetric];
+                  const stats = athleteFormatter.aggregateStats(p);
+                  const val = (stats as any)?.[selectedMetric];
                   const formattedVal = typeof val === 'number' ? (selectedMetric.includes('pct') ? `${val.toFixed(1)}%` : val.toFixed(1)) : 'N/A';
                   const isHidden = hiddenIds.includes(p.id);
                   

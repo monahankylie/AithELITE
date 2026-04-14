@@ -22,6 +22,7 @@ import type {
   DiscoverSortKey,
   AthleteFilters,
 } from "./athlete-types";
+import { athleteFormatter } from "./athlete-formatter";
 import {
   extractCompositionRatingFromDocument,
   estimateCompositionRatingFromBasketballStats,
@@ -45,7 +46,10 @@ class AthleteService {
     }
 
     const sortedRecords = [...rawRecords].sort((a, b) => b.year.localeCompare(a.year));
-    const current = sortedRecords[0];
+    
+    // Create an athlete stub for aggregation
+    const athleteStub = { records: sortedRecords } as Athlete;
+    const current = athleteFormatter.aggregateStats(athleteStub) as AnySportRecord;
 
     const firstName = data.first_name || data.firstName || "";
     const lastName = data.last_name || data.lastName || "";
@@ -99,7 +103,11 @@ class AthleteService {
     const q = query(collection(db, "athletes"), ...constraints);
     const snap = await getDocs(q);
 
-    const players = snap.docs.map(d => this.mapAthleteData(d.id, d.data()));
+    const players = await Promise.all(snap.docs.map(async (d) => {
+      const recordsSnap = await getDocs(collection(d.ref, "sport_records"));
+      const records = recordsSnap.docs.map(rd => rd.data() as AnySportRecord);
+      return this.mapAthleteData(d.id, { ...d.data(), records });
+    }));
 
     return {
       players,
@@ -147,7 +155,11 @@ class AthleteService {
       const q = query(collection(db, "athletes"), ...constraints);
       const snap = await getDocs(q);
       
-      let players = snap.docs.map((d) => this.mapAthleteData(d.id, d.data()));
+      let players = await Promise.all(snap.docs.map(async (d) => {
+        const recordsSnap = await getDocs(collection(d.ref, "sport_records"));
+        const records = recordsSnap.docs.map(rd => rd.data() as AnySportRecord);
+        return this.mapAthleteData(d.id, { ...d.data(), records });
+      }));
 
       // 3. In-memory Secondary Filters (handles the filters not prioritized above)
       if (filters.search && filters.gradYear) {
@@ -193,9 +205,18 @@ class AthleteService {
   }
 
   async fetchAthleteById(id: string): Promise<Athlete> {
-    const snap = await getDoc(doc(db, "athletes", id));
-    if (!snap.exists()) throw new Error(`Athlete ${id} not found`);
-    return this.mapAthleteData(id, snap.data());
+    const athleteRef = doc(db, "athletes", id);
+    const [athleteSnap, recordsSnap] = await Promise.all([
+      getDoc(athleteRef),
+      getDocs(collection(athleteRef, "sport_records"))
+    ]);
+
+    if (!athleteSnap.exists()) throw new Error(`Athlete ${id} not found`);
+    
+    const data = athleteSnap.data();
+    const records = recordsSnap.docs.map(d => d.data() as AnySportRecord);
+    
+    return this.mapAthleteData(id, { ...data, records });
   }
 
   async fetchAthletesByIds(ids: string[]): Promise<Athlete[]> {
@@ -212,9 +233,12 @@ class AthleteService {
       chunks.map(async (chunk) => {
         const q = query(collection(db, "athletes"), where(documentId(), "in", chunk));
         const snap = await getDocs(q);
-        snap.docs.forEach((d) => {
-          byId.set(d.id, this.mapAthleteData(d.id, d.data()));
-        });
+        
+        await Promise.all(snap.docs.map(async (d) => {
+          const recordsSnap = await getDocs(collection(d.ref, "sport_records"));
+          const records = recordsSnap.docs.map(rd => rd.data() as AnySportRecord);
+          byId.set(d.id, this.mapAthleteData(d.id, { ...d.data(), records }));
+        }));
       }),
     );
 
