@@ -1,6 +1,7 @@
 import os
 import json
 import time
+from typing import Optional
 import firebase_admin
 from firebase_admin import credentials, firestore
 
@@ -49,7 +50,7 @@ def merge_records(existing_records, new_records):
             
     return list(merged.values())
 
-def push_player_to_firestore(player: Player, team: Team):
+def push_player_to_firestore(player: Player, team: Optional[Team] = None):
     try:
         p_id = player.base_player_id
         if not p_id: return None
@@ -68,12 +69,18 @@ def push_player_to_firestore(player: Player, team: Team):
 
         # Use stable base_player_id as Document ID
         player_ref = db.collection("athletes").document(p_id)
+        subcollection = player_ref.collection("sport_records")
         existing = player_ref.get()
         
         if existing.exists:
             existing_data = existing.to_dict()
             player_doc["records"] = merge_records(existing_data.get("records", []), player_doc.get("records", []))
-            
+        
+        for r in player.records:
+            subcollection.document(r.record_id).set(r.model_dump(by_alias=True), merge=True)
+
+
+
         player_ref.set(player_doc, merge=True)
         return player_ref
     except Exception as e:

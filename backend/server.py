@@ -3,11 +3,14 @@ from data_structures.Scraper import Scraper_Task
 from data_structures.AthleteParsingClass import AthletesParsingClass
 import firebase_admin
 from firebase_admin import credentials, firestore, auth
+from utils import firestore_helper
 import uvicorn  
 from fastapi import FastAPI, BackgroundTasks, HTTPException,Request
 from fastapi.middleware.cors import CORSMiddleware
-from specific_scripts import parse_script, push_athletes, parse_boxscores, push_games
+from specific_scripts import aggregate_stats, parse_script, push_athletes, parse_boxscores, push_games
 from fake_useragent import UserAgent
+
+
 
 
 app = FastAPI()
@@ -118,6 +121,14 @@ async def scrape(background_tasks: BackgroundTasks):
 @app.get("/")
 def health_check():
     return {"status": "ok"}
+
+@app.get("/test_db")
+def test_db(background_tasks: BackgroundTasks):
+    background_tasks.add_task(aggregate_stats.test)
+    return {"status": "DB test completed"}
+
+
+
 
 def run_server():
     ##start server and listen for requests
