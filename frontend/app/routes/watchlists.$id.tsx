@@ -29,6 +29,7 @@ export default function WatchlistDetailPage() {
   const [renameValue, setRenameValue] = useState("");
   const [tagValue, setTagValue] = useState("");
   const [showPicker, setShowPicker] = useState(false);
+  const [showActions, setShowActions] = useState(false);
 
   async function loadList() {
     if (!user || !id) {
@@ -241,13 +242,13 @@ export default function WatchlistDetailPage() {
       variant="hero"
     >
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-4 pb-20 sm:px-6 lg:px-8">
-        <section className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+        <section className="grid gap-6">
           <div className="rounded-[36px] border border-slate-200 bg-white p-6 shadow-[0_18px_60px_-32px_rgba(15,23,42,0.35)] sm:p-8">
             <div className="flex flex-wrap items-center gap-2">
               {list.favorite && <HeaderBadge tone="amber">Favorite List</HeaderBadge>}
             </div>
 
-            <div className="mt-5 space-y-4">
+            <div className="mt-4 space-y-4">
               <div>
                 <label className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">Rename List Name</label>
                 <div className="mt-2 flex flex-col gap-3 md:flex-row">
@@ -269,7 +270,7 @@ export default function WatchlistDetailPage() {
 
               <div>
                 <label className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-400">Add Tags</label>
-                <div className="mt-2 flex flex-col gap-3 md:flex-row">
+                <div className="mt-2 flex flex-col gap-3 md:flex-row md:items-center">
                   <input
                     type="text"
                     value={tagValue}
@@ -277,14 +278,72 @@ export default function WatchlistDetailPage() {
                     placeholder="priority, west coast, class of 2027"
                     className="flex-1 rounded-[22px] border border-slate-200 bg-slate-50 px-5 py-4 text-sm font-medium text-slate-900 outline-none transition focus:border-[#00599c] focus:bg-white"
                   />
-                  <button
-                    onClick={handleSaveTags}
-                    disabled={busy}
-                    className="rounded-[22px] border border-slate-200 bg-white px-5 py-4 text-xs font-black uppercase tracking-[0.18em] text-slate-700 transition hover:border-[#00599c] hover:text-[#00599c]"
-                  >
-                    Save Tags
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={handleSaveTags}
+                      disabled={busy}
+                      className="rounded-[22px] border border-slate-200 bg-white px-5 py-4 text-xs font-black uppercase tracking-[0.18em] text-slate-700 transition hover:border-[#00599c] hover:text-[#00599c]"
+                    >
+                      Save Tags
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowActions((current) => !current)}
+                      aria-label="Toggle list actions"
+                      className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100"
+                    >
+                      <span className="text-lg">⋯</span>
+                    </button>
+                  </div>
                 </div>
+                {showActions && (
+                  <div className="mt-4 rounded-[26px] border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-xs font-black uppercase tracking-[0.24em] text-slate-500">List Actions</p>
+                    <p className="mt-2 text-sm text-slate-600">Quick actions for this list.</p>
+                    <div className="mt-4 grid gap-3">
+                      <button
+                        onClick={() => setShowPicker(true)}
+                        className="rounded-[22px] bg-[#00599c] px-5 py-4 text-xs font-black uppercase tracking-[0.2em] text-white transition hover:bg-[#00497f]"
+                      >
+                        Add Player
+                      </button>
+                      <button
+                        onClick={() => handleRemovePlayers(selectedPlayerIds)}
+                        disabled={busy || selectedPlayerIds.length === 0}
+                        className="rounded-[22px] border border-slate-200 bg-white px-5 py-4 text-xs font-black uppercase tracking-[0.2em] text-slate-700 transition hover:border-[#00599c] hover:text-[#00599c] disabled:opacity-45"
+                      >
+                        Delete Player
+                      </button>
+                      <button
+                        onClick={handleFavoriteToggle}
+                        disabled={busy}
+                        className="rounded-[22px] border border-slate-200 bg-white px-5 py-4 text-xs font-black uppercase tracking-[0.2em] text-slate-700 transition hover:border-[#00599c] hover:text-[#00599c]"
+                      >
+                        {list.favorite ? "Remove Favorite" : "Favorite List"}
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (compareIds.length > 0) {
+                            navigate(`/analyze?ids=${compareIds.join(",")}`);
+                          }
+                        }}
+                        disabled={compareIds.length === 0}
+                        className={`rounded-[22px] px-5 py-4 text-xs font-black uppercase tracking-[0.2em] transition ${
+                          compareIds.length > 0 ? "bg-amber-400 text-slate-950 hover:bg-amber-300" : "border border-slate-200 bg-slate-100 text-slate-400"
+                        }`}
+                      >
+                        Compare Athletes
+                      </button>
+                      <button
+                        onClick={handleDeleteList}
+                        disabled={busy}
+                        className="rounded-[22px] border border-red-300/40 bg-red-500/10 px-5 py-4 text-xs font-black uppercase tracking-[0.2em] text-red-700 transition hover:bg-red-500/10 disabled:opacity-50"
+                      >
+                        Delete List
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <div className="mt-3 flex flex-wrap gap-2">
                   {list.tags.length > 0 ? (
                     list.tags.map((tag) => (
@@ -302,61 +361,13 @@ export default function WatchlistDetailPage() {
               </div>
             </div>
           </div>
-
-          <div className="rounded-[36px] border border-slate-200 bg-gradient-to-br from-[#081223] via-[#0d2a52] to-[#00599c] p-6 text-white shadow-[0_18px_60px_-28px_rgba(8,18,35,0.55)] sm:p-8">
-            <p className="text-xs font-black uppercase tracking-[0.24em] text-white/70">List Actions</p>
-            <h2 className="mt-3 text-2xl font-black tracking-tight">Manage athletes and push this list into the rest of the product.</h2>
-
-            <div className="mt-6 grid gap-3">
-              <button
-                onClick={() => setShowPicker(true)}
-                className="rounded-[22px] bg-white px-5 py-4 text-xs font-black uppercase tracking-[0.2em] text-[#0d2a52] transition hover:-translate-y-0.5"
-              >
-                Add Player
-              </button>
-              <button
-                onClick={() => handleRemovePlayers(selectedPlayerIds)}
-                disabled={busy || selectedPlayerIds.length === 0}
-                className="rounded-[22px] border border-white/20 bg-white/10 px-5 py-4 text-xs font-black uppercase tracking-[0.2em] text-white transition hover:bg-white/15 disabled:opacity-45"
-              >
-                Delete Player
-              </button>
-              <button
-                onClick={handleFavoriteToggle}
-                disabled={busy}
-                className="rounded-[22px] border border-white/20 bg-white/10 px-5 py-4 text-xs font-black uppercase tracking-[0.2em] text-white transition hover:bg-white/15"
-              >
-                {list.favorite ? "Remove Favorite" : "Favorite List"}
-              </button>
-              <button
-                onClick={() => {
-                  if (compareIds.length > 0) {
-                    navigate(`/analyze?ids=${compareIds.join(",")}`);
-                  }
-                }}
-                disabled={compareIds.length === 0}
-                className={`rounded-[22px] px-5 py-4 text-xs font-black uppercase tracking-[0.2em] transition ${
-                  compareIds.length > 0 ? "bg-amber-400 text-slate-950 hover:bg-amber-300" : "border border-white/20 bg-white/10 text-white/45"
-                }`}
-              >
-                Compare Athletes
-              </button>
-              <button
-                onClick={handleDeleteList}
-                disabled={busy}
-                className="rounded-[22px] border border-red-300/40 bg-red-500/10 px-5 py-4 text-xs font-black uppercase tracking-[0.2em] text-red-100 transition hover:bg-red-500"
-              >
-                Delete List
-              </button>
-            </div>
-          </div>
         </section>
 
-        <section className="rounded-[36px] border border-slate-200 bg-white p-6 shadow-[0_18px_60px_-32px_rgba(15,23,42,0.35)] sm:p-8">
+        <section className="relative overflow-hidden rounded-[36px] bg-gradient-to-br from-[#07111f] via-[#0e2950] to-[#00599c] px-6 py-8 text-white shadow-[0_18px_60px_-32px_rgba(15,23,42,0.35)] sm:px-8 sm:py-10">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.22em] text-[#00599c]">Athletes</p>
-              <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Search and manage this board.</h2>
+              <p className="text-xs font-black uppercase tracking-[0.22em] text-slate-200/80">Athletes</p>
+              <h2 className="mt-2 text-3xl font-black tracking-tight text-white">Search and manage this board.</h2>
             </div>
 
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
