@@ -51,15 +51,25 @@ export default function DiscoverPage() {
     if (filters.gradYear) chips.push({key: "gradYear", label: "Class", display: filters.gradYear});
     if (filters.sortBy) {
       const opt = DISCOVER_SORT_OPTIONS.find((o) => o.value === filters.sortBy);
-      chips.push({key: "sortBy", label: "Sorted by", display: opt?.label ?? filters.sortBy});
+      const dir = filters.sortDirection === "asc" ? "(Low → High)" : "(High → Low)";
+      chips.push({key: "sortBy", label: "Sorted by", display: `${opt?.label ?? filters.sortBy} ${dir}`});
     }
     return chips;
   }, [filters]);
+
+  const toggleSortDirection = useCallback(() => {
+    setFilters((prev) => ({
+      ...prev,
+      sortDirection: prev.sortDirection === "asc" ? "desc" : "asc"
+    }));
+  }, []);
 
   const removeFilter = useCallback((key: keyof AthleteFilters) => {
     setFilters((prev) => {
       const next = {...prev};
       delete next[key];
+      // Reset sort direction if sortBy is removed
+      if (key === "sortBy") delete next.sortDirection;
       return next;
     });
     if (key === "search") setSearchInput("");
@@ -77,7 +87,7 @@ export default function DiscoverPage() {
 
       try {
         const result = filtersActive
-          ? await athleteService.fetchFilteredAthletes(filters, 200, isLoadMore ? lastDoc : null)
+          ? await athleteService.fetchFilteredAthletes(filters, 20, isLoadMore ? lastDoc : null)
           : await athleteService.fetchAthletes(20, isLoadMore ? lastDoc : null);
         
         setPlayers((prev) => (isLoadMore ? [...prev, ...result.players] : result.players));
@@ -188,12 +198,31 @@ export default function DiscoverPage() {
                   className="w-full rounded-2xl border-2 border-slate-200 bg-slate-50 py-4 pl-12 pr-4 text-sm font-medium text-slate-900 placeholder:text-slate-400 transition-all focus:border-[#00599c] focus:outline-none"
                 />
               </div>
-              <button
-                onClick={applySearch}
-                className="rounded-2xl bg-[#00599c] px-8 py-4 text-xs font-black uppercase tracking-widest text-white transition-all hover:bg-[#004a82] active:scale-95"
-              >
-                Search
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={applySearch}
+                  className="rounded-2xl bg-[#00599c] px-8 py-4 text-xs font-black uppercase tracking-widest text-white transition-all hover:bg-[#004a82] active:scale-95"
+                >
+                  Search
+                </button>
+                {filters.sortBy && (
+                  <button
+                    onClick={toggleSortDirection}
+                    title={filters.sortDirection === "asc" ? "Sort: Ascending" : "Sort: Descending"}
+                    className="flex items-center justify-center rounded-2xl border-2 border-slate-200 bg-white px-4 py-4 text-slate-600 transition-all hover:border-[#00599c] hover:text-[#00599c] active:scale-95"
+                  >
+                    <svg
+                      className={`h-5 w-5 transition-transform duration-300 ${filters.sortDirection === "asc" ? "rotate-180" : ""}`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h13M3 8h9M3 12h6m14-8v12m0 0l-4-4m4 4l4-4" />
+                    </svg>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
