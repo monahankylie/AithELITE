@@ -234,23 +234,23 @@ export default function AnalyzeLayout() {
                 <Tab label="Distribution" />
               </Tabs>
             </div>
+
+            {loading ? (
+              <div className="mt-10 rounded-[32px] border border-slate-200 bg-slate-50 p-10 shadow-sm">
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                  <CircularProgress size={48} sx={{ color: '#00599c' }} />
+                  <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#00599c80' }}>
+                    Crunching production data
+                  </Typography>
+                </Box>
+              </div>
+            ) : (
+              <div className="mt-10">
+                <Outlet context={contextValue} />
+              </div>
+            )}
           </div>
         </div>
-
-        {loading ? (
-          <div className="rounded-[32px] border border-slate-200 bg-white p-10 shadow-sm">
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-              <CircularProgress size={48} sx={{ color: '#00599c' }} />
-              <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#00599c80' }}>
-                Crunching production data
-              </Typography>
-            </Box>
-          </div>
-        ) : (
-          <div className="mt-10">
-            <Outlet context={contextValue} />
-          </div>
-        )}
       </div>
 
       {showAddPopup && (

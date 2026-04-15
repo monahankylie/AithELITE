@@ -112,8 +112,8 @@ export default React.memo(function AnalyzeOverview() {
   if (loading) return null; // Parent handles loading
 
   return (
-    <section className="rounded-[40px] border border-slate-200 bg-white p-8 shadow-sm">
-      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div className="space-y-8">
+      <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.25em', color: '#00599c' }}>Production Summary</Typography>
           <Typography variant="h4" sx={{ mt: 1, fontWeight: 900, letterSpacing: '-0.02em', color: '#0f172a' }}>Stats Overview</Typography>
@@ -171,6 +171,6 @@ export default React.memo(function AnalyzeOverview() {
           }}
         />
       </Box>
-    </section>
+    </div>
   );
 });
