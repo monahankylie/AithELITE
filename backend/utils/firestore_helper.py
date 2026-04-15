@@ -91,7 +91,7 @@ def push_agg(agg_data: dict, sport: str):
         print(f"[PUSH] Uploading aggregate stats for {sport} - {position} to subcollection 'agg_by_pos'")
         subcollection.document(position).set(data)
 
-def test():
+def refactor_old():
     athletes = list(pull_athletes(4915))
     athlete_objs = model_from_doc(athletes, Player)
     put_back_to_fs(athlete_objs)

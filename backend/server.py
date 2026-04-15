@@ -134,10 +134,11 @@ async def aggregate_sport_stats(sport: str, background_tasks: BackgroundTasks):
     background_tasks.add_task(aggregate_stats.test)
     return {"status": f"Aggregation and push for {sport} started in background"}
 
-@app.get("/test_db")
-def test_db(background_tasks: BackgroundTasks):
-    background_tasks.add_task(aggregate_stats.test)
-    return {"status": "DB test completed"}
+
+@app.get("/fs_refactor")
+def refactor_athletes(background_tasks: BackgroundTasks):
+    background_tasks.add_task(firestore_helper.refactor_old)
+    return {"status": "athletes refactored"}
 
 
 

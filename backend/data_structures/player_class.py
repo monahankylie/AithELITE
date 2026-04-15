@@ -12,6 +12,10 @@ class SeasonRecord(BaseModel):
     athlete_id: Optional[str] = Field(None,validation_alias=AliasChoices("AthleteID","athlete_id","athleteId"))
     record_id: Optional[str] = Field(None,validate_default=True)
     base_player_id : Optional[str] = Field(None, validation_alias=AliasChoices("basePlayerId", "base_player_id"))
+    school_name: Optional[str] = None
+    mascot: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
     @model_validator(mode='before')
     @classmethod
     def filter_none_values(cls, data: Any) -> Any:
