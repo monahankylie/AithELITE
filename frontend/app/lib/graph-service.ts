@@ -22,9 +22,13 @@ export interface RadarSeriesData {
 export interface TrendData {
   id: string;
   label: string;
-  data: number[];
+  data: (number | null)[];
   color?: string;
   xAxisData?: string[];
+  improvement?: number; // Added to store calculated rate of change
+  max?: number;
+  min?: number;
+  gameCount?: number;
 }
 
 /**
@@ -66,7 +70,6 @@ class GraphService {
       };
     });
 
-    console.log("[GraphService] getRadarData output:", radarData);
     return radarData;
   }
 
@@ -111,17 +114,10 @@ class GraphService {
    * Fetches game-by-game trend data for a specific metric across multiple years.
    * @param playerIds List of athlete IDs to include.
    * @param metricName The metric to track.
-   * @param gameLimit Max number of recent games to fetch total.
+   * @param gameLimit Max number of recent games to fetch total. (Optional)
    * @param years Array of season years to include (e.g., ['25-26', '24-25']).
    */
-  /**
-   * Fetches game-by-game trend data for a specific metric across multiple years.
-   * @param playerIds List of athlete IDs to include.
-   * @param metricName The metric to track.
-   * @param gameLimit Max number of recent games to fetch total.
-   * @param years Array of season years to include (e.g., ['25-26', '24-25']).
-   */
-  async getGameTrendData(playerIds: string[], metricName: string, gameLimit: number = 30, years: string[] = []): Promise<TrendData[]> {
+  async getGameTrendData(playerIds: string[], metricName: string, gameLimit?: number, years: string[] = []): Promise<TrendData[]> {
     if (!playerIds || playerIds.length === 0) return [];
 
     const players = await athleteService.fetchAthletesByIds(playerIds);
@@ -160,33 +156,82 @@ class GraphService {
           }
         }
 
-        // 3. Take the LAST N games (the most recent ones)
-        const recentGames = allGamesForSelection.slice(-gameLimit);
+        // 3. Take the LAST N games if limit provided, else all
+        const recentGames = gameLimit ? allGamesForSelection.slice(-gameLimit) : allGamesForSelection;
         
         if (recentGames.length === 0) return null;
+
+        const numericData = recentGames.map(game => this.resolveGameMetricValue(game, metricName));
 
         return {
           id: player.id,
           name: player.name,
-          gameData: recentGames.map(game => this.resolveGameMetricValue(game, metricName))
+          gameData: numericData,
+          improvement: this.calculateSlope(numericData),
+          max: Math.max(...numericData),
+          min: Math.min(...numericData),
+          gameCount: numericData.length
         };
       })
     );
 
-    const validResults = playerGamesResults.filter((r): r is { id: string; name: string; gameData: (number | null)[] } => r !== null);
+    const validResults = playerGamesResults.filter((r): r is { 
+      id: string; 
+      name: string; 
+      gameData: number[]; 
+      improvement: number;
+      max: number;
+      min: number;
+      gameCount: number;
+    } => r !== null);
     
     // 4. PAD START to ensure Right-Alignment
-    // This keeps the "Last Index" (most recent) at the far right of the chart area.
+    // Find max games across all selected players for this window
+    const maxGames = Math.max(...validResults.map(r => r.gameData.length));
+
     return validResults.map(res => {
-      const paddingSize = Math.max(0, gameLimit - res.gameData.length);
+      const paddingSize = Math.max(0, maxGames - res.gameData.length);
       const padding = Array(paddingSize).fill(null);
       
       return {
         id: res.id,
         label: res.name,
-        data: [...padding, ...res.gameData] as number[],
+        data: [...padding, ...res.gameData] as (number | null)[],
+        improvement: res.improvement,
+        max: res.max,
+        min: res.min,
+        gameCount: res.gameCount
       };
     });
+  }
+
+  /**
+   * Calculates the slope of a trendline using simple linear regression (Least Squares).
+   * This represents the average change per game, filtering out single-game outliers.
+   */
+  private calculateSlope(data: number[]): number {
+    if (data.length < 2) return 0;
+
+    const n = data.length;
+    let sumX = 0;
+    let sumY = 0;
+    let sumXY = 0;
+    let sumXX = 0;
+
+    for (let i = 0; i < n; i++) {
+      const y = data[i];
+      const x = i; // X is just the game index (0, 1, 2...)
+      sumX += x;
+      sumY += y;
+      sumXY += x * y;
+      sumXX += x * x;
+    }
+
+    const denominator = (n * sumXX - sumX * sumX);
+    if (denominator === 0) return 0;
+
+    const slope = (n * sumXY - sumX * sumY) / denominator;
+    return Number(slope.toFixed(2));
   }
 
   /**
