@@ -139,64 +139,62 @@ export default React.memo(function AnalyzeTrend() {
         </Stack>
       </div>
 
-      <Box sx={{ mb: 4, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 3 }}>
+      <Box sx={{ mb: 4, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 4 }}>
         {players.map((player) => {
           const trend = gameTrendData.find(t => t.id === player.id);
           const isImprovementPositive = trend && trend.improvement && trend.improvement > 0;
-          const improvementText = trend && trend.improvement !== undefined 
-            ? `${trend.improvement > 0 ? '+' : ''}${trend.improvement.toFixed(2)}/game`
-            : null;
 
           return (
-            <FormControlLabel
-              key={player.id}
-              control={
-                <Checkbox
-                  checked={!hiddenIds.includes(player.id)}
-                  onChange={() => togglePlayerVisibility(player.id)}
-                  sx={{
-                    color: playerColors[player.id],
-                    '&.Mui-checked': {
+            <Box key={player.id} sx={{ display: 'flex', flexDirection: 'column' }}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={!hiddenIds.includes(player.id)}
+                    onChange={() => togglePlayerVisibility(player.id)}
+                    sx={{
                       color: playerColors[player.id],
-                    },
-                  }}
-                />
-              }
-              label={
-                <Stack spacing={0.5}>
+                      '&.Mui-checked': {
+                        color: playerColors[player.id],
+                      },
+                      padding: '4px 8px 4px 4px'
+                    }}
+                  />
+                }
+                label={
                   <Typography sx={{ fontWeight: '900', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#0f172a' }}>
                     {player.name}
                   </Typography>
-                  {trend && trend.improvement !== undefined && (
-                    <Stack>
-                      <Stack direction="row" spacing={1.5}>
-                        <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, color: '#64748b' }}>
-                          MIN: {trend.min?.toFixed(1)}
-                        </Typography>
-                        <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, color: '#64748b' }}>
-                          MAX: {trend.max?.toFixed(1)}
-                        </Typography>
-                        <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, color: '#64748b' }}>
-                          GP: {trend.gameCount}
-                        </Typography>
-                      </Stack>
-                      <Typography 
-                        sx={{ 
-                          fontSize: '0.65rem', 
-                          fontWeight: 900, 
-                          color: isImprovementPositive ? '#10B981' : (trend.improvement === 0 ? '#64748b' : '#EF4444'),
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 0.5
-                        }}
-                      >
-                        ROC: {trend.improvement > 0 ? '+' : ''}{trend.improvement.toFixed(2)}/game
-                      </Typography>
-                    </Stack>
-                  )}
-                </Stack>
-              }
-            />
+                }
+                sx={{ margin: 0, alignItems: 'center' }}
+              />
+              {trend && trend.improvement !== undefined && (
+                <Box sx={{ pl: '40px' }}>
+                  <Stack direction="row" spacing={1.5}>
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, color: '#64748b' }}>
+                      MIN: {trend.min?.toFixed(1)}
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, color: '#64748b' }}>
+                      MAX: {trend.max?.toFixed(1)}
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, color: '#64748b' }}>
+                      GP: {trend.gameCount}
+                    </Typography>
+                  </Stack>
+                  <Typography 
+                    sx={{ 
+                      fontSize: '0.65rem', 
+                      fontWeight: 900, 
+                      color: isImprovementPositive ? '#10B981' : (trend.improvement === 0 ? '#64748b' : '#EF4444'),
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.5
+                    }}
+                  >
+                    ROC: {trend.improvement > 0 ? '+' : ''}{trend.improvement.toFixed(2)}/game
+                  </Typography>
+                </Box>
+              )}
+            </Box>
           );
         })}
       </Box>
