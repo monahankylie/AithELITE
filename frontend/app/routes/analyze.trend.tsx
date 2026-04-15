@@ -16,10 +16,10 @@ import AppDropdown from "../components/app-dropdown";
 import { TREND_METRICS } from "../lib/relevant-metrics";
 
 const YEAR_OPTIONS = [
-  { value: '25-26', label: '2025-26' },
-  { value: '24-25', label: '2024-25' },
-  { value: '23-24', label: '2023-24' },
-  { value: '22-23', label: '2022-23' },
+  { value: '2025-2026', label: '2025-2026' },
+  { value: '2024-2025', label: '2024-2025' },
+  { value: '2023-2024', label: '2023-2024' },
+  { value: '2022-2023', label: '2022-2023' },
 ];
 
 const LIMIT_OPTIONS = [
@@ -46,7 +46,7 @@ export default React.memo(function AnalyzeTrend() {
   const { playerIds, players, playerColors, loading: parentLoading } = useOutletContext<AnalyzeContext>();
   const [gameTrendData, setGameTrendData] = React.useState<TrendData[]>([]);
   const [selectedStat, setSelectedStat] = React.useState('points');
-  const [selectedYears, setSelectedYears] = React.useState<string[]>(['25-26']);
+  const [selectedYears, setSelectedYears] = React.useState<string[]>(['2024-2025']);
   const [gameLimit, setGameLimit] = React.useState(30);
   const [hiddenIds, setHiddenIds] = React.useState<string[]>([]);
   const [localLoading, setLocalLoading] = React.useState(false);
@@ -73,11 +73,22 @@ export default React.memo(function AnalyzeTrend() {
   };
 
   React.useEffect(() => {
-    if (playerIds.length === 0 || parentLoading) return;
+    if (playerIds.length === 0) {
+      setGameTrendData([]);
+      return;
+    }
+    
+    if (parentLoading) return;
+
+    if (selectedYears.length === 0) {
+      setGameTrendData([]);
+      return;
+    }
 
     async function loadGameTrend() {
       try {
         setLocalLoading(true);
+        console.log("[AnalyzeTrend] Loading trend for:", { playerIds, selectedStat, selectedYears, gameLimit });
         const data = await graphService.getGameTrendData(playerIds, selectedStat, gameLimit, selectedYears);
         
         const coloredTrend = data.map(s => ({
@@ -169,7 +180,7 @@ export default React.memo(function AnalyzeTrend() {
 
       {gameTrendData.length > 0 ? (
         <TrendLineChart 
-          key={`${selectedStat}-${selectedYears.join('-')}-${gameLimit}`}
+          key={`${selectedStat}-${selectedYears.join('-')}-${gameLimit}-${playerIds.join('-')}`}
           data={gameTrendData} 
           title={`Combined Performance Trend`} 
           yAxisLabel={selectedStatLabel}
@@ -179,7 +190,7 @@ export default React.memo(function AnalyzeTrend() {
         />
       ) : (
         <Typography sx={{ textAlign: 'center', color: '#94a3b8', py: 20, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.75rem' }}>
-          Insufficient game data for the selected filters
+          No Games Were Found For The Player(s)
         </Typography>
       )}
     </section>

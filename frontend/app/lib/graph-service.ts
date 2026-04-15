@@ -114,26 +114,56 @@ class GraphService {
    * @param gameLimit Max number of recent games to fetch total.
    * @param years Array of season years to include (e.g., ['25-26', '24-25']).
    */
+  /**
+   * Fetches game-by-game trend data for a specific metric across multiple years.
+   * @param playerIds List of athlete IDs to include.
+   * @param metricName The metric to track.
+   * @param gameLimit Max number of recent games to fetch total.
+   * @param years Array of season years to include (e.g., ['25-26', '24-25']).
+   */
   async getGameTrendData(playerIds: string[], metricName: string, gameLimit: number = 30, years: string[] = []): Promise<TrendData[]> {
     if (!playerIds || playerIds.length === 0) return [];
 
     const players = await athleteService.fetchAthletesByIds(playerIds);
 
+    // Aggressive normalization: 2024-2025 -> 24-25, 2024 -> 24
+    const normalizeYear = (y: string) => {
+      if (!y) return "";
+      const matches = y.match(/\d+/g);
+      if (!matches || matches.length === 0) return y.replace(/[^0-9-]/g, "");
+      return matches.map(m => m.slice(-2)).join("-");
+    };
+
     const playerGamesResults = await Promise.all(
       players.map(async (player) => {
-        // Find all athlete_ids associated with the requested years in player records
-        const internalIds = player.records
-          .filter(r => years.length === 0 || years.includes(r.year))
-          .map(r => (r as BasketballStatRecord).athlete_id)
-          .filter(id => !!id);
-
-        if (internalIds.length === 0) return null;
-
-        // Fetch and aggregate games across all selected seasons (passed limit for efficiency)
-        const allGames = await gameService.fetchGamesByInternalIds(internalIds, gameLimit);
+        // 1. Sort ALL player records by year (Earliest to Latest) 
+        // This ensures the "Last Index" of the combined array is the most recent.
+        const sortedRecords = [...player.records].sort((a, b) => a.year.localeCompare(b.year));
         
-        // Take the last N games (already limited in fetchGamesByInternalIds)
-        const recentGames = allGames.slice(-gameLimit);
+        let allGamesForSelection: BasketballGameStat[] = [];
+        
+        // 2. Iterate and collect all games for selected years
+        for (const record of sortedRecords) {
+          const isYearSelected = years.length === 0 || years.some(y => {
+            const normR = normalizeYear(record.year);
+            const normY = normalizeYear(y);
+            return normR === normY || normR.includes(normY) || normY.includes(normR);
+          });
+          
+          if (isYearSelected) {
+            const internalId = (record as any).athlete_id;
+            if (internalId) {
+              const games = await gameService.fetchGamesByPlayerId(internalId);
+              // games from service are Earliest -> Latest.
+              allGamesForSelection.push(...games);
+            }
+          }
+        }
+
+        // 3. Take the LAST N games (the most recent ones)
+        const recentGames = allGamesForSelection.slice(-gameLimit);
+        
+        if (recentGames.length === 0) return null;
 
         return {
           id: player.id,
@@ -144,10 +174,11 @@ class GraphService {
     );
 
     const validResults = playerGamesResults.filter((r): r is { id: string; name: string; gameData: (number | null)[] } => r !== null);
-    const xAxisSize = gameLimit;
     
+    // 4. PAD START to ensure Right-Alignment
+    // This keeps the "Last Index" (most recent) at the far right of the chart area.
     return validResults.map(res => {
-      const paddingSize = Math.max(0, xAxisSize - res.gameData.length);
+      const paddingSize = Math.max(0, gameLimit - res.gameData.length);
       const padding = Array(paddingSize).fill(null);
       
       return {
