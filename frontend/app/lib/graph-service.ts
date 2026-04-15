@@ -9,6 +9,7 @@ export interface RadarSeriesData {
   id?: string;
   label: string;
   data: number[];
+  rawValues?: number[]; // Added to store raw stat values for tooltips
   color?: string;
   hideMark?: boolean;
   fillArea?: boolean;
@@ -41,10 +42,18 @@ class GraphService {
     const players = await athleteService.fetchAthletesByIds(playerIds);
     
     return players.map(player => {
+      const rawValues: number[] = [];
       const data = metrics.map(metric => {
         const rawVal = this.resolveMetricValue(player, metric.name);
-        // Normalize to 0-100 scale based on the metric's max
-        const normalizedVal = Math.min(100, Math.round((rawVal / metric.max) * 100));
+        rawValues.push(rawVal);
+        
+        // LOGARITHMIC NORMALIZATION
+        // This ensures low-stat players don't "vanish" by giving more visual weight to smaller increments at the low end.
+        // Formula: normalized = (log10(val + 1) / log10(max + 1)) * 100
+        const logVal = Math.log10(rawVal + 1);
+        const logMax = Math.log10(metric.max + 1);
+        const normalizedVal = Math.min(100, Math.round((logVal / logMax) * 100));
+        
         return normalizedVal;
       });
 
@@ -52,6 +61,7 @@ class GraphService {
         id: player.id,
         label: player.name,
         data,
+        rawValues,
       };
     });
   }

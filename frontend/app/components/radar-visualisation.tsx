@@ -40,7 +40,15 @@ const RadarVisualisation: React.FC<RadarVisualisationProps> = ({
         }}
         series={processedSeries.map(s => ({
           ...s,
-          valueFormatter: (v: number | null) => v !== null ? `${v/10}` : "",
+          valueFormatter: (v: number | null, { dataIndex }: { dataIndex: number }) => {
+            if (v === null) return "";
+            const rawVal = s.rawValues?.[dataIndex];
+            if (rawVal !== undefined) {
+              return rawVal.toFixed(1);
+            }
+            // Fallback to normalized value if raw is missing (divided by 10 for original scale)
+            return (v / 10).toFixed(1);
+          },
         }))}
         sx={{
           '& text': { 
