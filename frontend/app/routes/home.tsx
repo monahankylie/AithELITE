@@ -1,5 +1,6 @@
 import type { Route } from "./+types/home";
 import { Link } from "react-router";
+import { useEffect, useState } from "react";
 import PlayerCard from "~/components/playercard";
 import PageLayout from "../components/page-layout";
 import { useAuth } from "../auth-context";
@@ -52,8 +53,27 @@ function FeaturedCarousel() {
   );
 }
 
+const HERO_IMAGES = [
+  "/images/basketball_img5.jpeg",
+  "/images/basketball_img2.webp",
+  "/images/basketball_img8.jpg",
+  "/images/basketball_img7.jpg",
+  "/images/basketball_img3.jpeg",
+  "/images/basketball_img6.jpeg",
+];
+
 export default function Home() {
   const {user, profile} = useAuth();
+  const [activeHeroIndex, setActiveHeroIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setActiveHeroIndex((current) => (current + 1) % HERO_IMAGES.length);
+    }, 3800);
+
+    return () => window.clearInterval(interval);
+  }, []);
+
   return (
     <PageLayout>
       <section className="relative overflow-hidden bg-gradient-to-r from-[#081c33] via-[#0b3d66] to-[#0ea5e9] text-white">
@@ -91,15 +111,20 @@ export default function Home() {
             {/* RIGHT SIDE (image + overlay card) */}
             <div className="relative">
               <div className="overflow-hidden rounded-[24px] bg-white/10 p-3 backdrop-blur-sm">
-                <img
-                  src="/images/hero-basketball.png"
-                  alt="High school basketball player driving to the hoop"
-                  className="h-[380px] w-full rounded-[16px] object-cover"
-                  loading="lazy"
-                />
+                <div className="relative h-[380px] overflow-hidden rounded-[16px]">
+                  {HERO_IMAGES.map((src, index) => (
+                    <img
+                      key={src}
+                      src={src}
+                      alt="Athlete hero image"
+                      loading="lazy"
+                      className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out ${
+                        index === activeHeroIndex ? "opacity-100" : "opacity-0"
+                      }`}
+                    />
+                  ))}
+                </div>
               </div>
-
-             
             </div>
           </div>
         </div>
