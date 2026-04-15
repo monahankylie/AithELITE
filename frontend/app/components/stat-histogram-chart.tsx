@@ -1,8 +1,7 @@
 import * as React from "react";
 import Box from '@mui/material/Box';
 import { BarChart } from '@mui/x-charts/BarChart';
-import { ChartsReferenceLine } from '@mui/x-charts/ChartsReferenceLine';
-import { useXScale, useChartId } from '@mui/x-charts/hooks';
+import { useXScale, useChartId, useDrawingArea } from '@mui/x-charts/hooks';
 import type { StatHistogram } from '../lib/athlete-types';
 
 interface StatHistogramChartProps {
@@ -16,7 +15,7 @@ interface StatHistogramChartProps {
 
 /**
  * Custom component to render labels with vertical offsets to prevent overlap.
- * Uses a greedy layout algorithm to avoid collisions even across nearby bins.
+ * Now also handles the centered vertical reference line.
  */
 const MarkerLabel = ({ 
   xValue, 
@@ -37,9 +36,11 @@ const MarkerLabel = ({
 }) => {
   const chartId = useChartId();
   const xScale = useXScale('h-axis');
+  const drawingArea = useDrawingArea();
   
-  if (!xScale || !chartId) return null;
+  if (!xScale || !chartId || !drawingArea) return null;
 
+  const { height } = drawingArea;
   const xPos = (xScale(xValue) ?? 0) + (xScale.bandwidth?.() ?? 0) / 2;
   
   // Stagger labels vertically based on their assigned layer.
@@ -51,8 +52,19 @@ const MarkerLabel = ({
     <g 
       onMouseEnter={onHover} 
       onMouseLeave={onLeave} 
-      style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+      style={{ cursor: 'pointer' }}
     >
+      {/* The Vertical Reference Line - PERFECTLY CENTERED */}
+      <line 
+        x1={xPos} y1={0} 
+        x2={xPos} y2={height} 
+        stroke={color} 
+        strokeWidth={isHovered ? 3 : 2} 
+        strokeDasharray={isHovered ? 'none' : '4 4'}
+        strokeOpacity={isHovered ? 1 : 0.6}
+        style={{ transition: 'all 0.2s', pointerEvents: 'none' }}
+      />
+
       {/* Small tick mark to connect label to the dashed line if deeply staggered */}
       {layer > 0 && (
         <line 
@@ -61,6 +73,7 @@ const MarkerLabel = ({
           stroke={color} 
           strokeWidth={isHovered ? 2 : 1} 
           strokeOpacity={isHovered ? 1 : 0.4}
+          style={{ pointerEvents: 'none' }}
         />
       )}
       <text
@@ -271,25 +284,7 @@ const StatHistogramChart: React.FC<StatHistogramChartProps> = ({
           '& .MuiBarElement-root': { rx: 0, ry: 0 }
         }}
       >
-        {/* Draw the reference lines */}
-        {markersWithLayers.map((m) => {
-          const isHovered = hoveredMarkerIdx === m.originalIdx;
-          return (
-            <ChartsReferenceLine
-              key={`line-${m.originalIdx}`}
-              x={m.xValue}
-              lineStyle={{ 
-                stroke: m.color, 
-                strokeWidth: isHovered ? 3 : 2, 
-                strokeDasharray: isHovered ? 'none' : '4 4',
-                opacity: isHovered ? 1 : 0.6,
-                transition: 'all 0.2s'
-              }}
-            />
-          );
-        })}
-
-        {/* Draw the labels with collision-aware layers */}
+        {/* Draw the labels with collision-aware layers and integrated centered reference lines */}
         {markersWithLayers.map((m) => (
           <MarkerLabel
             key={`label-${m.originalIdx}`}
