@@ -105,32 +105,44 @@ export default function AnalyzeLayout() {
 
   if (playerIds.length === 0) {
     return (
-      <PageLayout requireAuth title="Deep Analysis" description="No players selected for analysis.">
-        <Box sx={{ mx: 'auto', maxWidth: '48rem', px: 3, py: 10, textAlign: 'center' }}>
-          <Box sx={{ borderRadius: '32px', border: '1px solid', borderColor: 'divider', bg: 'white', p: 6, boxShadow: 1 }}>
-            <Typography variant="h5" sx={{ fontWeight: 900, color: '#0f172a' }}>No Athletes Selected</Typography>
-            <Typography sx={{ mt: 2, color: '#64748b' }}>Go to the Discover page and select athletes to compare their performance profiles.</Typography>
-            <Link to="/discover" style={{ marginTop: '32px', display: 'inline-flex', borderRadius: '9999px', backgroundColor: '#00599c', padding: '16px 32px', fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'white', textDecoration: 'none' }}>
-              Back to Discover
-            </Link>
-          </Box>
-        </Box>
+      <PageLayout requireAuth title="Prospect Analysis" description="No players selected for analysis.">
+        <div className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white p-10 shadow-sm">
+            <div className="space-y-4 text-center">
+              <p className="text-xs font-black uppercase tracking-[0.24em] text-[#00599c]">Analysis Workspace</p>
+              <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">No Athletes Selected</h1>
+              <p className="max-w-2xl mx-auto text-sm leading-7 text-slate-600">Select athletes from Discover to begin comparing profiles and production metrics across prospects.</p>
+              <Link
+                to="/discover"
+                className="inline-flex rounded-full bg-[#00599c] px-6 py-3 text-sm font-bold uppercase tracking-[0.18em] text-white transition hover:-translate-y-0.5 hover:bg-[#004a82]"
+              >
+                Back to Discover
+              </Link>
+            </div>
+          </div>
+        </div>
       </PageLayout>
     );
   }
 
   if (error) {
     return (
-      <PageLayout requireAuth title="Analysis Error" description="Something went wrong.">
-        <Box sx={{ mx: 'auto', maxWidth: '48rem', px: 3, py: 10, textAlign: 'center' }}>
-          <Box sx={{ borderRadius: '32px', border: '1px solid', borderColor: '#fee2e2', bg: 'white', p: 6, boxShadow: 1 }}>
-            <Typography variant="h5" sx={{ fontWeight: 900, color: '#dc2626' }}>Failed to Load Analysis</Typography>
-            <Typography sx={{ mt: 2, color: '#64748b' }}>{error}</Typography>
-            <Link to="/discover" style={{ marginTop: '32px', display: 'inline-flex', borderRadius: '9999px', backgroundColor: '#0f172a', padding: '16px 32px', fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'white', textDecoration: 'none' }}>
-              Return to Discover
-            </Link>
-          </Box>
-        </Box>
+      <PageLayout requireAuth title="Prospect Analysis" description="Something went wrong while loading the comparison.">
+        <div className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="overflow-hidden rounded-[32px] border border-red-200 bg-white p-10 shadow-sm">
+            <div className="space-y-4 text-center">
+              <p className="text-xs font-black uppercase tracking-[0.24em] text-red-500">Load error</p>
+              <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Failed to Load Analysis</h1>
+              <p className="max-w-2xl mx-auto text-sm leading-7 text-slate-600">{error}</p>
+              <Link
+                to="/discover"
+                className="inline-flex rounded-full bg-[#00599c] px-6 py-3 text-sm font-bold uppercase tracking-[0.18em] text-white transition hover:-translate-y-0.5 hover:bg-[#004a82]"
+              >
+                Return to Discover
+              </Link>
+            </div>
+          </div>
+        </div>
       </PageLayout>
     );
   }
@@ -143,59 +155,101 @@ export default function AnalyzeLayout() {
       description="Comparative performance profiling and production metrics."
       variant="hero"
     >
-      <div className="mx-auto max-w-[1600px] px-4 pb-20 sm:px-6 md:px-8 space-y-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          {/* Action Buttons */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setShowRemovePopup(true)}
-              className="rounded-2xl border-2 border-red-50 bg-white px-6 py-3 text-xs font-black uppercase tracking-widest text-red-500 shadow-sm transition-all hover:border-red-500 hover:bg-red-50 active:scale-95"
-            >
-              Remove Athletes
-            </button>
-            <button
-              onClick={() => setShowAddPopup(true)}
-              className="rounded-2xl bg-white border-2 border-slate-200 px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-900 shadow-sm transition-all hover:border-[#00599c] hover:bg-slate-50 active:scale-95"
-            >
-              Add Athletes
-            </button>
-          </div>
+      <div className="mx-auto w-full max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+        <div className="mb-6 flex items-center gap-2 text-sm font-semibold text-slate-500">
+          <Link to="/discover" className="transition hover:text-[#00599c]">Discover</Link>
+          <span>/</span>
+          <span className="text-slate-900">Prospect Analysis</span>
+        </div>
 
-          {/* Navigation Tabs */}
-          <Tabs 
-            value={tabValue} 
-            onChange={handleTabChange}
-            sx={{ 
-              opacity: isPending ? 0.7 : 1,
-              transition: 'opacity 0.2s',
-              '& .MuiTabs-indicator': { backgroundColor: '#00599c', height: 4, borderRadius: '4px 4px 0 0' },
-              '& .MuiTab-root': { 
-                fontWeight: 900, 
-                fontSize: '0.75rem', 
-                textTransform: 'uppercase', 
-                letterSpacing: '0.1em',
-                color: '#64748b',
-                minWidth: 120,
-                '&.Mui-selected': { color: '#00599c' }
-              }
-            }}
-          >
-            <Tab label="Overview" />
-            <Tab label="Radar" />
-            <Tab label="Trend" />
-            <Tab label="Distribution" />
-          </Tabs>
+        <div className="overflow-hidden rounded-[40px] border border-slate-200 bg-white shadow-[0_24px_80px_-30px_rgba(15,23,42,0.35)]">
+          <section className="relative overflow-hidden bg-gradient-to-br from-[#07111f] via-[#0e2950] to-[#00599c] px-6 py-8 text-white sm:px-8 lg:px-10 lg:py-10">
+            <div className="pointer-events-none absolute inset-0 opacity-20">
+              <div className="absolute -right-24 top-0 h-72 w-72 rounded-full bg-cyan-300 blur-3xl" />
+              <div className="absolute -left-20 bottom-10 h-56 w-56 rounded-full bg-blue-500 blur-3xl" />
+            </div>
+
+            <div className="relative grid gap-10 lg:grid-cols-[1.5fr_0.9fr] items-end">
+              <div className="space-y-4">
+                <div className="inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-[0.65rem] font-black uppercase tracking-[0.24em] text-white/90">Analysis Workspace</div>
+                <h2 className="text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">Compare prospect performance with clarity.</h2>
+                <p className="max-w-2xl text-sm leading-7 text-white/80">Switch between overview, radar, trend, and distribution modes to uncover recruitment-ready insights for your selected athletes.</p>
+              </div>
+
+              <div className="max-w-md">
+                <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur-sm">
+                  <p className="text-xs font-black uppercase tracking-[0.24em] text-white/70">Selected athletes</p>
+                  <p className="mt-3 text-4xl font-black tracking-tight text-white">{playerIds.length}</p>
+                  <p className="mt-2 text-sm leading-6 text-white/70">Athletes currently loaded for comparison.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div className="px-6 py-6 sm:px-8 sm:py-8">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.24em] text-[#00599c]">Athlete controls</p>
+                <p className="mt-2 text-sm text-slate-600">Add or remove athletes from the comparison set, then choose your view.</p>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => setShowRemovePopup(true)}
+                  className="rounded-full border border-red-200 bg-white px-5 py-3 text-sm font-black uppercase tracking-[0.18em] text-red-600 shadow-sm transition hover:-translate-y-0.5 hover:bg-red-50"
+                >
+                  Remove Athletes
+                </button>
+                <button
+                  onClick={() => setShowAddPopup(true)}
+                  className="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-black uppercase tracking-[0.18em] text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50"
+                >
+                  Add Athletes
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-6 rounded-[28px] bg-slate-50 p-4 shadow-sm">
+              <Tabs 
+                value={tabValue} 
+                onChange={handleTabChange}
+                sx={{ 
+                  opacity: isPending ? 0.7 : 1,
+                  transition: 'opacity 0.2s',
+                  '& .MuiTabs-indicator': { backgroundColor: '#00599c', height: 4, borderRadius: '4px 4px 0 0' },
+                  '& .MuiTab-root': { 
+                    fontWeight: 900, 
+                    fontSize: '0.75rem', 
+                    textTransform: 'uppercase', 
+                    letterSpacing: '0.1em',
+                    color: '#64748b',
+                    minWidth: 120,
+                    '&.Mui-selected': { color: '#00599c' }
+                  }
+                }}
+              >
+                <Tab label="Overview" />
+                <Tab label="Radar" />
+                <Tab label="Trend" />
+                <Tab label="Distribution" />
+              </Tabs>
+            </div>
+          </div>
         </div>
 
         {loading ? (
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 10, gap: 2 }}>
-            <CircularProgress size={48} sx={{ color: '#00599c' }} />
-            <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#00599c80' }}>
-              Crunching production data
-            </Typography>
-          </Box>
+          <div className="rounded-[32px] border border-slate-200 bg-white p-10 shadow-sm">
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+              <CircularProgress size={48} sx={{ color: '#00599c' }} />
+              <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.2em', color: '#00599c80' }}>
+                Crunching production data
+              </Typography>
+            </Box>
+          </div>
         ) : (
-          <Outlet context={contextValue} />
+          <div className="mt-10">
+            <Outlet context={contextValue} />
+          </div>
         )}
       </div>
 
