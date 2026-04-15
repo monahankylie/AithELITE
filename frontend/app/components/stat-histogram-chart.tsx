@@ -123,8 +123,9 @@ const StatHistogramChart: React.FC<StatHistogramChartProps> = ({
       const nextEdgeIdx = Math.min(i + binWindow, points.length - 1);
       const end = points[nextEdgeIdx];
       
-      const mid = ((start + end) / 2).toFixed(2);
-      aggregatedLabels.push(mid);
+      // Use range labels as requested: "start-end"
+      const label = `${start.toFixed(1)}-${end.toFixed(1)}`;
+      aggregatedLabels.push(label);
     }
 
     return { 
@@ -148,14 +149,15 @@ const StatHistogramChart: React.FC<StatHistogramChartProps> = ({
 
     markers.forEach((m, idx) => {
       let binIdx = -1;
+      // Find which point interval the value falls into
       for (let i = 0; i < points.length - 1; i++) {
-        if (m.value >= points[i] && m.value < points[i+1]) {
+        // Use inclusive start, exclusive end for most bins
+        // For the very last bin, include the end point
+        const isLastBin = i === points.length - 2;
+        if (m.value >= points[i] && (isLastBin ? m.value <= points[i+1] : m.value < points[i+1])) {
           binIdx = i;
           break;
         }
-      }
-      if (binIdx === -1 && m.value >= points[points.length - 1]) {
-        binIdx = points.length - 2;
       }
 
       if (binIdx !== -1) {
@@ -230,7 +232,7 @@ const StatHistogramChart: React.FC<StatHistogramChartProps> = ({
             fontSize: 10, 
             textTransform: 'uppercase' 
           },
-          valueFormatter: (v) => Number(v).toFixed(1),
+          // Remove number formatter as these are now "X.X-Y.Y" strings
         }]}
         series={[{
           xAxisId: 'h-axis',

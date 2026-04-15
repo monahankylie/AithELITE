@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useOutletContext } from "react-router";
+import { useOutletContext, Link } from "react-router";
 import { 
   Box, 
   Typography,
@@ -8,6 +8,7 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Checkbox,
   type SelectChangeEvent
 } from '@mui/material';
 import type { Athlete, AggregatedStats } from "../lib/athlete-types";
@@ -102,7 +103,8 @@ export default function AnalyzeDistribution() {
     return players
       .filter(p => !hiddenIds.includes(p.id))
       .map(p => {
-        const stats = athleteFormatter.aggregateStats(p);
+        // USE MOST RECENT DATA (currentStats) instead of aggregateStats
+        const stats = p.currentStats || athleteFormatter.aggregateStats(p);
         const val = (stats as any)?.[selectedMetric];
         if (typeof val !== 'number') return null;
 
@@ -222,7 +224,8 @@ export default function AnalyzeDistribution() {
               
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, flex: 1, overflowY: 'auto' }}>
                 {players.map(p => {
-                  const stats = athleteFormatter.aggregateStats(p);
+                  // USE MOST RECENT DATA (currentStats) instead of aggregateStats
+                  const stats = p.currentStats || athleteFormatter.aggregateStats(p);
                   const val = (stats as any)?.[selectedMetric];
                   const formattedVal = typeof val === 'number' ? (selectedMetric.includes('pct') ? `${val.toFixed(1)}%` : val.toFixed(1)) : 'N/A';
                   const isHidden = hiddenIds.includes(p.id);
@@ -234,31 +237,43 @@ export default function AnalyzeDistribution() {
                   return (
                     <Box 
                       key={p.id} 
-                      onClick={() => togglePlayerVisibility(p.id)}
                       sx={{ 
-                        display: 'flex', alignItems: 'center', px: 1.5, py: 1, borderRadius: '12px', 
+                        display: 'flex', alignItems: 'center', px: 1, py: 1, borderRadius: '12px', 
                         backgroundColor: isHidden ? '#f8fafc' : 'white', 
                         border: '2px solid', 
                         borderColor: isHidden ? '#e2e8f0' : playerColors[p.id],
                         boxShadow: isHidden ? 'none' : '0 1px 2px rgba(0,0,0,0.02)',
-                        cursor: 'pointer',
                         transition: 'all 0.2s',
-                        opacity: isHidden ? 0.5 : 1,
-                        '&:hover': {
-                          borderColor: playerColors[p.id],
-                          opacity: 1
-                        }
+                        opacity: isHidden ? 0.6 : 1,
                       }}
                     >
-                      <Box sx={{ 
-                        width: 8, height: 8, borderRadius: '50%', 
-                        backgroundColor: isHidden ? '#cbd5e1' : playerColors[p.id], 
-                        mr: 1.5, flexShrink: 0 
-                      }} />
-                      <Box sx={{ flex: 1, minWidth: 0, mr: 1 }}>
-                        <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, color: isHidden ? '#94a3b8' : '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {p.lastName || p.name.split(' ').pop()}
-                        </Typography>
+                      <Checkbox 
+                        size="small"
+                        checked={!isHidden}
+                        onChange={() => togglePlayerVisibility(p.id)}
+                        sx={{ 
+                          color: playerColors[p.id],
+                          p: 0.5,
+                          '&.Mui-checked': { color: playerColors[p.id] }
+                        }}
+                      />
+                      <Box sx={{ flex: 1, minWidth: 0, mr: 1, ml: 0.5 }}>
+                        <Link 
+                          to={`/players/${p.id}`}
+                          style={{ textDecoration: 'none' }}
+                        >
+                          <Typography sx={{ 
+                            fontSize: '0.75rem', 
+                            fontWeight: 900, 
+                            color: isHidden ? '#94a3b8' : '#0f172a', 
+                            whiteSpace: 'nowrap', 
+                            overflow: 'hidden', 
+                            textOverflow: 'ellipsis',
+                            '&:hover': { color: '#00599c' }
+                          }}>
+                            {p.lastName || p.name.split(' ').pop()}
+                          </Typography>
+                        </Link>
                         {!isHidden && percentileText && (
                           <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                             {percentileText} Percentile
