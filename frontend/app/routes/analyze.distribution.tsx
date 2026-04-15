@@ -251,6 +251,9 @@ export default function AnalyzeDistribution() {
                   const marker = markers.find(m => m.label.startsWith(p.lastName || p.name.split(' ').pop() || ''));
                   const percentileText = marker ? marker.label.split(' (').pop()?.replace(')', '') : '';
 
+                  // Calculate Year shorthand for legend
+                  const yearSuffix = stats.year ? ` '${stats.year.split('-')[0]}` : '';
+
                   return (
                     <Box 
                       key={p.id} 
@@ -288,7 +291,7 @@ export default function AnalyzeDistribution() {
                             textOverflow: 'ellipsis',
                             '&:hover': { color: '#00599c' }
                           }}>
-                            {p.name} {stats.positions?.length ? `(${stats.positions.join('/')})` : ''}
+                            {p.name}{yearSuffix} {stats.positions?.length ? `(${stats.positions.join('/')})` : ''}
                           </Typography>
                         </Link>
                         {!isHidden && percentileText && (

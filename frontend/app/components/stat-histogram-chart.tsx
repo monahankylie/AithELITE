@@ -99,6 +99,8 @@ const MarkerLabel = ({
   );
 };
 
+const CHART_MARGINS = { left: 40, right: 85, top: 10, bottom: 40 };
+
 const StatHistogramChart: React.FC<StatHistogramChartProps> = ({
   histogram,
   height: initialHeight,
@@ -165,7 +167,7 @@ const StatHistogramChart: React.FC<StatHistogramChartProps> = ({
    */
   const markersWithLayers = React.useMemo(() => {
     const { points } = histogram;
-    const chartWidth = size.width - 50; // Approximating usable chart width
+    const chartWidth = size.width - CHART_MARGINS.left - CHART_MARGINS.right;
     const binWidthPx = xAxisData.length > 0 ? chartWidth / xAxisData.length : 0;
     
     // INCREASED GAP: Full names + Position + Percentile need more horizontal room
@@ -272,7 +274,7 @@ const StatHistogramChart: React.FC<StatHistogramChartProps> = ({
           color: color,
           valueFormatter: (v) => `${v} athletes`,
         }]}
-        margin={{ left: 40, right: 10, top: 10, bottom: 40 }}
+        margin={CHART_MARGINS}
         slotProps={{
           legend: { hidden: true },
           bar: { style: { rx: 0, ry: 0 } }

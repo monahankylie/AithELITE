@@ -19,6 +19,7 @@ const RadarVisualisation: React.FC<RadarVisualisationProps> = ({
   height = 300,
   showControls = true 
 }) => {
+  console.log("[RadarVisualisation] Debug - Props:", { metrics, series });
   const [hideMark, setHideMark] = React.useState(true);
   const [fillArea, setFillArea] = React.useState(true);
 
@@ -40,13 +41,17 @@ const RadarVisualisation: React.FC<RadarVisualisationProps> = ({
         }}
         series={processedSeries.map(s => ({
           ...s,
-          valueFormatter: (v: number | null, { dataIndex }: { dataIndex: number }) => {
+          valueFormatter: (v: number | null, { dataIndex, seriesId }: { dataIndex: number; seriesId: any }) => {
             if (v === null) return "";
-            const rawVal = s.rawValues?.[dataIndex];
+            
+            // Look up the specific series by ID to get the correct rawValue
+            // seriesId might be internal, so we find our processed series
+            const currentSeries = processedSeries.find(ps => ps.id === seriesId) || s;
+            const rawVal = currentSeries.rawValues?.[dataIndex];
+            
             if (rawVal !== undefined) {
               return rawVal.toFixed(1);
             }
-            // Fallback to normalized value if raw is missing (divided by 10 for original scale)
             return (v / 10).toFixed(1);
           },
         }))}

@@ -26,6 +26,16 @@ export const ALL_BASKETBALL_METRICS: MetricDefinition[] = [
   { name: '3-Point %', key: 'fg3_pct', shortLabel: '3P%', max: 100, isPercentage: true, category: 'Shooting' },
   { name: '2-Point %', key: 'fg2_pct', shortLabel: '2P%', max: 100, isPercentage: true, category: 'Shooting' },
   { name: 'Free Throw %', key: 'ft_pct', shortLabel: 'FT%', max: 100, isPercentage: true, category: 'Shooting' },
+
+  // Shooting Volume
+  { name: 'Field Goals Made', key: 'fg_made', shortLabel: 'FGM', max: 500, category: 'Shooting' },
+  { name: 'Field Goals Attempted', key: 'fg_attempted', shortLabel: 'FGA', max: 1000, category: 'Shooting' },
+  { name: '3-Pointers Made', key: 'fg3_made', shortLabel: '3PM', max: 200, category: 'Shooting' },
+  { name: '3-Pointers Attempted', key: 'fg3_attempted', shortLabel: '3PA', max: 500, category: 'Shooting' },
+  { name: '2-Pointers Made', key: 'fg2_made', shortLabel: '2PM', max: 400, category: 'Shooting' },
+  { name: '2-Pointers Attempted', key: 'fg2_attempted', shortLabel: '2PA', max: 800, category: 'Shooting' },
+  { name: 'Free Throws Made', key: 'ft_made', shortLabel: 'FTM', max: 300, category: 'Shooting' },
+  { name: 'Free Throws Attempted', key: 'ft_attempted', shortLabel: 'FTA', max: 400, category: 'Shooting' },
   
   // Rebounding
   { name: 'Rebounds Per Game', key: 'rebounds_per_game', shortLabel: 'RPG', max: 20, category: 'Rebounding' },
@@ -57,6 +67,24 @@ export const ALL_BASKETBALL_METRICS: MetricDefinition[] = [
   { name: 'Triple Doubles', key: 'triple_doubles', shortLabel: 'TD', max: 10, category: 'Production' },
   { name: 'Games Played', key: 'games_played', shortLabel: 'GP', max: 40, category: 'Production' },
   { name: 'Minutes Per Game', key: 'minutes_per_game', shortLabel: 'MPG', max: 48, category: 'Production' },
+];
+
+/**
+ * Metrics specifically suitable for Game-by-Game trend analysis.
+ * Excludes cumulative totals and includes per-game averages or rates.
+ */
+export const TREND_METRICS: MetricDefinition[] = [
+  { name: 'Points', key: 'points', shortLabel: 'PTS', max: 50 },
+  { name: 'Rebounds', key: 'rebounds', shortLabel: 'REB', max: 25 },
+  { name: 'Assists', key: 'assists', shortLabel: 'AST', max: 20 },
+  { name: 'Steals', key: 'steals', shortLabel: 'STL', max: 10 },
+  { name: 'Blocks', key: 'blocks', shortLabel: 'BLK', max: 10 },
+  { name: 'Turnovers', key: 'turnovers', shortLabel: 'TO', max: 10 },
+  { name: 'Fouls', key: 'fouls', shortLabel: 'PF', max: 5 },
+  { name: 'Field Goal %', key: 'fg_pct', shortLabel: 'FG%', max: 100, isPercentage: true },
+  { name: '3-Point %', key: 'fg3_pct', shortLabel: '3P%', max: 100, isPercentage: true },
+  { name: 'Free Throw %', key: 'ft_pct', shortLabel: 'FT%', max: 100, isPercentage: true },
+  { name: 'Minutes', key: 'minutes_played', shortLabel: 'MIN', max: 48 },
 ];
 
 /**

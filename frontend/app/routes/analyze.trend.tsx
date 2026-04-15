@@ -13,7 +13,7 @@ import { graphService, type TrendData } from "../lib/graph-service";
 import type { Athlete } from "../lib/athlete-types";
 import TrendLineChart from "../components/trend-line-chart";
 import AppDropdown from "../components/app-dropdown";
-import { ALL_BASKETBALL_METRICS } from "../lib/relevant-metrics";
+import { TREND_METRICS } from "../lib/relevant-metrics";
 
 const YEAR_OPTIONS = [
   { value: '25-26', label: '2025-26' },
@@ -30,13 +30,10 @@ const LIMIT_OPTIONS = [
   { value: 100, label: 'Last 100' },
 ];
 
-const AVAILABLE_STATS = [
-  { value: 'positions', label: 'POS' },
-  ...ALL_BASKETBALL_METRICS.map(m => ({
-    value: m.key,
-    label: m.shortLabel || m.name
-  }))
-];
+const AVAILABLE_STATS = TREND_METRICS.map(m => ({
+  value: m.key,
+  label: m.shortLabel || m.name
+}));
 
 interface AnalyzeContext {
   playerIds: string[];
@@ -48,7 +45,7 @@ interface AnalyzeContext {
 export default React.memo(function AnalyzeTrend() {
   const { playerIds, players, playerColors, loading: parentLoading } = useOutletContext<AnalyzeContext>();
   const [gameTrendData, setGameTrendData] = React.useState<TrendData[]>([]);
-  const [selectedStat, setSelectedStat] = React.useState('points_per_game');
+  const [selectedStat, setSelectedStat] = React.useState('points');
   const [selectedYears, setSelectedYears] = React.useState<string[]>(['25-26']);
   const [gameLimit, setGameLimit] = React.useState(30);
   const [hiddenIds, setHiddenIds] = React.useState<string[]>([]);

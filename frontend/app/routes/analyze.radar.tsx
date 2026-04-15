@@ -25,9 +25,14 @@ interface AnalyzeContext {
 
 export default React.memo(function AnalyzeRadar() {
   const { playerIds, players, playerColors, loading: parentLoading } = useOutletContext<AnalyzeContext>();
-  const [radarData, setRadarData] = React.useState<RadarSeriesData[]>([]);
+  
+  // Combine into one state to ensure metrics and data are always in sync for MUI Charts
+  const [chartState, setChartState] = React.useState<{
+    data: RadarSeriesData[];
+    metrics: MetricDefinition[];
+  }>({ data: [], metrics: [] });
+
   const [selectedMetricKeys, setSelectedMetricKeys] = React.useState<string[]>([]);
-  const [activeMetrics, setActiveMetrics] = React.useState<MetricDefinition[]>([]);
   const [radarHiddenIds, setRadarHiddenIds] = React.useState<string[]>([]);
   const [localLoading, setLocalLoading] = React.useState(false);
 
@@ -54,6 +59,14 @@ export default React.memo(function AnalyzeRadar() {
     async function loadRadarData() {
       try {
         setLocalLoading(true);
+        console.log("[AnalyzeRadar] Debug - Players for Radar:", players.map(p => ({
+          id: p.id,
+          name: p.name,
+          recordsCount: p.records?.length,
+          currentStats: p.currentStats,
+          records: p.records
+        })));
+        
         const firstPlayer = players[0];
         const stats = firstPlayer.currentStats as BasketballStatRecord;
         const primaryPos = (stats?.positions?.[0] || "PG").toUpperCase();
@@ -73,9 +86,7 @@ export default React.memo(function AnalyzeRadar() {
           };
         });
 
-        setActiveMetrics(dynamicMetrics);
-
-        // 3. Get Radar Data with these dynamic metrics
+        // 3. Get Radar Data with these dynamic metrics (Single most recent record)
         const radar = await graphService.getRadarData(playerIds, dynamicMetrics);
         
         const coloredRadar = radar.map(s => ({
@@ -83,7 +94,11 @@ export default React.memo(function AnalyzeRadar() {
           color: s.id ? playerColors[s.id] : undefined
         }));
 
-        setRadarData(coloredRadar);
+        // ATOMIC UPDATE: Sync metrics and data together to prevent MUI scale crash
+        setChartState({
+          metrics: dynamicMetrics,
+          data: coloredRadar
+        });
       } catch (err) {
         console.error("[AnalyzeRadar] load failure:", err);
       } finally {
@@ -116,7 +131,7 @@ export default React.memo(function AnalyzeRadar() {
         </Box>
       )}
       
-      <div className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="text-left">
           <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.25em', color: '#00599c' }}>Production Radar</Typography>
           <Typography variant="h4" sx={{ mt: 1, fontWeight: 900, letterSpacing: '-0.02em', color: '#0f172a' }}>Profile Comparison</Typography>
@@ -161,10 +176,10 @@ export default React.memo(function AnalyzeRadar() {
 
       <div className="flex justify-center">
         <div className="w-full max-w-4xl">
-          {radarData.length > 0 ? (
+          {chartState.data.length > 0 && chartState.metrics.length > 0 ? (
             <RadarVisualisation 
-              metrics={activeMetrics} 
-              series={radarData.filter(s => !radarHiddenIds.includes(s.id!))} 
+              metrics={chartState.metrics} 
+              series={chartState.data.filter(s => !radarHiddenIds.includes(s.id!))} 
               height={500} 
             />
           ) : (

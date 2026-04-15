@@ -7,6 +7,7 @@ import { gameService } from './game-service';
  */
 export interface RadarSeriesData {
   id?: string;
+  playerId?: string; // Added to handle color matching for multiple historical records
   label: string;
   data: number[];
   rawValues?: number[]; // Added to store raw stat values for tooltips
@@ -34,22 +35,21 @@ class GraphService {
   /**
    * Fetches data for radar charts.
    * @param playerIds List of athlete IDs to include in the graph.
-   * @param metrics List of metrics to display (name and max value).
+   * @param metrics List of metrics to display (name, key and max value).
    */
-  async getRadarData(playerIds: string[], metrics: { name: string; max: number }[]): Promise<RadarSeriesData[]> {
+  async getRadarData(playerIds: string[], metrics: { name: string; key?: string; max: number }[]): Promise<RadarSeriesData[]> {
     if (!playerIds || playerIds.length === 0) return [];
     
     const players = await athleteService.fetchAthletesByIds(playerIds);
     
-    return players.map(player => {
+    const radarData = players.map(player => {
       const rawValues: number[] = [];
       const data = metrics.map(metric => {
-        const rawVal = this.resolveMetricValue(player, metric.name);
+        // Use key if available, otherwise name
+        const rawVal = this.resolveMetricValue(player, metric.key || metric.name);
         rawValues.push(rawVal);
         
         // LOGARITHMIC NORMALIZATION
-        // This ensures low-stat players don't "vanish" by giving more visual weight to smaller increments at the low end.
-        // Formula: normalized = (log10(val + 1) / log10(max + 1)) * 100
         const logVal = Math.log10(rawVal + 1);
         const logMax = Math.log10(metric.max + 1);
         const normalizedVal = Math.min(100, Math.round((logVal / logMax) * 100));
@@ -59,11 +59,15 @@ class GraphService {
 
       return {
         id: player.id,
+        playerId: player.id,
         label: player.name,
         data,
         rawValues,
       };
     });
+
+    console.log("[GraphService] getRadarData output:", radarData);
+    return radarData;
   }
 
   /**
