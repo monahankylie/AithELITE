@@ -25,13 +25,16 @@ function parseCompositionValue(raw: unknown): number | null {
  * Read composition from top-level fields, then from newest season record (some pipelines
  * only denormalize onto `records[]`).
  */
-export function extractCompositionRatingFromDocument(data: DocumentData): number | null {
+export function extractCompositionRatingFromDocument(
+  data: DocumentData,
+  recordsOverride?: any[]
+): number | null {
   for (const k of COMPOSITION_KEYS) {
     const v = parseCompositionValue(data[k]);
     if (v != null) return v;
   }
 
-  const records = data.records;
+  const records = recordsOverride || data.records;
   if (!Array.isArray(records)) return null;
 
   const sorted = [...records].sort((a, b) => {

@@ -37,8 +37,8 @@ export type FetchResult = {
 
 let loggedFirstDocKeys = false;
 class AthleteService {
-  private mapAthleteData(id: string, data: DocumentData): Athlete {
-    const rawRecords = (data.records || []) as AnySportRecord[];
+  private mapAthleteData(id: string, data: DocumentData, records: AnySportRecord[]): Athlete {
+    const rawRecords = records || [];
 
     if (!loggedFirstDocKeys) {
       loggedFirstDocKeys = true;
@@ -49,15 +49,15 @@ class AthleteService {
     
     // Use the most recent season record as currentStats (Recruiter's standard)
     // instead of an aggregate average to preserve single-season high-performance rankings.
-    const current = sortedRecords[0] || {} as AnySportRecord;
+    const current = sortedRecords[0] || null;
 
     const firstName = data.first_name || data.firstName || "";
     const lastName = data.last_name || data.lastName || "";
 
     const compositionRating = (() => {
-      const fromDoc = extractCompositionRatingFromDocument(data);
+      const fromDoc = extractCompositionRatingFromDocument(data, rawRecords);
       if (fromDoc != null) return fromDoc;
-      const stats = current as BasketballStatRecord;
+      const stats = current as BasketballStatRecord | null;
       if (stats?.sport !== "Basketball") return null;
       const est = estimateCompositionRatingFromBasketballStats(stats);
       return est != null && Number.isFinite(est) ? est : null;
@@ -79,13 +79,15 @@ class AthleteService {
       scouting_report: data.scouting_report || null,
       compositionRating,
       records: sortedRecords,
-      currentStats: current,
+      currentStats: current || undefined,
     };
   }
 
   public getStatValue(p: Athlete, key: SortKey): number {
-    const s = p.currentStats as BasketballStatRecord;
-    if (!s || s.sport !== "Basketball") return 0;
+    const s = p.currentStats as BasketballStatRecord | undefined;
+    if (!s) return 0;
+    // If sport is missing, we still try to return the numeric value if it exists,
+    // but usually these records should have a sport.
     return Number(s[key]) || 0;
   }
 
@@ -106,7 +108,7 @@ class AthleteService {
     const players = await Promise.all(snap.docs.map(async (d) => {
       const recordsSnap = await getDocs(collection(d.ref, "sport_records"));
       const records = recordsSnap.docs.map(rd => rd.data() as AnySportRecord);
-      return this.mapAthleteData(d.id, { ...d.data(), records });
+      return this.mapAthleteData(d.id, d.data(), records);
     }));
 
     return {
@@ -168,7 +170,7 @@ class AthleteService {
     let players = await Promise.all(snap.docs.map(async (d) => {
       const recordsSnap = await getDocs(collection(d.ref, "sport_records"));
       const records = recordsSnap.docs.map(rd => rd.data() as AnySportRecord);
-      return this.mapAthleteData(d.id, { ...d.data(), records });
+      return this.mapAthleteData(d.id, d.data(), records);
     }));
 
     // Post-filter in memory
@@ -271,7 +273,7 @@ class AthleteService {
         const allRecords = allRecordsSnap.docs.map(rd => rd.data() as AnySportRecord);
         
         // mapAthleteData will correctly identify the most recent season as currentStats
-        const athlete = this.mapAthleteData(id, { ...adoc.data(), records: allRecords });
+        const athlete = this.mapAthleteData(id, adoc.data(), allRecords);
         
         if (filters.gradYear && athlete.classYear !== Number(filters.gradYear)) {
           return null;
@@ -326,7 +328,7 @@ class AthleteService {
     let players = await Promise.all(snap.docs.map(async (d) => {
       const recordsSnap = await getDocs(collection(d.ref, "sport_records"));
       const records = recordsSnap.docs.map(rd => rd.data() as AnySportRecord);
-      return this.mapAthleteData(d.id, { ...d.data(), records });
+      return this.mapAthleteData(d.id, d.data(), records);
     }));
 
     if (filters.position) {
@@ -365,7 +367,7 @@ class AthleteService {
     const data = athleteSnap.data();
     const records = recordsSnap.docs.map(d => d.data() as AnySportRecord);
     
-    return this.mapAthleteData(id, { ...data, records });
+    return this.mapAthleteData(id, data, records);
   }
 
   async fetchAthletesByIds(ids: string[]): Promise<Athlete[]> {
@@ -386,7 +388,7 @@ class AthleteService {
         await Promise.all(snap.docs.map(async (d) => {
           const recordsSnap = await getDocs(collection(d.ref, "sport_records"));
           const records = recordsSnap.docs.map(rd => rd.data() as AnySportRecord);
-          byId.set(d.id, this.mapAthleteData(d.id, { ...d.data(), records }));
+          byId.set(d.id, this.mapAthleteData(d.id, d.data(), records));
         }));
       }),
     );
