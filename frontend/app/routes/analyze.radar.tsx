@@ -11,6 +11,7 @@ import { graphService, type RadarSeriesData } from "../lib/graph-service";
 import type { Athlete, BasketballStatRecord } from "../lib/athlete-types";
 import { POSITION_METRICS, DEFAULT_METRICS } from "../lib/relevant-metrics";
 import RadarVisualisation from "../components/radar-visualisation";
+import { athleteFormatter } from "../lib/athlete-formatter";
 
 interface AnalyzeContext {
   playerIds: string[];
@@ -38,7 +39,7 @@ export default React.memo(function AnalyzeRadar() {
       try {
         setLocalLoading(true);
         const firstPlayer = players[0];
-        const stats = firstPlayer?.currentStats as BasketballStatRecord;
+        const stats = athleteFormatter.aggregateStats(firstPlayer);
         const primaryPos = (stats?.positions?.[0] || "PG").toUpperCase();
         const metrics = POSITION_METRICS[primaryPos] || DEFAULT_METRICS;
 

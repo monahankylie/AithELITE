@@ -96,4 +96,24 @@ export interface AthleteFilters {
   position?: string;
   gradYear?: string;
   sortBy?: DiscoverSortKey;
+  sortDirection?: "asc" | "desc";
+}
+
+export interface StatHistogram {
+  points: number[];
+  counts: number[];
+}
+
+export interface AggregatedStats {
+  position: string;
+  count: number;
+  avg: Partial<BasketballStatRecord>;
+  std: Partial<BasketballStatRecord>;
+  median: Partial<BasketballStatRecord>;
+  f_quartile: Partial<BasketballStatRecord>;
+  t_quartile: Partial<BasketballStatRecord>;
+  min: Partial<BasketballStatRecord>;
+  max: Partial<BasketballStatRecord>;
+  range: Partial<BasketballStatRecord>;
+  histograms: Record<string, StatHistogram>;
 }

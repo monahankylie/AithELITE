@@ -90,11 +90,12 @@ export default function AnalyzeLayout() {
     const path = location.pathname;
     if (path === '/analyze/radar') return 1;
     if (path === '/analyze/trend') return 2;
+    if (path === '/analyze/distribution') return 3;
     return 0;
   }, [location.pathname]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    const paths = ['/analyze', '/analyze/radar', '/analyze/trend'];
+    const paths = ['/analyze', '/analyze/radar', '/analyze/trend', '/analyze/distribution'];
     const targetPath = `${paths[newValue]}?${searchParams.toString()}`;
     
     startTransition(() => {
@@ -142,7 +143,7 @@ export default function AnalyzeLayout() {
       description="Comparative performance profiling and production metrics."
       variant="hero"
     >
-      <div className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 md:px-12 lg:px-24 space-y-8">
+      <div className="mx-auto max-w-[1600px] px-4 pb-20 sm:px-6 md:px-8 space-y-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           {/* Action Buttons */}
           <div className="flex items-center gap-3">
@@ -182,6 +183,7 @@ export default function AnalyzeLayout() {
             <Tab label="Overview" />
             <Tab label="Radar" />
             <Tab label="Trend" />
+            <Tab label="Distribution" />
           </Tabs>
         </div>
 

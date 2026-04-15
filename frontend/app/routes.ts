@@ -13,6 +13,7 @@ export default [
     index("routes/analyze._index.tsx"),
     route("radar", "routes/analyze.radar.tsx"),
     route("trend", "routes/analyze.trend.tsx"),
+    route("distribution", "routes/analyze.distribution.tsx"),
   ]),
   route("/players/:id", "routes/player.$id.tsx"),
   route("/players/:id/stats", "routes/player.$id.stats.tsx"),
