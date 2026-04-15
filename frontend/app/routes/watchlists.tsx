@@ -68,7 +68,7 @@ export default function WatchlistsPage() {
     [lists],
   );
 
-  const favoriteList = lists.find((list) => list.favorite);
+  const favoriteLists = lists.filter((list) => list.favorite);
 
   async function handleCreateList() {
     if (!user || !newListName.trim() || creating) return;
@@ -157,7 +157,7 @@ export default function WatchlistsPage() {
               <div className="grid grid-cols-2 gap-3 sm:max-w-[460px] xl:max-w-none">
                 <StatPill label="Lists" value={String(lists.length)} />
                 <StatPill label="Athletes" value={String(totalPlayers)} />
-                <StatPill label="Favorite" value={favoriteList?.name ?? "None"} compact />
+                <StatPill label="Favorites" value={favoriteLists.length > 0 ? `${favoriteLists.length} list${favoriteLists.length === 1 ? "" : "s"}` : "None"} compact />
                 <StatPill label="Tagged Lists" value={String(lists.filter((list) => list.tags.length > 0).length)} />
               </div>
             </div>

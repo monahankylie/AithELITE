@@ -112,13 +112,9 @@ class WatchlistService {
     });
 
     if (favorite) {
-      const existingLists = await this.fetchUserLists(userId);
-      for (const list of existingLists.filter((item) => item.id !== docRef.id)) {
-        batch.update(doc(db, "users", userId, "lists", list.id), { favorite: false });
-        batch.update(userRef, {
-          [`watchlistIndex.${list.id}.favorite`]: false,
-        });
-      }
+      batch.update(userRef, {
+        [`watchlistIndex.${docRef.id}.favorite`]: true,
+      });
     }
 
     await batch.commit();
@@ -239,17 +235,14 @@ class WatchlistService {
   async setFavoriteList(userId: string, listId: string): Promise<void> {
     if (!db) throw new Error("Firestore not initialized");
 
-    const lists = await this.fetchUserLists(userId);
+    const listRef = doc(db, "users", userId, "lists", listId);
     const userRef = doc(db, "users", userId);
     const batch = writeBatch(db);
 
-    for (const list of lists) {
-      const isTarget = list.id === listId;
-      batch.update(doc(db, "users", userId, "lists", list.id), { favorite: isTarget });
-      batch.update(userRef, {
-        [`watchlistIndex.${list.id}.favorite`]: isTarget,
-      });
-    }
+    batch.update(listRef, { favorite: true });
+    batch.update(userRef, {
+      [`watchlistIndex.${listId}.favorite`]: true,
+    });
 
     await batch.commit();
   }
