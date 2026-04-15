@@ -157,7 +157,7 @@ export default function WatchlistsPage() {
               <div className="grid grid-cols-2 gap-3 sm:max-w-[460px] xl:max-w-none">
                 <StatPill label="Lists" value={String(lists.length)} />
                 <StatPill label="Athletes" value={String(totalPlayers)} />
-                <StatPill label="Favorites" value={favoriteLists.length > 0 ? `${favoriteLists.length} list${favoriteLists.length === 1 ? "" : "s"}` : "None"} compact />
+                <StatPill label="Favorites" value={favoriteLists.length > 0 ? `${favoriteLists.length} list${favoriteLists.length === 1 ? "" : "s"}` : "None"} />
                 <StatPill label="Tagged Lists" value={String(lists.filter((list) => list.tags.length > 0).length)} />
               </div>
             </div>
@@ -222,7 +222,7 @@ export default function WatchlistsPage() {
 
                       <Link
                         to={`/watchlists/${list.id}`}
-                        className="inline-flex items-center justify-center rounded-full border border-slate-200 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-slate-700 transition hover:border-[#00599c] hover:text-[#00599c]"
+                        className="inline-flex min-w-[120px] shrink-0 items-center justify-center rounded-full border border-slate-200 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-slate-700 transition hover:border-[#00599c] hover:text-[#00599c]"
                       >
                         Open List
                       </Link>
@@ -249,7 +249,7 @@ export default function WatchlistsPage() {
                       <button
                         onClick={() => toggleFavorite(list)}
                         disabled={busy}
-                        className={`rounded-[20px] px-4 py-3 text-xs font-black uppercase tracking-[0.18em] transition ${
+                        className={`w-full rounded-[20px] px-4 py-3 text-xs font-black uppercase tracking-[0.18em] transition ${
                           list.favorite
                             ? "bg-amber-400 text-slate-950 hover:bg-amber-300"
                             : "border border-slate-200 bg-white text-slate-700 hover:border-amber-300 hover:text-amber-600"
@@ -260,7 +260,7 @@ export default function WatchlistsPage() {
 
                       <Link
                         to={list.playerIds.length > 0 ? `/analyze?ids=${list.playerIds.join(",")}` : `/watchlists/${list.id}`}
-                        className={`inline-flex items-center justify-center rounded-[20px] px-4 py-3 text-xs font-black uppercase tracking-[0.18em] transition ${
+                        className={`inline-flex w-full items-center justify-center rounded-[20px] px-4 py-3 text-xs font-black uppercase tracking-[0.18em] transition ${
                           list.playerIds.length > 0
                             ? "bg-slate-950 text-white hover:bg-slate-800"
                             : "border border-slate-200 bg-slate-50 text-slate-400"
@@ -272,7 +272,7 @@ export default function WatchlistsPage() {
                       <button
                         onClick={() => handleDelete(list)}
                         disabled={busy}
-                        className="rounded-[20px] border border-red-200 bg-red-50 px-4 py-3 text-xs font-black uppercase tracking-[0.18em] text-red-600 transition hover:bg-red-600 hover:text-white"
+                        className="w-full rounded-[20px] border border-red-200 bg-red-50 px-4 py-3 text-xs font-black uppercase tracking-[0.18em] text-red-600 transition hover:bg-red-600 hover:text-white"
                       >
                         Delete List
                       </button>
