@@ -13,30 +13,19 @@ import { graphService, type TrendData } from "../lib/graph-service";
 import type { Athlete } from "../lib/athlete-types";
 import TrendLineChart from "../components/trend-line-chart";
 import AppDropdown from "../components/app-dropdown";
-import { ALL_BASKETBALL_METRICS } from "../lib/relevant-metrics";
+import { TREND_METRICS } from "../lib/relevant-metrics";
 
 const YEAR_OPTIONS = [
-  { value: '25-26', label: '2025-26' },
-  { value: '24-25', label: '2024-25' },
-  { value: '23-24', label: '2023-24' },
-  { value: '22-23', label: '2022-23' },
+  { value: '2025-2026', label: '2025-2026' },
+  { value: '2024-2025', label: '2024-2025' },
+  { value: '2023-2024', label: '2023-2024' },
+  { value: '2022-2023', label: '2022-2023' },
 ];
 
-const LIMIT_OPTIONS = [
-  { value: 10, label: 'Last 10' },
-  { value: 20, label: 'Last 20' },
-  { value: 30, label: 'Last 30' },
-  { value: 50, label: 'Last 50' },
-  { value: 100, label: 'Last 100' },
-];
-
-const AVAILABLE_STATS = [
-  { value: 'positions', label: 'POS' },
-  ...ALL_BASKETBALL_METRICS.map(m => ({
-    value: m.key,
-    label: m.shortLabel || m.name
-  }))
-];
+const AVAILABLE_STATS = TREND_METRICS.map(m => ({
+  value: m.key,
+  label: m.shortLabel || m.name
+}));
 
 interface AnalyzeContext {
   playerIds: string[];
@@ -48,9 +37,8 @@ interface AnalyzeContext {
 export default React.memo(function AnalyzeTrend() {
   const { playerIds, players, playerColors, loading: parentLoading } = useOutletContext<AnalyzeContext>();
   const [gameTrendData, setGameTrendData] = React.useState<TrendData[]>([]);
-  const [selectedStat, setSelectedStat] = React.useState('points_per_game');
-  const [selectedYears, setSelectedYears] = React.useState<string[]>(['25-26']);
-  const [gameLimit, setGameLimit] = React.useState(30);
+  const [selectedStat, setSelectedStat] = React.useState('points');
+  const [selectedYears, setSelectedYears] = React.useState<string[]>(['2024-2025']);
   const [hiddenIds, setHiddenIds] = React.useState<string[]>([]);
   const [localLoading, setLocalLoading] = React.useState(false);
 
@@ -65,10 +53,6 @@ export default React.memo(function AnalyzeTrend() {
     setSelectedYears(sorted);
   };
 
-  const handleLimitChange = (event: SelectChangeEvent<any>) => {
-    setGameLimit(Number(event.target.value));
-  };
-
   const togglePlayerVisibility = (id: string) => {
     setHiddenIds(prev => 
       prev.includes(id) ? prev.filter(hid => hid !== id) : [...prev, id]
@@ -76,12 +60,22 @@ export default React.memo(function AnalyzeTrend() {
   };
 
   React.useEffect(() => {
-    if (playerIds.length === 0 || parentLoading) return;
+    if (playerIds.length === 0) {
+      setGameTrendData([]);
+      return;
+    }
+    
+    if (parentLoading) return;
+
+    if (selectedYears.length === 0) {
+      setGameTrendData([]);
+      return;
+    }
 
     async function loadGameTrend() {
       try {
         setLocalLoading(true);
-        const data = await graphService.getGameTrendData(playerIds, selectedStat, gameLimit, selectedYears);
+        const data = await graphService.getGameTrendData(playerIds, selectedStat, undefined, selectedYears);
         
         const coloredTrend = data.map(s => ({
             ...s,
@@ -96,11 +90,19 @@ export default React.memo(function AnalyzeTrend() {
       }
     }
     loadGameTrend();
-  }, [playerIds, players, playerColors, parentLoading, selectedStat, selectedYears, gameLimit]);
+  }, [playerIds, players, playerColors, parentLoading, selectedStat, selectedYears]);
 
   if (parentLoading) return null;
 
   const selectedStatLabel = AVAILABLE_STATS.find(opt => opt.value === selectedStat)?.label || 'Stats';
+
+  // Construct dynamic title: {stat_name} from {years_old} season to {years_new} season
+  const sortedYearsForTitle = [...selectedYears].sort((a, b) => a.localeCompare(b));
+  const trendTitle = sortedYearsForTitle.length > 0
+    ? sortedYearsForTitle.length === 1
+      ? `games for ${sortedYearsForTitle[0]} season`
+      : `games from ${sortedYearsForTitle[0]} season to ${sortedYearsForTitle[sortedYearsForTitle.length - 1]} season`
+    : 'Performance Trend';
 
   return (
     <section className="rounded-[40px] border border-slate-200 bg-slate-50 p-8 shadow-sm relative">
@@ -128,14 +130,6 @@ export default React.memo(function AnalyzeTrend() {
           />
 
           <AppDropdown
-            label="Limit"
-            value={gameLimit}
-            onChange={handleLimitChange}
-            options={LIMIT_OPTIONS}
-            minWidth={140}
-          />
-
-          <AppDropdown
             label="Metric"
             value={selectedStat}
             onChange={handleStatChange}
@@ -145,36 +139,71 @@ export default React.memo(function AnalyzeTrend() {
         </Stack>
       </div>
 
-      <Box sx={{ mb: 4, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 3 }}>
-        {players.map((player) => (
-          <FormControlLabel
-            key={player.id}
-            control={
-              <Checkbox
-                checked={!hiddenIds.includes(player.id)}
-                onChange={() => togglePlayerVisibility(player.id)}
-                sx={{
-                  color: playerColors[player.id],
-                  '&.Mui-checked': {
-                    color: playerColors[player.id],
-                  },
-                }}
+      <Box sx={{ mb: 4, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 4 }}>
+        {players.map((player) => {
+          const trend = gameTrendData.find(t => t.id === player.id);
+          const isImprovementPositive = trend && trend.improvement && trend.improvement > 0;
+
+          return (
+            <Box key={player.id} sx={{ display: 'flex', flexDirection: 'column' }}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={!hiddenIds.includes(player.id)}
+                    onChange={() => togglePlayerVisibility(player.id)}
+                    sx={{
+                      color: playerColors[player.id],
+                      '&.Mui-checked': {
+                        color: playerColors[player.id],
+                      },
+                      padding: '4px 8px 4px 4px'
+                    }}
+                  />
+                }
+                label={
+                  <Typography sx={{ fontWeight: '900', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#0f172a' }}>
+                    {player.name}
+                  </Typography>
+                }
+                sx={{ margin: 0, alignItems: 'center' }}
               />
-            }
-            label={
-              <Typography sx={{ fontWeight: '900', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#0f172a' }}>
-                {player.name}
-              </Typography>
-            }
-          />
-        ))}
+              {trend && trend.improvement !== undefined && (
+                <Box sx={{ pl: '40px' }}>
+                  <Stack direction="row" spacing={1.5}>
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, color: '#64748b' }}>
+                      MIN: {trend.min?.toFixed(1)}
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, color: '#64748b' }}>
+                      MAX: {trend.max?.toFixed(1)}
+                    </Typography>
+                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, color: '#64748b' }}>
+                      GP: {trend.gameCount}
+                    </Typography>
+                  </Stack>
+                  <Typography 
+                    sx={{ 
+                      fontSize: '0.65rem', 
+                      fontWeight: 900, 
+                      color: isImprovementPositive ? '#10B981' : (trend.improvement === 0 ? '#64748b' : '#EF4444'),
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.5
+                    }}
+                  >
+                    ROC: {trend.improvement > 0 ? '+' : ''}{trend.improvement.toFixed(2)}/game
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          );
+        })}
       </Box>
 
       {gameTrendData.length > 0 ? (
         <TrendLineChart 
-          key={`${selectedStat}-${selectedYears.join('-')}-${gameLimit}`}
+          key={`${selectedStat}-${selectedYears.join('-')}-${playerIds.join('-')}`}
           data={gameTrendData} 
-          title={`Combined Performance Trend`} 
+          title={trendTitle} 
           yAxisLabel={selectedStatLabel}
           height={450}
           hideXAxisLabels
@@ -182,7 +211,7 @@ export default React.memo(function AnalyzeTrend() {
         />
       ) : (
         <Typography sx={{ textAlign: 'center', color: '#94a3b8', py: 20, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.75rem' }}>
-          Insufficient game data for the selected filters
+          No Games Were Found For The Player(s)
         </Typography>
       )}
     </section>

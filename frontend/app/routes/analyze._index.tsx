@@ -19,10 +19,10 @@ const YEAR_OPTIONS = [
 ];
 
 const AVAILABLE_STATS = [
-  { value: 'positions', label: 'POS' },
+  { value: 'positions', label: 'Position' },
   ...ALL_BASKETBALL_METRICS.map(m => ({
     value: m.key,
-    label: m.shortLabel || m.name
+    label: m.name
   }))
 ];
 

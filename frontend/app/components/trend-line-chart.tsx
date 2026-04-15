@@ -12,7 +12,6 @@ interface TrendLineChartProps {
   hideXAxisLabels?: boolean;
   hiddenIds?: string[];
 }
-
 const TrendLineChart: React.FC<TrendLineChartProps> = ({ 
   title, 
   data, 
@@ -21,24 +20,25 @@ const TrendLineChart: React.FC<TrendLineChartProps> = ({
   hideXAxisLabels = false,
   hiddenIds = []
 }) => {
-  // Use the length of the data to define the x-axis spread.
-  const pointCount = data.length > 0 && data[0].data ? data[0].data.length : 30;
-  const xAxisData = Array.from({ length: pointCount }, (_, i) => i);
+  // Use the maximum length across all series to define the x-axis spread.
+  const maxPointCount = React.useMemo(() => {
+    if (data.length === 0) return 0;
+    return Math.max(...data.map(d => d.data?.length || 0));
+  }, [data]);
+
+  const xAxisData = React.useMemo(() => 
+    Array.from({ length: maxPointCount }, (_, i) => i),
+  [maxPointCount]);
 
   return (
     <Box sx={{ width: '100%' }}>
-      {title && (
-        <Typography className="text-black font-black uppercase tracking-widest mb-4" textAlign="center" fontSize="0.75rem">
-          {title}
-        </Typography>
-      )}
       <LineChart
         series={data.map(item => ({
           id: item.id,
           curve: "linear",
           label: item.label,
           data: item.data,
-          color: item.color, // Pass color from data
+          color: item.color,
           connectNulls: true,
           showMark: true,
           valueFormatter: (v: number | null) => v !== null ? String(v) : "N/A",
@@ -47,10 +47,16 @@ const TrendLineChart: React.FC<TrendLineChartProps> = ({
           data: xAxisData,
           scaleType: 'linear',
           min: 0,
-          max: Math.max(0, pointCount - 1),
+          max: Math.max(0, maxPointCount - 1),
           disableTicks: true,
-          label: "",
-          valueFormatter: (v) => hideXAxisLabels ? "" : String(v)
+          label: title,
+          labelStyle: {
+            fill: 'black',
+            fontWeight: 900,
+            fontSize: 10,
+            textTransform: 'uppercase'
+          },
+          valueFormatter: () => ""
         }]}
         yAxis={[{ 
           label: yAxisLabel,
@@ -62,7 +68,7 @@ const TrendLineChart: React.FC<TrendLineChartProps> = ({
           }
         }]}
         height={height}
-        margin={{ left: 60, right: 20, top: 40, bottom: 40 }}
+        margin={{ left: 60, right: 20, top: 40, bottom: 60 }}
         slotProps={{
           legend: {
             hidden: true // Hide default legend to use custom checkboxes

@@ -7,8 +7,10 @@ import { gameService } from './game-service';
  */
 export interface RadarSeriesData {
   id?: string;
+  playerId?: string; // Added to handle color matching for multiple historical records
   label: string;
   data: number[];
+  rawValues?: number[]; // Added to store raw stat values for tooltips
   color?: string;
   hideMark?: boolean;
   fillArea?: boolean;
@@ -20,9 +22,13 @@ export interface RadarSeriesData {
 export interface TrendData {
   id: string;
   label: string;
-  data: number[];
+  data: (number | null)[];
   color?: string;
   xAxisData?: string[];
+  improvement?: number; // Added to store calculated rate of change
+  max?: number;
+  min?: number;
+  gameCount?: number;
 }
 
 /**
@@ -33,27 +39,38 @@ class GraphService {
   /**
    * Fetches data for radar charts.
    * @param playerIds List of athlete IDs to include in the graph.
-   * @param metrics List of metrics to display (name and max value).
+   * @param metrics List of metrics to display (name, key and max value).
    */
-  async getRadarData(playerIds: string[], metrics: { name: string; max: number }[]): Promise<RadarSeriesData[]> {
+  async getRadarData(playerIds: string[], metrics: { name: string; key?: string; max: number }[]): Promise<RadarSeriesData[]> {
     if (!playerIds || playerIds.length === 0) return [];
     
     const players = await athleteService.fetchAthletesByIds(playerIds);
     
-    return players.map(player => {
+    const radarData = players.map(player => {
+      const rawValues: number[] = [];
       const data = metrics.map(metric => {
-        const rawVal = this.resolveMetricValue(player, metric.name);
-        // Normalize to 0-100 scale based on the metric's max
-        const normalizedVal = Math.min(100, Math.round((rawVal / metric.max) * 100));
+        // Use key if available, otherwise name
+        const rawVal = this.resolveMetricValue(player, metric.key || metric.name);
+        rawValues.push(rawVal);
+        
+        // LOGARITHMIC NORMALIZATION
+        const logVal = Math.log10(rawVal + 1);
+        const logMax = Math.log10(metric.max + 1);
+        const normalizedVal = Math.min(100, Math.round((logVal / logMax) * 100));
+        
         return normalizedVal;
       });
 
       return {
         id: player.id,
+        playerId: player.id,
         label: player.name,
         data,
+        rawValues,
       };
     });
+
+    return radarData;
   }
 
   /**
@@ -97,51 +114,124 @@ class GraphService {
    * Fetches game-by-game trend data for a specific metric across multiple years.
    * @param playerIds List of athlete IDs to include.
    * @param metricName The metric to track.
-   * @param gameLimit Max number of recent games to fetch total.
+   * @param gameLimit Max number of recent games to fetch total. (Optional)
    * @param years Array of season years to include (e.g., ['25-26', '24-25']).
    */
-  async getGameTrendData(playerIds: string[], metricName: string, gameLimit: number = 30, years: string[] = []): Promise<TrendData[]> {
+  async getGameTrendData(playerIds: string[], metricName: string, gameLimit?: number, years: string[] = []): Promise<TrendData[]> {
     if (!playerIds || playerIds.length === 0) return [];
 
     const players = await athleteService.fetchAthletesByIds(playerIds);
 
+    // Aggressive normalization: 2024-2025 -> 24-25, 2024 -> 24
+    const normalizeYear = (y: string) => {
+      if (!y) return "";
+      const matches = y.match(/\d+/g);
+      if (!matches || matches.length === 0) return y.replace(/[^0-9-]/g, "");
+      return matches.map(m => m.slice(-2)).join("-");
+    };
+
     const playerGamesResults = await Promise.all(
       players.map(async (player) => {
-        // Find all athlete_ids associated with the requested years in player records
-        const internalIds = player.records
-          .filter(r => years.length === 0 || years.includes(r.year))
-          .map(r => (r as BasketballStatRecord).athlete_id)
-          .filter(id => !!id);
-
-        if (internalIds.length === 0) return null;
-
-        // Fetch and aggregate games across all selected seasons (passed limit for efficiency)
-        const allGames = await gameService.fetchGamesByInternalIds(internalIds, gameLimit);
+        // 1. Sort ALL player records by year (Earliest to Latest) 
+        // This ensures the "Last Index" of the combined array is the most recent.
+        const sortedRecords = [...player.records].sort((a, b) => a.year.localeCompare(b.year));
         
-        // Take the last N games (already limited in fetchGamesByInternalIds)
-        const recentGames = allGames.slice(-gameLimit);
+        let allGamesForSelection: BasketballGameStat[] = [];
+        
+        // 2. Iterate and collect all games for selected years
+        for (const record of sortedRecords) {
+          const isYearSelected = years.length === 0 || years.some(y => {
+            const normR = normalizeYear(record.year);
+            const normY = normalizeYear(y);
+            return normR === normY || normR.includes(normY) || normY.includes(normR);
+          });
+          
+          if (isYearSelected) {
+            const internalId = (record as any).athlete_id;
+            if (internalId) {
+              const games = await gameService.fetchGamesByPlayerId(internalId);
+              // games from service are Earliest -> Latest.
+              allGamesForSelection.push(...games);
+            }
+          }
+        }
+
+        // 3. Take the LAST N games if limit provided, else all
+        const recentGames = gameLimit ? allGamesForSelection.slice(-gameLimit) : allGamesForSelection;
+        
+        if (recentGames.length === 0) return null;
+
+        const numericData = recentGames.map(game => this.resolveGameMetricValue(game, metricName));
 
         return {
           id: player.id,
           name: player.name,
-          gameData: recentGames.map(game => this.resolveGameMetricValue(game, metricName))
+          gameData: numericData,
+          improvement: this.calculateSlope(numericData),
+          max: Math.max(...numericData),
+          min: Math.min(...numericData),
+          gameCount: numericData.length
         };
       })
     );
 
-    const validResults = playerGamesResults.filter((r): r is { id: string; name: string; gameData: (number | null)[] } => r !== null);
-    const xAxisSize = gameLimit;
+    const validResults = playerGamesResults.filter((r): r is { 
+      id: string; 
+      name: string; 
+      gameData: number[]; 
+      improvement: number;
+      max: number;
+      min: number;
+      gameCount: number;
+    } => r !== null);
     
+    // 4. PAD START to ensure Right-Alignment
+    // Find max games across all selected players for this window
+    const maxGames = Math.max(...validResults.map(r => r.gameData.length));
+
     return validResults.map(res => {
-      const paddingSize = Math.max(0, xAxisSize - res.gameData.length);
+      const paddingSize = Math.max(0, maxGames - res.gameData.length);
       const padding = Array(paddingSize).fill(null);
       
       return {
         id: res.id,
         label: res.name,
-        data: [...padding, ...res.gameData] as number[],
+        data: [...padding, ...res.gameData] as (number | null)[],
+        improvement: res.improvement,
+        max: res.max,
+        min: res.min,
+        gameCount: res.gameCount
       };
     });
+  }
+
+  /**
+   * Calculates the slope of a trendline using simple linear regression (Least Squares).
+   * This represents the average change per game, filtering out single-game outliers.
+   */
+  private calculateSlope(data: number[]): number {
+    if (data.length < 2) return 0;
+
+    const n = data.length;
+    let sumX = 0;
+    let sumY = 0;
+    let sumXY = 0;
+    let sumXX = 0;
+
+    for (let i = 0; i < n; i++) {
+      const y = data[i];
+      const x = i; // X is just the game index (0, 1, 2...)
+      sumX += x;
+      sumY += y;
+      sumXY += x * y;
+      sumXX += x * x;
+    }
+
+    const denominator = (n * sumXX - sumX * sumX);
+    if (denominator === 0) return 0;
+
+    const slope = (n * sumXY - sumX * sumY) / denominator;
+    return Number(slope.toFixed(2));
   }
 
   /**

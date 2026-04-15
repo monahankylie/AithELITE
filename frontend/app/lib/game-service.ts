@@ -82,6 +82,12 @@ class GameService {
     }
   }
 
+  private extractDateFromId(gid: string): string {
+    if (!gid) return "";
+    const match = gid.match(/\d{8}/);
+    return match ? match[0] : "";
+  }
+
   /**
    * Fetches game stats for a specific internal athlete_id (player_id in game_stats).
    */
@@ -130,8 +136,16 @@ class GameService {
       } as BasketballGameStat;
     });
 
-    // Sort chronologically (Oldest to Newest) using normalized ISO strings
+    // Sort chronologically (Oldest to Newest)
+    // Primary: YYYYMMDD from game_id, Fallback: date field
     const sorted = games.sort((a, b) => {
+      const idDateA = this.extractDateFromId(a.game_id);
+      const idDateB = this.extractDateFromId(b.game_id);
+      
+      if (idDateA && idDateB && idDateA !== idDateB) {
+        return idDateA.localeCompare(idDateB);
+      }
+      
       const dateA = a.date || "";
       const dateB = b.date || "";
       return dateA.localeCompare(dateB);
@@ -182,6 +196,13 @@ class GameService {
 
     // Sort the aggregated list chronologically (Oldest to Newest)
     const sorted = allGames.sort((a, b) => {
+      const idDateA = this.extractDateFromId(a.game_id);
+      const idDateB = this.extractDateFromId(b.game_id);
+      
+      if (idDateA && idDateB && idDateA !== idDateB) {
+        return idDateA.localeCompare(idDateB);
+      }
+
       const dateA = a.date || "";
       const dateB = b.date || "";
       return dateA.localeCompare(dateB);
