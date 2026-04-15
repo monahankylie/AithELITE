@@ -22,12 +22,18 @@ const MarkerLabel = ({
   xValue, 
   label, 
   color, 
-  layer
+  layer,
+  isHovered,
+  onHover,
+  onLeave
 }: { 
   xValue: string; 
   label: string; 
   color: string; 
   layer: number;
+  isHovered: boolean;
+  onHover: () => void;
+  onLeave: () => void;
 }) => {
   const chartId = useChartId();
   const xScale = useXScale('h-axis');
@@ -37,21 +43,24 @@ const MarkerLabel = ({
   const xPos = (xScale(xValue) ?? 0) + (xScale.bandwidth?.() ?? 0) / 2;
   
   // Stagger labels vertically based on their assigned layer.
-  // Base offset is 30px from top, each layer adds 18px of depth.
   const baseTop = 30; 
   const offsetPerLayer = 18;
   const yPos = baseTop + (layer * offsetPerLayer);
 
   return (
-    <g>
+    <g 
+      onMouseEnter={onHover} 
+      onMouseLeave={onLeave} 
+      style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+    >
       {/* Small tick mark to connect label to the dashed line if deeply staggered */}
       {layer > 0 && (
         <line 
           x1={xPos} y1={baseTop} 
           x2={xPos} y2={yPos - 8} 
           stroke={color} 
-          strokeWidth={1} 
-          strokeOpacity={0.4}
+          strokeWidth={isHovered ? 2 : 1} 
+          strokeOpacity={isHovered ? 1 : 0.4}
         />
       )}
       <text
@@ -60,13 +69,15 @@ const MarkerLabel = ({
         fill={color}
         textAnchor="middle"
         style={{ 
-          fontSize: 10, 
+          fontSize: isHovered ? 11 : 10, 
           fontWeight: 900, 
           fontFamily: 'Inter',
           paintOrder: 'stroke',
           stroke: 'white',
-          strokeWidth: 3,
-          strokeLinejoin: 'round'
+          strokeWidth: isHovered ? 4 : 3,
+          strokeLinejoin: 'round',
+          opacity: isHovered ? 1 : 0.8,
+          transition: 'all 0.2s'
         }}
       >
         {label}
@@ -85,6 +96,7 @@ const StatHistogramChart: React.FC<StatHistogramChartProps> = ({
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [size, setSize] = React.useState({ width: 0, height: initialHeight || 400 });
+  const [hoveredMarkerIdx, setHoveredMarkerIdx] = React.useState<number | null>(null);
 
   React.useEffect(() => {
     if (!containerRef.current) return;
@@ -142,17 +154,16 @@ const StatHistogramChart: React.FC<StatHistogramChartProps> = ({
     const { points } = histogram;
     const chartWidth = size.width - 50; // Approximating usable chart width
     const binWidthPx = xAxisData.length > 0 ? chartWidth / xAxisData.length : 0;
-    const MIN_LABEL_GAP_PX = 65; // Minimum horizontal space a name needs
+    
+    // INCREASED GAP: Full names + Position + Percentile need more horizontal room
+    const MIN_LABEL_GAP_PX = 150; 
 
     // 1. Map all valid markers to their bin index and approximate X pixel position
     const placed: { label: string; color: string; xPos: number; xValue: string; originalIdx: number; layer: number }[] = [];
 
     markers.forEach((m, idx) => {
       let binIdx = -1;
-      // Find which point interval the value falls into
       for (let i = 0; i < points.length - 1; i++) {
-        // Use inclusive start, exclusive end for most bins
-        // For the very last bin, include the end point
         const isLastBin = i === points.length - 2;
         if (m.value >= points[i] && (isLastBin ? m.value <= points[i+1] : m.value < points[i+1])) {
           binIdx = i;
@@ -163,7 +174,9 @@ const StatHistogramChart: React.FC<StatHistogramChartProps> = ({
       if (binIdx !== -1) {
         const processedBinIdx = Math.min(Math.floor(binIdx / binWindow), xAxisData.length - 1);
         const xValue = xAxisData[processedBinIdx];
-        const xPosPx = processedBinIdx * binWidthPx;
+        
+        // Calculate center of bin for X position
+        const xPosPx = (processedBinIdx * binWidthPx) + (binWidthPx / 2);
         
         placed.push({ ...m, xPos: xPosPx, xValue, originalIdx: idx, layer: 0 });
       }
@@ -172,24 +185,29 @@ const StatHistogramChart: React.FC<StatHistogramChartProps> = ({
     // 2. Sort by X position so we can process left-to-right
     placed.sort((a, b) => a.xPos - b.xPos);
 
-    // 3. Assign layers greedily. If a marker is too close to anyone in a lower layer, bump it up.
+    // 3. Assign layers greedily. 
+    // If a marker is too close to anyone in ANY existing layer, find the first free layer.
     placed.forEach((current, i) => {
       let layer = 0;
-      let collision = true;
+      let foundLayer = false;
 
-      while (collision) {
-        collision = false;
-        // Check previous markers that might overlap at this layer
+      while (!foundLayer) {
+        let hasCollisionInLayer = false;
         for (let j = 0; j < i; j++) {
           const prev = placed[j];
           if (prev.layer === layer) {
             const distance = Math.abs(current.xPos - prev.xPos);
             if (distance < MIN_LABEL_GAP_PX) {
-              collision = true;
-              layer++;
+              hasCollisionInLayer = true;
               break;
             }
           }
+        }
+        
+        if (!hasCollisionInLayer) {
+          foundLayer = true;
+        } else {
+          layer++;
         }
       }
       current.layer = layer;
@@ -254,17 +272,22 @@ const StatHistogramChart: React.FC<StatHistogramChartProps> = ({
         }}
       >
         {/* Draw the reference lines */}
-        {markersWithLayers.map((m) => (
-          <ChartsReferenceLine
-            key={`line-${m.originalIdx}`}
-            x={m.xValue}
-            lineStyle={{ 
-              stroke: m.color, 
-              strokeWidth: 2, 
-              strokeDasharray: '4 4' 
-            }}
-          />
-        ))}
+        {markersWithLayers.map((m) => {
+          const isHovered = hoveredMarkerIdx === m.originalIdx;
+          return (
+            <ChartsReferenceLine
+              key={`line-${m.originalIdx}`}
+              x={m.xValue}
+              lineStyle={{ 
+                stroke: m.color, 
+                strokeWidth: isHovered ? 3 : 2, 
+                strokeDasharray: isHovered ? 'none' : '4 4',
+                opacity: isHovered ? 1 : 0.6,
+                transition: 'all 0.2s'
+              }}
+            />
+          );
+        })}
 
         {/* Draw the labels with collision-aware layers */}
         {markersWithLayers.map((m) => (
@@ -274,6 +297,9 @@ const StatHistogramChart: React.FC<StatHistogramChartProps> = ({
             label={m.label}
             color={m.color}
             layer={m.layer}
+            isHovered={hoveredMarkerIdx === m.originalIdx}
+            onHover={() => setHoveredMarkerIdx(m.originalIdx)}
+            onLeave={() => setHoveredMarkerIdx(null)}
           />
         ))}
       </BarChart>

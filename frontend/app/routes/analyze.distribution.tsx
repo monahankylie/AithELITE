@@ -4,11 +4,8 @@ import {
   Box, 
   Typography,
   CircularProgress,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
   Checkbox,
+  Stack,
   type SelectChangeEvent
 } from '@mui/material';
 import type { Athlete, AggregatedStats } from "../lib/athlete-types";
@@ -16,6 +13,7 @@ import { aggStatsService } from "../lib/agg-stats-service";
 import StatHistogramChart from "../components/stat-histogram-chart";
 import { DEFAULT_METRICS, ALL_BASKETBALL_METRICS } from "../lib/relevant-metrics";
 import { athleteFormatter } from "../lib/athlete-formatter";
+import AppDropdown from "../components/app-dropdown";
 
 interface AnalyzeContext {
   players: Athlete[];
@@ -92,7 +90,9 @@ export default function AnalyzeDistribution() {
   if (loading) return null;
 
   const histogram = aggData?.histograms[selectedMetric];
-  const metricName = DEFAULT_METRICS.find(m => m.key === selectedMetric)?.name || selectedMetric;
+  const metricDef = ALL_BASKETBALL_METRICS.find(m => m.key === selectedMetric);
+  const metricName = metricDef?.name || selectedMetric;
+  const isPercentage = metricDef?.isPercentage || false;
 
   const markers = React.useMemo(() => {
     if (!histogram || !histogram.counts || !histogram.points) return [];
@@ -102,40 +102,49 @@ export default function AnalyzeDistribution() {
 
     return players
       .filter(p => !hiddenIds.includes(p.id))
-      .map(p => {
-        // USE MOST RECENT DATA (currentStats) instead of aggregateStats
-        const stats = p.currentStats || athleteFormatter.aggregateStats(p);
-        const val = (stats as any)?.[selectedMetric];
-        if (typeof val !== 'number') return null;
+      .flatMap(p => {
+        return p.records.map((record: any) => {
+          const val = record[selectedMetric];
+          if (typeof val !== 'number') return null;
 
-        // Calculate Percentile
-        let countBelow = 0;
-        const { points, counts } = histogram;
-        for (let i = 0; i < counts.length; i++) {
-          if (val > points[i + 1]) {
-            countBelow += counts[i];
-          } else {
-            // Linear interpolation for more accuracy within the bin
-            const binWidth = points[i + 1] - points[i];
-            if (binWidth > 0) {
-              const fraction = (val - points[i]) / binWidth;
-              countBelow += counts[i] * Math.max(0, Math.min(1, fraction));
+          // Calculate Percentile
+          let countBelow = 0;
+          const { points, counts } = histogram;
+          for (let i = 0; i < counts.length; i++) {
+            if (val > points[i + 1]) {
+              countBelow += counts[i];
+            } else {
+              // Linear interpolation for more accuracy within the bin
+              const binWidth = points[i + 1] - points[i];
+              if (binWidth > 0) {
+                const fraction = (val - points[i]) / binWidth;
+                countBelow += counts[i] * Math.max(0, Math.min(1, fraction));
+              }
+              break;
             }
-            break;
           }
-        }
-        
-        const percentile = (countBelow / totalCount) * 100;
-        const roundedPercentile = Math.round(percentile);
-        const percentileLabel = percentile > 99 ? "Top 1%" : `${getOrdinalSuffix(roundedPercentile)}`;
+          
+          const percentile = (countBelow / totalCount) * 100;
+          const roundedPercentile = Math.round(percentile);
+          
+          // CLEANER LABEL LOGIC:
+          // If > 99, use "Top 1%". Otherwise use ordinal like "95th".
+          const percentileBrief = percentile > 99 ? "Top 1%" : getOrdinalSuffix(roundedPercentile);
+          
+          // Add year shorthand, e.g. '26
+          const yearSuffix = record.year ? ` '${record.year.split('-')[0]}` : '';
+          
+          // Add positions to markers
+          const posSuffix = record.positions?.length ? ` [${record.positions.join('/')}]` : '';
 
-        return {
-          value: val,
-          color: playerColors[p.id],
-          label: `${p.lastName || p.name.split(' ').pop() || ''} (${percentileLabel})`,
-          percentile: percentile
-        };
-      }).filter((m): m is { value: number; color: string; label: string; percentile: number } => m !== null);
+          return {
+            value: val,
+            color: playerColors[p.id],
+            label: `${p.lastName || p.name.split(' ').pop() || ''}${yearSuffix}${posSuffix} (${percentileBrief})`,
+            percentile: percentile
+          };
+        }).filter((m): m is { value: number; color: string; label: string; percentile: number } => m !== null);
+      });
   }, [players, histogram, selectedMetric, playerColors, hiddenIds]);
 
   return (
@@ -144,48 +153,56 @@ export default function AnalyzeDistribution() {
       border: '1px solid', 
       borderColor: 'divider', 
       backgroundColor: 'white', 
-      p: '5px', // Exact 5px padding from box edge
+      p: 8, // Standard padding to match others
       boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
       width: '100%',
-      overflow: 'hidden'
     }}>
       {/* Header Section */}
-      <Box sx={{ p: 3, pb: 2, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: 'flex-end', justifyContent: 'between', gap: 4 }}>
-        <Box sx={{ flex: 1 }}>
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <div>
           <Typography sx={{ fontSize: '0.75rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.25em', color: '#00599c' }}>
             Benchmark Distribution
           </Typography>
           <Typography variant="h4" sx={{ mt: 1, fontWeight: 900, letterSpacing: '-0.02em', color: '#0f172a' }}>
             Production Spread
           </Typography>
-        </Box>
+        </div>
 
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <FormControl size="small" sx={{ minWidth: 120 }}>
-            <InputLabel>Smoothness</InputLabel>
-            <Select value={String(binWindow)} label="Smoothness" onChange={handleBinWindowChange} sx={{ borderRadius: '12px', fontWeight: 700 }}>
-              <MenuItem value="1">Original (100)</MenuItem>
-              <MenuItem value="2">Smooth (50)</MenuItem>
-              <MenuItem value="4">Blocky (25)</MenuItem>
-              <MenuItem value="10">Aggressive (10)</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Position Group</InputLabel>
-            <Select value={selectedPosition} label="Position Group" onChange={handlePositionChange} sx={{ borderRadius: '12px', fontWeight: 700 }}>
-              {availablePositions.map(pos => <MenuItem key={pos} value={pos}>{pos === "All" ? "All Players" : pos}</MenuItem>)}
-            </Select>
-          </FormControl>
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Metric</InputLabel>
-            <Select value={selectedMetric} label="Metric" onChange={handleMetricChange} sx={{ borderRadius: '12px', fontWeight: 700 }}>
-              {ALL_BASKETBALL_METRICS.map(m => (
-                <MenuItem key={m.key} value={m.key}>{m.name}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
-      </Box>
+        <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', gap: 2 }}>
+          <AppDropdown
+            label="Smoothness"
+            value={String(binWindow)}
+            onChange={handleBinWindowChange}
+            options={[
+              { value: '1', label: 'Original (100)' },
+              { value: '2', label: 'Smooth (50)' },
+              { value: '4', label: 'Blocky (25)' },
+              { value: '10', label: 'Aggressive (10)' },
+            ]}
+            minWidth={160}
+          />
+          <AppDropdown
+            label="Position Group"
+            value={selectedPosition}
+            onChange={handlePositionChange}
+            options={availablePositions.map(pos => ({
+              value: pos,
+              label: pos === "All" ? "All Players" : pos
+            }))}
+            minWidth={180}
+          />
+          <AppDropdown
+            label="Metric"
+            value={selectedMetric}
+            onChange={handleMetricChange}
+            options={ALL_BASKETBALL_METRICS.map(m => ({
+              value: m.key,
+              label: m.name
+            }))}
+            minWidth={180}
+          />
+        </Stack>
+      </div>
 
       {fetchingAgg ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}><CircularProgress size={40} sx={{ color: '#00599c' }} /></Box>
@@ -219,7 +236,7 @@ export default function AnalyzeDistribution() {
           }}>
             <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
               <Typography sx={{ fontSize: '0.7rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#64748b', mb: 2 }}>
-                Athlete Placement
+                Athlete Placement <span style={{ fontWeight: 500, opacity: 0.6 }}>(Most Recent Record)</span>
               </Typography>
               
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, flex: 1, overflowY: 'auto' }}>
@@ -271,12 +288,12 @@ export default function AnalyzeDistribution() {
                             textOverflow: 'ellipsis',
                             '&:hover': { color: '#00599c' }
                           }}>
-                            {p.lastName || p.name.split(' ').pop()}
+                            {p.name} {stats.positions?.length ? `(${stats.positions.join('/')})` : ''}
                           </Typography>
                         </Link>
                         {!isHidden && percentileText && (
                           <Typography sx={{ fontSize: '0.65rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                            {percentileText} Percentile
+                            {percentileText.includes('%') ? percentileText : `${percentileText} Percentile`}
                           </Typography>
                         )}
                       </Box>
@@ -289,12 +306,25 @@ export default function AnalyzeDistribution() {
               </Box>
               
               <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-                <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#64748b', mb: 0.5 }}>
-                  Group Average
-                </Typography>
-                <Typography sx={{ fontSize: '1.5rem', fontWeight: 900, color: '#0f172a', lineHeight: 1 }}>
-                  {(aggData.avg as any)[selectedMetric]?.toFixed(2) || '—'}
-                </Typography>
+                <Box sx={{ mb: 3 }}>
+                  <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#64748b', mb: 0.5 }}>
+                    25-75% of Players Have
+                  </Typography>
+                  <Typography sx={{ fontSize: '1.5rem', fontWeight: 900, color: '#0f172a', lineHeight: 1 }}>
+                    {(aggData.f_quartile as any)[selectedMetric]?.toFixed(1)}{isPercentage ? '%' : ''} – {(aggData.t_quartile as any)[selectedMetric]?.toFixed(1)}{isPercentage ? '%' : ''}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 700 }}>{metricName}</Typography>
+                </Box>
+
+                <Box>
+                  <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#64748b', mb: 0.5 }}>
+                    All Players Have An Average Of
+                  </Typography>
+                  <Typography sx={{ fontSize: '1.5rem', fontWeight: 900, color: '#0f172a', lineHeight: 1 }}>
+                    {(aggData.avg as any)[selectedMetric]?.toFixed(2) || '—'}{isPercentage ? '%' : ''}
+                  </Typography>
+                  <Typography sx={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 700 }}>{metricName}</Typography>
+                </Box>
               </Box>
             </Box>
           </Box>
