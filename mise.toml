@@ -1,0 +1,15 @@
+[tools]
+python = "3.14"
+uv = "latest"
+
+[env]
+_.python.venv = { path = ".venv", create = true }
+
+[settings]
+experimental = true # for uv venv auto and watch_file_hooks
+python.uv_venv_auto = true # venv changes with working directory
+install_before = "7d" # 7 day cooldown for tool installs
+
+[shell_alias]
+pip = "echo Using uv.; uv pip"
+pip3 = "echo Using uv.; uv pip"
