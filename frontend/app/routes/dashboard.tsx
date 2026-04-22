@@ -27,8 +27,11 @@ const DashboardPage = () => {
     async function fetchInitial() {
       setLoading(true);
       try {
-        // Updated to use standardized clinical method
-        const result = await athleteService.fetchAthletes(10);
+        // Updated to use standardized clinical method with sorting
+        const result = await athleteService.fetchFilteredAthletes({
+          sortBy: "composition_rating",
+          sortDirection: "desc"
+        }, 10);
         setPlayers(result.players);
       } catch (error) {
         console.error("Dashboard athlete load failed:", error);
@@ -73,7 +76,15 @@ const DashboardPage = () => {
           const fetched = await Promise.all(
             list.playerIds.map(id => athleteService.fetchAthleteById(id))
           );
-          setWatchlistPlayers(fetched);
+          
+          // Sort watchlist players by composition rating descending
+          const sorted = [...fetched].sort((a, b) => {
+            const valA = a.compositionRating ?? 0;
+            const valB = b.compositionRating ?? 0;
+            return valB - valA;
+          });
+          
+          setWatchlistPlayers(sorted);
         } else {
           setWatchlistPlayers([]);
         }

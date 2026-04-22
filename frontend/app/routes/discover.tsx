@@ -15,7 +15,7 @@ import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 
 import WatchlistPopup from "../components/watchlist-popup";
 
-const POSITIONS = ["PG", "SG", "SF", "PF", "C", "G", "F", "MB", "OH", "S", "L"];
+const POSITIONS = ["PG", "SG", "SF", "PF", "C", "G", "F"];
 const GRAD_YEARS = ["2025", "2026", "2027", "2028"];
 
 export default function DiscoverPage() {
